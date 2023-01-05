@@ -4,7 +4,8 @@ module.exports = {
       name: "Wheel of Styles",
       script: "npx",
       interpreter: "none",
-      args: "serve -p 8443 -T",
+      args: "serve -s build -l 4000",
+      watch: true,
     },
   ],
 };
