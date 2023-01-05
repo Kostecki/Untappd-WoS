@@ -9,12 +9,12 @@ RUN npm install --production
 COPY . .
 
 RUN --mount=type=secret,id=CLIENT_ID \
-  export CLIENT_ID=$(cat /run/secrets/CLIENT_ID) \
-  echo "Secret is $(cat /run/secrets/CLIENT_ID)"
+  export CLIENT_ID=$(cat /run/secrets/CLIENT_ID) && \
+  echo $CLIENT_ID
 
 RUN --mount=type=secret,id=CLIENT_SECRET \
-  export CLIENT_SECRET=$(cat /run/secrets/CLIENT_SECRET) \
-  echo "Secret is $(cat /run/secrets/CLIENT_SECRET)"
+  export CLIENT_SECRET=$(cat /run/secrets/CLIENT_SECRET) && \
+  echo $CLIENT_SECRET
 
 RUN npm run build
 
