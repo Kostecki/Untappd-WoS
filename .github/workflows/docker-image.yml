@@ -37,6 +37,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v1.3.0
+        with:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}"
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
@@ -44,9 +50,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          secrets: |
-            "CLIENT_ID=${{ secrets.CLIENT_ID }}"
-            "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}"
       
       - name: Ping Portainer
         uses: fjogeleit/http-request-action@v1
