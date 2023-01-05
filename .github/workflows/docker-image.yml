@@ -42,11 +42,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: kostecki/untappd-wos:latest
           labels: ${{ steps.meta.outputs.labels }}
           secrets: |
-            CLIENT_ID=${{ secrets.CLIENT_ID }}
-            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+            "CLIENT_ID=${{ secrets.CLIENT_ID }}"
+            "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}"
       
       - name: Ping Portainer
         uses: fjogeleit/http-request-action@v1
