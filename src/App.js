@@ -119,6 +119,8 @@ function App() {
   const logOut = () => {
     removeCookie("accessToken");
     setAuthData({ username: null, password: null, accessToken: null });
+    setStyles(null);
+    setUserData(null);
   };
 
   useEffect(() => {
