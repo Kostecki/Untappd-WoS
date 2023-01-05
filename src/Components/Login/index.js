@@ -67,7 +67,12 @@ function Login({ authData, setAuthData }) {
         />
       </div>
       <Box sx={{ textAlign: "right" }}>
-        <Button sx={{ mt: 4 }} variant="outlined" onClick={handleClick}>
+        <Button
+          disabled={!username || !password}
+          sx={{ mt: 4 }}
+          variant="outlined"
+          onClick={handleClick}
+        >
           Login
         </Button>
       </Box>
