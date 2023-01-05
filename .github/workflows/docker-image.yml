@@ -40,8 +40,8 @@ jobs:
       - name: Create .env file
         uses: SpicyPizza/create-envfile@v1.3.0
         with:
-          envkey_CLIENT_ID: ${{ secrets.CLIENT_ID }}"
-          envkey_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}"
+          envkey_REACT_APP_CLIENT_ID: ${{ secrets.CLIENT_ID }}"
+          envkey_REACT_APP_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}"
           fail_on_empty: true
 
       - name: Build and push Docker image
