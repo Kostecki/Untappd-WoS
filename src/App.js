@@ -22,12 +22,12 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import LogoutIcon from "@mui/icons-material/Logout";
-import CircularProgress from "@mui/material/CircularProgress";
 
 import Login from "./Components/Login";
 import TR from "./Components/TableRow";
 import Auth from "./Auth/Auth";
 import CustomTextProgressbar from "./Components/CustomTextProgressbar";
+import Spinner from "./Components/Spinner";
 
 import "react-circular-progressbar/dist/styles.css";
 import "./App.css";
@@ -155,7 +155,7 @@ function App() {
           )}
         {loading && (
           <Box sx={{ display: "flex", m: 2 }}>
-            <CircularProgress size={100} />
+            <Spinner />
           </Box>
         )}
 

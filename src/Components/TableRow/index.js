@@ -12,7 +12,8 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
+
+import Spinner from "../Spinner";
 
 function TR({ style, apiBaseURL, authData }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -100,8 +101,8 @@ function TR({ style, apiBaseURL, authData }) {
           unmountOnExit
         >
           {isLoading && (
-            <Box sx={{ display: "flex", m: 2 }}>
-              <CircularProgress />
+            <Box sx={{ display: "flex", m: 2, height: 60, width: 60 }}>
+              <Spinner />
             </Box>
           )}
           {!isLoading && (
