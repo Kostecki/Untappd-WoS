@@ -16,12 +16,18 @@ function Login({ authData, setAuthData }) {
     setPassword(event.target.value);
   };
 
-  const handleClick = () => {
-    setAuthData({
-      ...authData,
-      username,
-      password,
-    });
+  const handleClick = (event) => {
+    if (
+      username &&
+      password &&
+      (event.type === "click" || event.keyCode === 13)
+    ) {
+      setAuthData({
+        ...authData,
+        username,
+        password,
+      });
+    }
   };
 
   return (
@@ -54,6 +60,7 @@ function Login({ authData, setAuthData }) {
           label="Username"
           value={username}
           onChange={handleUsername}
+          onKeyDown={handleClick}
         />
       </div>
       <div>
@@ -64,6 +71,7 @@ function Login({ authData, setAuthData }) {
           type="password"
           value={password}
           onChange={handlePassword}
+          onKeyDown={handleClick}
         />
       </div>
       <Box sx={{ textAlign: "right" }}>
