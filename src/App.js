@@ -45,6 +45,7 @@ function App() {
     accessToken: null,
   });
 
+  const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [haveHadCount, setHaveHadCount] = useState(0);
@@ -139,6 +140,18 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cookies, authData.accessToken]);
 
+  useEffect(() => {
+    function handleResize() {
+      const width = window.innerWidth;
+      setIsMobile(width < 800);
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -165,8 +178,8 @@ function App() {
           userData &&
           userData.first_name && (
             <Container>
-              <Grid container spacing={2}>
-                <Grid xs={6} sx={{ my: 3 }}>
+              <Grid container spacing={2} className="cards">
+                <Grid xs={12} md={6} sx={{ mt: 2 }} className="table">
                   <TableContainer
                     component={Paper}
                     sx={{ maxHeight: document.body.scrollHeight - 100 }}
@@ -208,7 +221,7 @@ function App() {
                     </Table>
                   </TableContainer>
                 </Grid>
-                <Grid xs={6} sx={{ my: 2, p: 2 }}>
+                <Grid xs={12} md={6} sx={{ mt: 2 }}>
                   <Paper sx={{ mb: 2, p: 2 }}>
                     <Box
                       sx={{
@@ -240,6 +253,7 @@ function App() {
                     </Box>
                     <Box
                       sx={{ display: "flex", justifyContent: "space-between" }}
+                      className="actions"
                     >
                       <FormGroup>
                         <FormControlLabel
@@ -260,7 +274,11 @@ function App() {
                       <Divider />
                     </Box>
                     <Box>
-                      <Typography variant="h6" sx={{ textAlign: "left" }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ textAlign: "left" }}
+                        className="badge-title"
+                      >
                         Wheel of Styles
                       </Typography>
                       <Box
@@ -275,6 +293,7 @@ function App() {
                             justifyContent: "center",
                             py: 3,
                           }}
+                          className="style-progress"
                         >
                           <CustomTextProgressbar
                             strokeWidth={4}
@@ -282,12 +301,15 @@ function App() {
                             maxValue={Math.floor(
                               styles.length / checkinsPerLevel
                             )}
+                            mobile={isMobile}
                           >
                             <div
                               style={{
                                 fontSize: 16,
                                 fontWeight: "bold",
                                 marginBottom: 4,
+                                position: isMobile ? "absolute" : "relative",
+                                top: isMobile ? "-50px" : "unset",
                               }}
                             >
                               Level progress
@@ -305,17 +327,21 @@ function App() {
                             justifyContent: "center",
                             py: 3,
                           }}
+                          className="style-progress"
                         >
                           <CustomTextProgressbar
                             strokeWidth={4}
                             value={haveHadCount}
                             maxValue={totalStyles}
+                            mobile={isMobile}
                           >
                             <div
                               style={{
                                 fontSize: 16,
                                 fontWeight: "bold",
                                 marginBottom: 4,
+                                position: isMobile ? "absolute" : "relative",
+                                top: isMobile ? "-50px" : "unset",
                               }}
                             >
                               Style progress
@@ -330,7 +356,8 @@ function App() {
                                 fontStyle: "italic",
                               }}
                             >
-                              Missing: {totalStyles - haveHadCount}
+                              Missing: {isMobile && <br />}{" "}
+                              {totalStyles - haveHadCount}
                             </div>
                           </CustomTextProgressbar>
                         </Box>
@@ -340,17 +367,21 @@ function App() {
                             justifyContent: "center",
                             py: 3,
                           }}
+                          className="style-progress"
                         >
                           <CustomTextProgressbar
                             strokeWidth={4}
                             value={calcLeftToNextLevel()}
                             maxValue={checkinsPerLevel}
+                            mobile={isMobile}
                           >
                             <div
                               style={{
                                 fontSize: 16,
                                 fontWeight: "bold",
                                 marginBottom: 4,
+                                position: isMobile ? "absolute" : "relative",
+                                top: isMobile ? "-50px" : "unset",
                               }}
                             >
                               To next level
