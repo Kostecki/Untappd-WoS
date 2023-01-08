@@ -8,7 +8,7 @@ function CustomTextProgressbar(props) {
       style={{
         position: "relative",
         width: "145px",
-        height: "145px",
+        height: props.mobile ? "100px" : "145px",
       }}
     >
       <div style={{ position: "absolute" }}>

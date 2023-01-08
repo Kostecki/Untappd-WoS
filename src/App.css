@@ -41,3 +41,30 @@
 .bold-text {
   font-weight: bold;
 }
+
+@media (max-width: 899px) {
+  .cards {
+    flex-direction: column-reverse !important;
+    margin-bottom: 14px !important;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    margin-top: 15px;
+  }
+
+  .badge-title {
+    margin-bottom: 50px !important;
+  }
+
+  .style-progress {
+    width: calc(90% / 3)
+  }
+
+  .table {
+    margin-top: 0 !important;
+  }
+}
