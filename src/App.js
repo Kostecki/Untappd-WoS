@@ -1,33 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-import {
-  Container,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Switch,
-  Button,
-  FormGroup,
-  FormControlLabel,
-  Avatar,
-  IconButton,
-  Divider,
-} from "@mui/material";
+import { Container, Box, Paper } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import LogoutIcon from "@mui/icons-material/Logout";
+import { debounce } from "@mui/material/utils";
 
-import Login from "./Components/Login";
-import TR from "./Components/TableRow";
 import Auth from "./Auth/Auth";
-import CustomTextProgressbar from "./Components/CustomTextProgressbar";
 import Spinner from "./Components/Spinner";
+import Login from "./Components/Login";
+import StylesTable from "./Components/StylesTable";
+import Dashboard from "./Components/Dashboard/Index";
+import VenueSearch from "./Components/VenueSearch";
 
 import "react-circular-progressbar/dist/styles.css";
 import "./App.css";
@@ -45,12 +28,17 @@ function App() {
     accessToken: null,
   });
 
-  const [isMobile, setIsMobile] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [getVenuesLoading, setGetVenuesLoading] = useState(false);
+  const [getVenueBeersLoading, setGetVenueBeersLoading] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
   const [userData, setUserData] = useState(null);
   const [haveHadCount, setHaveHadCount] = useState(0);
   const [styles, setStyles] = useState(null);
   const [showHaveHad, setShowHaveHad] = useState(false);
+  const [venueBeers, setVenueBeers] = useState([]);
+  const [options, setOptions] = useState([]);
 
   const calcLeftToNextLevel = () => haveHadCount % checkinsPerLevel;
 
@@ -113,6 +101,82 @@ function App() {
       .catch((error) => console.error("Error:", error));
   };
 
+  const searchVenues = debounce((query) => {
+    if (!query || query === "") return setOptions([]);
+
+    setGetVenuesLoading(true);
+
+    fetch(
+      `${apiBaseURL}/search/venue?q=${query}&access_token=${authData.accessToken}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          const options = data.response.venues.items.map((e) => e.venue);
+          const sorted = options.sort((a, b) => {
+            if (
+              a.venue_country === "Danmark" &&
+              b.venue_country !== "Danmark"
+            ) {
+              return -1;
+            }
+
+            if (
+              a.venue_country !== "Danmark" &&
+              b.venue_country === "Danmark"
+            ) {
+              return 1;
+            }
+
+            return 0;
+          });
+
+          setOptions(sorted);
+          setGetVenuesLoading(false);
+        }
+      })
+      .catch((error) => {
+        setGetVenuesLoading(false);
+        console.error("Error:", error);
+      });
+  }, 500);
+
+  const getVenueBeers = (venue) => {
+    if (!venue) return setVenueBeers([]);
+
+    setGetVenueBeersLoading(true);
+    const { venue_id, venue_name, venue_slug } = venue;
+
+    fetch(
+      `${apiBaseURL}/inventory/view/${venue_id}?hasNotHadBefore=true&access_token=${authData.accessToken}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        const beers = [];
+
+        data.response.items.forEach((e) => {
+          const list = [];
+
+          e.menu.sections.items.forEach((items) => list.push(...items.items));
+
+          beers.push({
+            beers: list,
+            menu: e.menu.menu_name,
+            venueId: venue_id,
+            venueName: venue_name,
+            venueSlug: venue_slug,
+          });
+        });
+
+        setVenueBeers(beers);
+        setGetVenueBeersLoading(false);
+      })
+      .catch((error) => {
+        setGetVenueBeersLoading(false);
+        console.error("Error:", error);
+      });
+  };
+
   const toggleHaveHad = (event) => {
     setShowHaveHad(event.target.checked);
   };
@@ -137,6 +201,7 @@ function App() {
     if (!styles) {
       getStylesHad();
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cookies, authData.accessToken]);
 
@@ -151,6 +216,8 @@ function App() {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // TODO: Move props around 🤷‍♂️
 
   return (
     <div className="App">
@@ -180,219 +247,39 @@ function App() {
             <Container>
               <Grid container spacing={2} className="cards">
                 <Grid xs={12} md={6} sx={{ mt: 2 }} className="table">
-                  <TableContainer
-                    component={Paper}
-                    sx={{ maxHeight: document.body.scrollHeight - 100 }}
-                  >
-                    <Table stickyHeader>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Style</TableCell>
-                          <TableCell align="center" sx={{ width: 100 }}>
-                            Have Had
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {styles.map((style) => {
-                          if (showHaveHad) {
-                            return (
-                              <TR
-                                key={style.style_id}
-                                style={style}
-                                apiBaseURL={apiBaseURL}
-                                authData={authData}
-                              />
-                            );
-                          } else if (!style.had) {
-                            return (
-                              <TR
-                                key={style.style_id}
-                                style={style}
-                                apiBaseURL={apiBaseURL}
-                                authData={authData}
-                              />
-                            );
-                          } else {
-                            return "";
-                          }
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                  <StylesTable
+                    data={styles}
+                    showHaveHad={showHaveHad}
+                    apiBaseURL={apiBaseURL}
+                    authData={authData}
+                  />
                 </Grid>
                 <Grid xs={12} md={6} sx={{ mt: 2 }}>
                   <Paper sx={{ mb: 2, p: 2 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Avatar
-                          sx={{ mr: 1 }}
-                          alt={`${userData.first_name} ${userData.last_name}`}
-                          src={userData.user_avatar}
-                        />
-                        <Typography>
-                          {userData.first_name} {userData.last_name}
-                        </Typography>
-                      </Box>
-                      <IconButton onClick={logOut} aria-label="logout">
-                        <LogoutIcon />
-                      </IconButton>
-                    </Box>
-                    <Box sx={{ my: 2 }}>
-                      <Divider />
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "space-between" }}
-                      className="actions"
-                    >
-                      <FormGroup>
-                        <FormControlLabel
-                          control={
-                            <Switch
-                              checked={showHaveHad}
-                              onChange={toggleHaveHad}
-                            />
-                          }
-                          label='Show "have had"'
-                        />
-                      </FormGroup>
-                      <Button variant="outlined" onClick={getStylesHad}>
-                        Refresh data
-                      </Button>
-                    </Box>
-                    <Box sx={{ my: 2 }}>
-                      <Divider />
-                    </Box>
-                    <Box>
-                      <Typography
-                        variant="h6"
-                        sx={{ textAlign: "left" }}
-                        className="badge-title"
-                      >
-                        Wheel of Styles
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            py: 3,
-                          }}
-                          className="style-progress"
-                        >
-                          <CustomTextProgressbar
-                            strokeWidth={4}
-                            value={Math.floor(haveHadCount / checkinsPerLevel)}
-                            maxValue={Math.floor(
-                              styles.length / checkinsPerLevel
-                            )}
-                            mobile={isMobile}
-                          >
-                            <div
-                              style={{
-                                fontSize: 16,
-                                fontWeight: "bold",
-                                marginBottom: 4,
-                                position: isMobile ? "absolute" : "relative",
-                                top: isMobile ? "-50px" : "unset",
-                              }}
-                            >
-                              Level progress
-                            </div>
-                            <div style={{ fontSize: 14 }}>
-                              {Math.floor(haveHadCount / checkinsPerLevel)}
-                              {" / "}
-                              {Math.floor(styles.length / checkinsPerLevel)}
-                            </div>
-                          </CustomTextProgressbar>
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            py: 3,
-                          }}
-                          className="style-progress"
-                        >
-                          <CustomTextProgressbar
-                            strokeWidth={4}
-                            value={haveHadCount}
-                            maxValue={totalStyles}
-                            mobile={isMobile}
-                          >
-                            <div
-                              style={{
-                                fontSize: 16,
-                                fontWeight: "bold",
-                                marginBottom: 4,
-                                position: isMobile ? "absolute" : "relative",
-                                top: isMobile ? "-50px" : "unset",
-                              }}
-                            >
-                              Style progress
-                            </div>
-                            <div style={{ fontSize: 14 }}>
-                              {haveHadCount} / {totalStyles}
-                            </div>
-                            <div
-                              style={{
-                                fontSize: 14,
-                                marginTop: 5,
-                                fontStyle: "italic",
-                              }}
-                            >
-                              Missing: {isMobile && <br />}{" "}
-                              {totalStyles - haveHadCount}
-                            </div>
-                          </CustomTextProgressbar>
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            py: 3,
-                          }}
-                          className="style-progress"
-                        >
-                          <CustomTextProgressbar
-                            strokeWidth={4}
-                            value={calcLeftToNextLevel()}
-                            maxValue={checkinsPerLevel}
-                            mobile={isMobile}
-                          >
-                            <div
-                              style={{
-                                fontSize: 16,
-                                fontWeight: "bold",
-                                marginBottom: 4,
-                                position: isMobile ? "absolute" : "relative",
-                                top: isMobile ? "-50px" : "unset",
-                              }}
-                            >
-                              To next level
-                            </div>
-                            <div style={{ fontSize: 14 }}>
-                              {calcLeftToNextLevel()} / {checkinsPerLevel}
-                            </div>
-                          </CustomTextProgressbar>
-                        </Box>
-                      </Box>
-                    </Box>
+                    <Dashboard
+                      userData={userData}
+                      logOut={logOut}
+                      showHaveHad={showHaveHad}
+                      toggleHaveHad={toggleHaveHad}
+                      getStylesHad={getStylesHad}
+                      haveHadCount={haveHadCount}
+                      checkinsPerLevel={checkinsPerLevel}
+                      styles={styles}
+                      isMobile={isMobile}
+                      totalStyles={totalStyles}
+                      calcLeftToNextLevel={calcLeftToNextLevel}
+                    />
+                  </Paper>
+                  <Paper sx={{ mb: 2, p: 2 }}>
+                    <VenueSearch
+                      options={options}
+                      getVenueBeers={getVenueBeers}
+                      searchVenues={searchVenues}
+                      venueBeers={venueBeers}
+                      styles={styles}
+                      getVenuesLoading={getVenuesLoading}
+                      getVenueBeersLoading={getVenueBeersLoading}
+                    />
                   </Paper>
                 </Grid>
               </Grid>
