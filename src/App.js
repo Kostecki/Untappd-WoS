@@ -19,8 +19,6 @@ function App() {
   const [cookies, removeCookie] = useCookies(["wheel-of-styles"]);
 
   const apiBaseURL = "https://api.untappd.com/v4";
-  const checkinsPerLevel = 5;
-  const totalStyles = 244;
 
   const [authData, setAuthData] = useState({
     username: null,
@@ -28,33 +26,38 @@ function App() {
     accessToken: null,
   });
 
-  const [loading, setLoading] = useState(false);
+  const [getUserLoading, setGetUserLoading] = useState(false);
+  const [getStylesLoading, setGetStylesLoading] = useState(false);
   const [getVenuesLoading, setGetVenuesLoading] = useState(false);
   const [getVenueBeersLoading, setGetVenueBeersLoading] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [haveHadCount, setHaveHadCount] = useState(0);
-  const [styles, setStyles] = useState(null);
-  const [showHaveHad, setShowHaveHad] = useState(false);
+  const [styles, setStyles] = useState([]);
   const [venueBeers, setVenueBeers] = useState([]);
   const [options, setOptions] = useState([]);
-
-  const calcLeftToNextLevel = () => haveHadCount % checkinsPerLevel;
+  const [showHaveHad, setShowHaveHad] = useState(false);
 
   const getUserInfo = () => {
     if (authData.accessToken && authData.accessToken !== "undefined") {
-      setLoading(true);
+      setGetUserLoading(true);
 
       fetch(`${apiBaseURL}/user/info?access_token=${authData.accessToken}`)
         .then((response) => response.json())
-        .then((data) => setUserData(data.response.user));
+        .then((data) => {
+          setUserData(data.response.user);
+          setGetUserLoading(false);
+        })
+        .catch((error) => {
+          setGetUserLoading(false);
+          console.error("Error:", error);
+        });
     }
   };
 
   const getStylesHad = () => {
     if (authData.accessToken && authData.accessToken !== "undefined") {
-      setLoading(true);
+      setGetStylesLoading(true);
 
       fetch(
         `${apiBaseURL}/badges/view/995171674?access_token=${authData.accessToken}`
@@ -63,7 +66,6 @@ function App() {
         .then((data) => {
           const items = data.response.badge.special_status_list.items[0].items;
 
-          setHaveHadCount(items.length);
           const stylesHad = items.map((style) => ({
             style_id: style.item_id,
             style_name: style.item_name,
@@ -76,7 +78,7 @@ function App() {
   };
 
   const getStylesNotHad = (stylesHad) => {
-    setLoading(true);
+    setGetStylesLoading(true);
 
     fetch(
       `${apiBaseURL}/badges/styles_not_had?access_token=${authData.accessToken}`
@@ -96,7 +98,7 @@ function App() {
         );
         setStyles(payload);
 
-        setLoading(false);
+        setGetStylesLoading(false);
       })
       .catch((error) => console.error("Error:", error));
   };
@@ -177,28 +179,22 @@ function App() {
       });
   };
 
-  const toggleHaveHad = (event) => {
-    setShowHaveHad(event.target.checked);
-  };
-
   const logOut = () => {
     removeCookie("accessToken");
-    setAuthData({ username: null, password: null, accessToken: null });
-    setStyles(null);
-    setUserData(null);
+    window.location.reload();
   };
 
   useEffect(() => {
     if (cookies.accessToken && cookies.accessToken !== "undefined") {
       setAuthData({ ...authData, accessToken: cookies.accessToken });
-      setLoading(false);
+      setGetUserLoading(false);
     }
 
     if (!userData) {
       getUserInfo();
     }
 
-    if (!styles) {
+    if (!styles.length) {
       getStylesHad();
     }
 
@@ -217,8 +213,6 @@ function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // TODO: Move props around 🤷‍♂️
-
   return (
     <div className="App">
       <header className="App-header">
@@ -226,21 +220,20 @@ function App() {
           baseURL={apiBaseURL}
           authData={authData}
           setAuthData={setAuthData}
-          setLoading={setLoading}
+          setGetUserLoading={setGetUserLoading}
         />
 
-        {!loading &&
+        {!getUserLoading &&
           (!authData.accessToken || authData.accessToken === "undefined") && (
             <Login authData={authData} setAuthData={setAuthData} />
           )}
-        {loading && (
+        {(getUserLoading || getStylesLoading) && (
           <Box sx={{ display: "flex", m: 2 }}>
             <Spinner />
           </Box>
         )}
 
-        {!loading &&
-          styles &&
+        {!getStylesLoading &&
           styles.length > 0 &&
           userData &&
           userData.first_name && (
@@ -258,27 +251,23 @@ function App() {
                   <Paper sx={{ mb: 2, p: 2 }}>
                     <Dashboard
                       userData={userData}
-                      logOut={logOut}
                       showHaveHad={showHaveHad}
-                      toggleHaveHad={toggleHaveHad}
-                      getStylesHad={getStylesHad}
-                      haveHadCount={haveHadCount}
-                      checkinsPerLevel={checkinsPerLevel}
                       styles={styles}
                       isMobile={isMobile}
-                      totalStyles={totalStyles}
-                      calcLeftToNextLevel={calcLeftToNextLevel}
+                      setShowHaveHad={setShowHaveHad}
+                      getStylesHad={getStylesHad}
+                      logOut={logOut}
                     />
                   </Paper>
                   <Paper sx={{ mb: 2, p: 2 }}>
                     <VenueSearch
                       options={options}
-                      getVenueBeers={getVenueBeers}
                       searchVenues={searchVenues}
                       venueBeers={venueBeers}
                       styles={styles}
                       getVenuesLoading={getVenuesLoading}
                       getVenueBeersLoading={getVenueBeersLoading}
+                      getVenueBeers={getVenueBeers}
                     />
                   </Paper>
                 </Grid>

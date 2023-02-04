@@ -16,12 +16,12 @@ import "./VenueSearch.css";
 
 function VenueSearch({
   options,
-  getVenueBeers,
   searchVenues,
   venueBeers,
   styles,
   getVenuesLoading,
   getVenueBeersLoading,
+  getVenueBeers,
 }) {
   const [selectedVenue, setSelectedVenue] = useState(undefined);
   return (

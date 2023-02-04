@@ -2,7 +2,7 @@ import { Alert } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 
-function Auth({ baseURL, authData, setAuthData, setLoading }) {
+function Auth({ baseURL, authData, setAuthData, setGetUserLoading }) {
   const [cookies, setCookie] = useCookies(["wheel-of-styles"]);
   const [messageText, setMessageText] = useState(null);
   const [messageType, setMessageType] = useState(null);
@@ -12,7 +12,7 @@ function Auth({ baseURL, authData, setAuthData, setLoading }) {
   const deviceUDID = "9b5e46525304d62a";
 
   const authUser = () => {
-    setLoading(true);
+    setGetUserLoading(true);
 
     const formData = new FormData();
     formData.append("user_name", authData.username);
@@ -46,10 +46,10 @@ function Auth({ baseURL, authData, setAuthData, setLoading }) {
         setMessageText(null);
         setMessageType(null);
 
-        setLoading(false);
+        setGetUserLoading(false);
       })
       .catch((error) => {
-        setLoading(false);
+        setGetUserLoading(false);
         setAuthData({ username: null, password: null, accessToken: null });
         setMessageText(error.message);
         setMessageType("error");
