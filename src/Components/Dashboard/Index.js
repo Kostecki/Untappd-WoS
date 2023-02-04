@@ -17,17 +17,23 @@ import "./Dashboard.css";
 
 function Dashboard({
   userData,
-  logOut,
   showHaveHad,
-  toggleHaveHad,
-  getStylesHad,
-  haveHadCount,
-  checkinsPerLevel,
   styles,
   isMobile,
-  totalStyles,
-  calcLeftToNextLevel,
+  setShowHaveHad,
+  getStylesHad,
+  logOut,
 }) {
+  const haveHadCount = styles.filter((e) => e.had).length;
+  const checkinsPerLevel = 5;
+  const totalStyles = styles.length; // https://updates.untappd.com/post/688440770055766016/style-changes-h1-2022
+
+  const calcLeftToNextLevel = () => haveHadCount % checkinsPerLevel;
+
+  const toggleHaveHad = (event) => {
+    setShowHaveHad(event.target.checked);
+  };
+
   return (
     <>
       <Box
