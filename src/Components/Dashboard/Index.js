@@ -116,6 +116,7 @@ function Dashboard({
                   marginBottom: 4,
                   position: isMobile ? "absolute" : "relative",
                   top: isMobile ? "-50px" : "unset",
+                  textAlign: "center",
                 }}
               >
                 Level progress
@@ -148,6 +149,7 @@ function Dashboard({
                   marginBottom: 4,
                   position: isMobile ? "absolute" : "relative",
                   top: isMobile ? "-50px" : "unset",
+                  textAlign: "center",
                 }}
               >
                 Style progress
@@ -160,6 +162,7 @@ function Dashboard({
                   fontSize: 14,
                   marginTop: 5,
                   fontStyle: "italic",
+                  textAlign: "center",
                 }}
               >
                 Missing: {isMobile && <br />} {totalStyles - haveHadCount}
@@ -187,6 +190,7 @@ function Dashboard({
                   marginBottom: 4,
                   position: isMobile ? "absolute" : "relative",
                   top: isMobile ? "-50px" : "unset",
+                  textAlign: "center",
                 }}
               >
                 To next level
