@@ -193,7 +193,7 @@ function Dashboard({
                   textAlign: "center",
                 }}
               >
-                To next level
+                Level progress
               </div>
               <div style={{ fontSize: 14 }}>
                 {calcLeftToNextLevel()} / {checkinsPerLevel}
