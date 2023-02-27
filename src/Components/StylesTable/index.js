@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Table,
   TableBody,
@@ -6,10 +8,33 @@ import {
   TableHead,
   TableRow,
   Paper,
+  TextField,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
 import TR from "../TableRow";
 
 function StylesTable({ data, showHaveHad, apiBaseURL, authData }) {
+  const [tableData, setTableData] = useState(data);
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleChange = (input) => {
+    setSearchInput(input);
+
+    if (input) {
+      const result = data.filter((e) =>
+        e.style_name.toLowerCase().includes(input)
+      );
+      setTableData(result);
+    } else {
+      setTableData(data);
+    }
+  };
+
+  const handleClickClear = () => handleChange("");
+  const handleMouseDownClear = (event) => event.preventDefault();
+
   return (
     <TableContainer
       component={Paper}
@@ -18,14 +43,36 @@ function StylesTable({ data, showHaveHad, apiBaseURL, authData }) {
       <Table stickyHeader>
         <TableHead>
           <TableRow>
-            <TableCell>Style</TableCell>
+            <TableCell>
+              <TextField
+                value={searchInput}
+                label="Style"
+                variant="standard"
+                size="small"
+                onChange={(event) => {
+                  handleChange(event.target.value);
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={handleClickClear}
+                        onMouseDown={handleMouseDownClear}
+                      >
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </TableCell>
             <TableCell align="center" sx={{ width: 100 }}>
               Have Had
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((style) => {
+          {tableData.map((style) => {
             if (showHaveHad) {
               return (
                 <TR
