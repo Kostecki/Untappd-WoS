@@ -79,7 +79,6 @@ function App() {
             const badges = data.response.items;
             const wosBadge = badges.find((e) => e.badge_id === 5115);
             if (wosBadge) {
-              console.log(authData);
               updateWosBadgeIt(wosBadge.user_badge_id);
             } else {
               getBadgeId(offset + 50);
