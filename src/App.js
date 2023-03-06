@@ -11,7 +11,6 @@ import Login from "./Components/Login";
 import StylesTable from "./Components/StylesTable";
 import Dashboard from "./Components/Dashboard/Index";
 import VenueSearch from "./Components/VenueSearch";
-import Scanner from "./Components/Scanner";
 
 import "react-circular-progressbar/dist/styles.css";
 import "./App.css";
