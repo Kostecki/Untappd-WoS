@@ -17,7 +17,7 @@ import "react-circular-progressbar/dist/styles.css";
 import "./App.css";
 
 function App() {
-  const [cookies, removeCookie] = useCookies(["wheel-of-styles"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["wheel-of-styles"]);
 
   const apiBaseURL = "https://api.untappd.com/v4";
 
@@ -34,10 +34,21 @@ function App() {
 
   const [isMobile, setIsMobile] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [wosBadgeId, setWosBadgeId] = useState(null);
   const [styles, setStyles] = useState([]);
   const [venueBeers, setVenueBeers] = useState([]);
   const [options, setOptions] = useState([]);
   const [showHaveHad, setShowHaveHad] = useState(false);
+
+  const updateWosBadgeIt = (badgeId) => {
+    setWosBadgeId(badgeId);
+
+    const expires = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365);
+    setCookie(`wosBadgeId`, badgeId, {
+      path: "/",
+      expires,
+    });
+  };
 
   const getUserInfo = () => {
     if (authData.accessToken && authData.accessToken !== "undefined") {
@@ -56,12 +67,39 @@ function App() {
     }
   };
 
-  const getStylesHad = () => {
+  const getBadgeId = (offset = 0) => {
     if (authData.accessToken && authData.accessToken !== "undefined") {
+      fetch(
+        `${apiBaseURL}/user/badges?offset=${offset}&access_token=${authData.accessToken}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data.response.items) {
+            console.error("Couldn't find badge id for wheel of styles");
+          } else {
+            const badges = data.response.items;
+            const wosBadge = badges.find((e) => e.badge_id === 5115);
+            if (wosBadge) {
+              console.log(authData);
+              updateWosBadgeIt(wosBadge.user_badge_id);
+            } else {
+              getBadgeId(offset + 50);
+            }
+          }
+        });
+    }
+  };
+
+  const getStylesHad = () => {
+    if (
+      authData.accessToken &&
+      authData.accessToken !== "undefined" &&
+      wosBadgeId
+    ) {
       setGetStylesLoading(true);
 
       fetch(
-        `${apiBaseURL}/badges/view/995171674?access_token=${authData.accessToken}`
+        `${apiBaseURL}/badges/view/${wosBadgeId}?access_token=${authData.accessToken}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -195,6 +233,14 @@ function App() {
       getUserInfo();
     }
 
+    if (!wosBadgeId) {
+      if (cookies.wosBadgeId) {
+        setWosBadgeId(cookies.wosBadgeId);
+      } else {
+        getBadgeId();
+      }
+    }
+
     if (!styles.length) {
       getStylesHad();
     }
@@ -260,9 +306,9 @@ function App() {
                       logOut={logOut}
                     />
                   </Paper>
-                  <Paper sx={{ mb: 2, p: 2 }}>
+                  {/* <Paper sx={{ mb: 2, p: 2 }}>
                     <Scanner authData={authData} apiBaseURL={apiBaseURL} />
-                  </Paper>
+                  </Paper> */}
                   <Paper sx={{ mb: 2, p: 2 }}>
                     <VenueSearch
                       options={options}

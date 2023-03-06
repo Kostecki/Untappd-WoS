@@ -42,6 +42,10 @@ function Auth({ baseURL, authData, setAuthData, setGetUserLoading }) {
           path: "/",
           expires,
         });
+        setCookie("username", authData.username, {
+          path: "/",
+          expires,
+        });
         setAuthData({ ...authData, accessToken });
         setMessageText(null);
         setMessageType(null);
