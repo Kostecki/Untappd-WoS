@@ -220,6 +220,8 @@ function App() {
 
   const logOut = () => {
     removeCookie("accessToken");
+    removeCookie("username");
+    removeCookie("wosBadgeId");
     window.location.reload();
   };
 
