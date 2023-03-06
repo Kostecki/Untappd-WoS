@@ -33,15 +33,12 @@ function App() {
 
   const [isMobile, setIsMobile] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [wosBadgeId, setWosBadgeId] = useState(null);
   const [styles, setStyles] = useState([]);
   const [venueBeers, setVenueBeers] = useState([]);
   const [options, setOptions] = useState([]);
   const [showHaveHad, setShowHaveHad] = useState(false);
 
-  const updateWosBadgeIt = (badgeId) => {
-    setWosBadgeId(badgeId);
-
+  const updateBadgeCookie = (badgeId) => {
     const expires = new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 365);
     setCookie(`wosBadgeId`, badgeId, {
       path: "/",
@@ -56,8 +53,8 @@ function App() {
       fetch(`${apiBaseURL}/user/info?access_token=${authData.accessToken}`)
         .then((response) => response.json())
         .then((data) => {
-          setUserData(data.response.user);
           setGetUserLoading(false);
+          setUserData(data.response.user);
         })
         .catch((error) => {
           setGetUserLoading(false);
@@ -66,38 +63,41 @@ function App() {
     }
   };
 
-  const getBadgeId = (offset = 0) => {
-    if (authData.accessToken && authData.accessToken !== "undefined") {
-      fetch(
-        `${apiBaseURL}/user/badges?offset=${offset}&access_token=${authData.accessToken}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.response.items) {
-            console.error("Couldn't find badge id for wheel of styles");
+  const getBadgeId = async (offset = 0) => {
+    return await fetch(
+      `${apiBaseURL}/user/badges?offset=${offset}&access_token=${authData.accessToken}`
+    )
+      .then((response) => response.json())
+      .then(async (data) => {
+        if (!data.response.items) {
+          console.error("Couldn't find badge id for wheel of styles");
+        } else {
+          const badges = data.response.items;
+          const wosBadge = badges.find((e) => e.badge_id === 5115);
+          if (wosBadge) {
+            const badgeId = wosBadge.user_badge_id;
+            updateBadgeCookie(badgeId);
+            return badgeId;
           } else {
-            const badges = data.response.items;
-            const wosBadge = badges.find((e) => e.badge_id === 5115);
-            if (wosBadge) {
-              updateWosBadgeIt(wosBadge.user_badge_id);
-            } else {
-              getBadgeId(offset + 50);
-            }
+            return getBadgeId(offset + 50);
           }
-        });
-    }
+        }
+      });
   };
 
-  const getStylesHad = () => {
-    if (
-      authData.accessToken &&
-      authData.accessToken !== "undefined" &&
-      wosBadgeId
-    ) {
+  const getStylesHad = async () => {
+    if (authData.accessToken && authData.accessToken !== "undefined") {
       setGetStylesLoading(true);
 
+      let badgeId;
+      if (cookies.wosBadgeId) {
+        badgeId = cookies.wosBadgeId;
+      } else {
+        badgeId = await getBadgeId();
+      }
+
       fetch(
-        `${apiBaseURL}/badges/view/${wosBadgeId}?access_token=${authData.accessToken}`
+        `${apiBaseURL}/badges/view/${badgeId}?access_token=${authData.accessToken}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -233,14 +233,6 @@ function App() {
       getUserInfo();
     }
 
-    if (!wosBadgeId) {
-      if (cookies.wosBadgeId) {
-        setWosBadgeId(cookies.wosBadgeId);
-      } else {
-        getBadgeId();
-      }
-    }
-
     if (!styles.length) {
       getStylesHad();
     }
@@ -274,53 +266,51 @@ function App() {
           (!authData.accessToken || authData.accessToken === "undefined") && (
             <Login authData={authData} setAuthData={setAuthData} />
           )}
+
         {(getUserLoading || getStylesLoading) && (
           <Box sx={{ display: "flex", m: 2 }}>
             <Spinner />
           </Box>
         )}
 
-        {!getStylesLoading &&
-          styles.length > 0 &&
-          userData &&
-          userData.first_name && (
-            <Container>
-              <Grid container spacing={2} className="cards">
-                <Grid xs={12} md={6} sx={{ mt: 2 }} className="table">
-                  <StylesTable
-                    data={styles}
-                    showHaveHad={showHaveHad}
-                    apiBaseURL={apiBaseURL}
-                    authData={authData}
-                  />
-                </Grid>
-                <Grid xs={12} md={6} sx={{ mt: 2 }}>
-                  <Paper sx={{ mb: 2, p: 2 }}>
-                    <Dashboard
-                      userData={userData}
-                      showHaveHad={showHaveHad}
-                      styles={styles}
-                      isMobile={isMobile}
-                      setShowHaveHad={setShowHaveHad}
-                      getStylesHad={getStylesHad}
-                      logOut={logOut}
-                    />
-                  </Paper>
-                  <Paper sx={{ mb: 2, p: 2 }}>
-                    <VenueSearch
-                      options={options}
-                      searchVenues={searchVenues}
-                      venueBeers={venueBeers}
-                      styles={styles}
-                      getVenuesLoading={getVenuesLoading}
-                      getVenueBeersLoading={getVenueBeersLoading}
-                      getVenueBeers={getVenueBeers}
-                    />
-                  </Paper>
-                </Grid>
+        {!getStylesLoading && styles.length > 0 && userData?.first_name && (
+          <Container>
+            <Grid container spacing={2} className="cards">
+              <Grid xs={12} md={6} sx={{ mt: 2 }} className="table">
+                <StylesTable
+                  data={styles}
+                  showHaveHad={showHaveHad}
+                  apiBaseURL={apiBaseURL}
+                  authData={authData}
+                />
               </Grid>
-            </Container>
-          )}
+              <Grid xs={12} md={6} sx={{ mt: 2 }}>
+                <Paper sx={{ mb: 2, p: 2 }}>
+                  <Dashboard
+                    userData={userData}
+                    showHaveHad={showHaveHad}
+                    styles={styles}
+                    isMobile={isMobile}
+                    setShowHaveHad={setShowHaveHad}
+                    getStylesHad={getStylesHad}
+                    logOut={logOut}
+                  />
+                </Paper>
+                <Paper sx={{ mb: 2, p: 2 }}>
+                  <VenueSearch
+                    options={options}
+                    searchVenues={searchVenues}
+                    venueBeers={venueBeers}
+                    styles={styles}
+                    getVenuesLoading={getVenuesLoading}
+                    getVenueBeersLoading={getVenueBeersLoading}
+                    getVenueBeers={getVenueBeers}
+                  />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Container>
+        )}
       </header>
     </div>
   );
