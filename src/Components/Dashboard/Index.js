@@ -48,14 +48,16 @@ function Dashboard({
             alignItems: "center",
           }}
         >
-          <Avatar
-            sx={{ mr: 1 }}
-            alt={`${userData.first_name} ${userData.last_name}`}
-            src={userData.user_avatar}
-          />
-          <Typography>
-            {userData.first_name} {userData.last_name}
-          </Typography>
+          <>
+            <Avatar
+              sx={{ mr: 1 }}
+              alt={`${userData.first_name} ${userData.last_name}`}
+              src={userData.user_avatar}
+            />
+            <Typography>
+              {userData.first_name} {userData.last_name}
+            </Typography>
+          </>
         </Box>
         <IconButton onClick={logOut} aria-label="logout">
           <LogoutIcon />
