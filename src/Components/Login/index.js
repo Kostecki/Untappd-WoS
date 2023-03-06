@@ -1,11 +1,10 @@
 import { useState } from "react";
 
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import { useTheme } from "@mui/material/styles";
+import { Box, Typography, TextField, Button } from "@mui/material";
 
 function Login({ authData, setAuthData }) {
+  const theme = useTheme();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,7 +36,10 @@ function Login({ authData, setAuthData }) {
         background: "white",
         borderRadius: 2,
         padding: 2,
-        "& .MuiTextField-root": { width: "20ch" },
+        [theme.breakpoints.up("md")]: {
+          minWidth: "450px",
+        },
+        "& .MuiTextField-root": { width: "100%" },
       }}
       noValidate
       autoComplete="off"
