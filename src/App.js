@@ -307,9 +307,6 @@ function App() {
                       logOut={logOut}
                     />
                   </Paper>
-                  {/* <Paper sx={{ mb: 2, p: 2 }}>
-                    <Scanner authData={authData} apiBaseURL={apiBaseURL} />
-                  </Paper> */}
                   <Paper sx={{ mb: 2, p: 2 }}>
                     <VenueSearch
                       options={options}
