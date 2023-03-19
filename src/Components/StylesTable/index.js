@@ -24,7 +24,7 @@ function StylesTable({ data, showHaveHad, apiBaseURL, authData }) {
 
     if (input) {
       const result = data.filter((e) =>
-        e.style_name.toLowerCase().includes(input)
+        e.style_name.toLowerCase().includes(input.toLowerCase())
       );
       setTableData(result);
     } else {
