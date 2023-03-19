@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 
 import Spinner from "../Spinner";
+import deepLinker from "../../utils/deepLinkFromBrowser";
 
 function TR({ style, apiBaseURL, authData }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +51,6 @@ function TR({ style, apiBaseURL, authData }) {
             breweryId: beer.brewery.brewery_id,
             breweryName: beer.brewery.brewery_name,
             breweryCountry: beer.brewery.country_name,
-            link: `https://untappd.com/b/${beer.beer.beer_slug}/${beer.beer.bid}`,
           };
         });
 
@@ -65,6 +65,23 @@ function TR({ style, apiBaseURL, authData }) {
         console.error("Error:", error);
         setIsLoading(false);
       });
+  };
+
+  const clickHandler = (beerId, beerSlug) => {
+    const appUrl = `untappd://beer/${beerId}`;
+    const webUrl = `https://untappd.com/b/${beerSlug}/${beerId}`;
+
+    if ("ontouchstart" in document.documentElement) {
+      const linker = new deepLinker({
+        onIgnored: function () {
+          window.open(webUrl, "_blank");
+        },
+      });
+
+      linker.openURL(appUrl);
+    } else {
+      window.open(webUrl, "_blank");
+    }
   };
 
   useEffect(() => {
@@ -110,10 +127,7 @@ function TR({ style, apiBaseURL, authData }) {
               {relatedBeers.map((beer) => (
                 <ListItem key={beer.bid}>
                   <ListItemButton
-                    component="a"
-                    href={beer.link}
-                    target="_blank"
-                    rel="noreferrer"
+                    onClick={() => clickHandler(beer.beerId, beer.beerSlug)}
                   >
                     <ListItemText
                       primary={`${beer.beerName}`}
