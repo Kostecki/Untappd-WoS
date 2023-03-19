@@ -11,6 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import deepLinker from "../../utils/deepLinkFromBrowser";
 
 function BeersTable({ data, styles, getVenueBeersLoading, selectedVenue }) {
   const [value, setValue] = useState(0);
@@ -19,8 +20,25 @@ function BeersTable({ data, styles, getVenueBeersLoading, selectedVenue }) {
     return styles.find((style) => style.style_name === styleName).had;
   };
 
-  const handleChange = (event, newValue) => {
+  const handleChange = (_event, newValue) => {
     setValue(newValue);
+  };
+
+  const clickHandler = (beerId, beerSlug) => {
+    const appUrl = `untappd://beer/${beerId}`;
+    const webUrl = `https://untappd.com/b/${beerSlug}/${beerId}`;
+
+    if ("ontouchstart" in document.documentElement) {
+      const linker = new deepLinker({
+        onIgnored: function () {
+          window.open(webUrl, "_blank");
+        },
+      });
+
+      linker.openURL(appUrl);
+    } else {
+      window.open(webUrl, "_blank");
+    }
   };
 
   function TabPanel(props) {
@@ -70,13 +88,17 @@ function BeersTable({ data, styles, getVenueBeersLoading, selectedVenue }) {
         <TabPanel value={value} index={index}>
           {menu.beers.map((beer) => {
             if (!beer.beer.has_had && !hasHad(beer.beer.beer_style)) {
+              const beerId = beer.beer.bid;
+              const beerSlug = beer.beer.beer_slug;
+              const beerName = beer.beer.beer_name;
+              const beerStyle = beer.beer.beer_style;
+              const breweryName = beer.brewery.brewery_name;
+
               return (
-                <List disablePadding key={beer.beer.bid}>
+                <List disablePadding key={beerId}>
                   <ListItem disablePadding>
                     <ListItemButton
-                      component="a"
-                      href={`https://untappd.com/b/${beer.beer.beer_slug}/${beer.beer.bid}`}
-                      target="_blank"
+                      onClick={() => clickHandler(beerId, beerSlug)}
                     >
                       <Typography
                         sx={{
@@ -89,13 +111,13 @@ function BeersTable({ data, styles, getVenueBeersLoading, selectedVenue }) {
                         <Box>
                           <Box>
                             <Box component="span" sx={{ fontWeight: "500" }}>
-                              {beer.beer.beer_name}{" "}
+                              {beerName}{" "}
                             </Box>
                             <Box component="span" sx={{ fontStyle: "italic" }}>
-                              ({beer.beer.beer_style})
+                              ({beerStyle})
                             </Box>
                           </Box>
-                          <Box>{beer.brewery.brewery_name}</Box>
+                          <Box>{breweryName}</Box>
                         </Box>
                         <OpenInNewIcon sx={{ opacity: 0.5 }} />
                       </Typography>
