@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const apiBaseURL = "https://api.untappd.com/v4";
+const device_udid = "00008030-000024C22292802E";
 
 const getBadgeId = async (offset = 0, token) => {
   return await fetch(
@@ -44,10 +45,6 @@ export default NextAuth({
     CredentialsProvider({
       id: "untappd",
       name: "Untappd",
-      credentials: {
-        username: { label: "Username" },
-        password: { label: "Password", type: "password" },
-      },
       async authorize(credentials) {
         const url = `${apiBaseURL}/xauth?client_id=${process.env.UNTAPPD_ID}&client_secret=${process.env.UNTAPPD_SECRET}`;
         const authResponse = await fetch(url, {

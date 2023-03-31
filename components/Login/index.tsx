@@ -21,7 +21,7 @@ export default function Login() {
     if (username && password) {
       setIsloading(true);
       signIn("untappd", {
-        redirect: true,
+        redirect: false,
         username,
         password,
       });
