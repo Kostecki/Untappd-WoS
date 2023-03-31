@@ -22,8 +22,8 @@ export default function Login() {
       setIsloading(true);
       signIn("untappd", {
         redirect: true,
-        username: "jkostecki",
-        password: "whee-aim-alumna-bairn-ace",
+        username,
+        password,
       });
     }
   };
