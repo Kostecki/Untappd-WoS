@@ -20,7 +20,7 @@ export default function Login() {
   const clickHandler = () => {
     if (username && password) {
       setIsloading(true);
-      signIn("untappdRaw", {
+      signIn("untappd", {
         redirect: true,
         username: "jkostecki",
         password: "whee-aim-alumna-bairn-ace",
