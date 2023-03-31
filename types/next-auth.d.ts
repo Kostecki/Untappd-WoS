@@ -2,6 +2,7 @@ import "next-auth";
 
 declare module "next-auth" {
   interface User {
+    accessToken: string;
     id: number;
     username: string;
     image: string;
@@ -19,6 +20,7 @@ declare module "next-auth" {
       totalPhotos: number;
     };
     dateJoined: string;
+    wosBadgeId?: number;
   }
   export interface Session {
     user: User;
