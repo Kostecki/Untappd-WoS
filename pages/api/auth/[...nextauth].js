@@ -42,7 +42,7 @@ export default NextAuth({
   },
   providers: [
     CredentialsProvider({
-      id: "untappdRaw",
+      id: "untappd",
       name: "Untappd",
       credentials: {
         username: { label: "Username" },
