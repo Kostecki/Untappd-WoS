@@ -1,21 +1,38 @@
+import { useEffect } from "react";
 import Head from "next/head";
-import { Inter } from "next/font/google";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { Container, Grid, Paper, useTheme } from "@mui/material";
+
+import { useMobileMode } from "@/context/mobileMode";
+import { useStyles } from "@/context/styles";
+import Login from "@/components/Login";
+import Dashboard from "@/components/Dashboard";
 
 import styles from "@/styles/Home.module.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function Home() {
-  const { data: session, status } = useSession();
+  const theme = useTheme();
 
-  console.log(status);
+  const { data: session } = useSession();
+  const { updateMobileMode } = useMobileMode();
+  const { fetchStyles } = useStyles();
 
-  const test = (input: any) => {
-    console.log(input);
+  useEffect(() => {
+    if (session?.user) {
+      fetchStyles();
+    }
 
-    return true;
-  };
+    function handleResize() {
+      const width = window.innerWidth;
+      updateMobileMode(width < 800);
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -56,18 +73,48 @@ export default function Home() {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <main className={styles.main}>
-        {session && test(session) && (
-          <>
-            Signed in as {session.user.username} <br />
-            <button onClick={() => signOut()}>Sign out</button>
-          </>
+        {session && (
+          <Container>
+            <Grid container spacing={2} className="cards">
+              <Grid xs={12} md={6} sx={{ mt: 2 }} className="table">
+                StylesTable
+                {/* <StylesTable
+                  data={styles}
+                  showHaveHad={showHaveHad}
+                  apiBaseURL={apiBaseURL}
+                  authData={authData}
+                /> */}
+              </Grid>
+              <Grid xs={12} md={6} sx={{ mt: 2 }}>
+                <Paper sx={{ mb: 2, p: 2 }}>
+                  <Dashboard />
+                  {/* <Dashboard
+                    userData={userData}
+                    showHaveHad={showHaveHad}
+                    styles={styles}
+                    isMobile={isMobile}
+                    setShowHaveHad={setShowHaveHad}
+                    getStylesHad={getStylesHad}
+                    logOut={logOut}
+                  /> */}
+                </Paper>
+                <Paper sx={{ mb: 2, p: 2 }}>
+                  VenueSearch
+                  {/* <VenueSearch
+                    options={options}
+                    searchVenues={searchVenues}
+                    venueBeers={venueBeers}
+                    styles={styles}
+                    getVenuesLoading={getVenuesLoading}
+                    getVenueBeersLoading={getVenueBeersLoading}
+                    getVenueBeers={getVenueBeers}
+                  /> */}
+                </Paper>
+              </Grid>
+            </Grid>
+          </Container>
         )}
-        {!session && (
-          <>
-            Not signed in <br />
-            <button onClick={() => signIn("untappd")}>Sign in</button>
-          </>
-        )}
+        {!session && <Login />}
       </main>
     </>
   );
