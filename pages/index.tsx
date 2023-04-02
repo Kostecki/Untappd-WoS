@@ -13,6 +13,7 @@ import VenueSearch from "@/components/VenueSearch";
 import StylesTable from "@/components/StylesTable";
 
 import styles from "@/styles/Home.module.css";
+import Scanner from "@/components/Scanner";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -87,6 +88,9 @@ export default function Home() {
                 </Paper>
                 <Paper sx={{ mb: 2, p: 2 }}>
                   <VenueSearch />
+                </Paper>
+                <Paper sx={{ mb: 2, p: 2 }}>
+                  <Scanner />
                 </Paper>
               </Grid2>
             </Grid2>
