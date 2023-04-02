@@ -1,0 +1,17 @@
+@media (max-width: 899px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    margin-top: 15px;
+  }
+
+  .progressCircles {
+    margin-top: 50px;
+  }
+
+  .styleProgress {
+    width: calc(90% / 3)
+  }
+}

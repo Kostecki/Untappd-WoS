@@ -20,6 +20,8 @@ import { useStyles } from "@/context/styles";
 import CircularProgress from "../CircularProgress";
 import Spinner from "../Spinner";
 
+import styles from "./Dashboard.module.css";
+
 export default function Dashboard() {
   const { data: session } = useSession();
   const { mobileMode } = useMobileMode();
@@ -79,7 +81,7 @@ export default function Dashboard() {
       </Box>
       <Box
         sx={{ display: "flex", justifyContent: "space-between" }}
-        className="actions"
+        className={styles.actions}
       >
         <FormGroup>
           <FormControlLabel
@@ -103,14 +105,7 @@ export default function Dashboard() {
       <Box sx={{ my: 2 }}>
         <Divider />
       </Box>
-      <Box>
-        <Typography
-          variant="h6"
-          sx={{ textAlign: "left" }}
-          className="badge-title"
-        >
-          Wheel of Styles
-        </Typography>
+      <Box className={styles.progressCircles}>
         {stylesLoading && (
           <Box sx={{ display: "flex", justifyContent: "center", pt: 3, pb: 1 }}>
             <Spinner height={145} />
@@ -129,7 +124,7 @@ export default function Dashboard() {
                 justifyContent: "center",
                 py: 3,
               }}
-              className="style-progress"
+              className={styles.styleProgress}
             >
               <CircularProgress
                 checkinsPerLevel={checkinsPerLevel}
@@ -162,7 +157,7 @@ export default function Dashboard() {
                 justifyContent: "center",
                 py: 3,
               }}
-              className="style-progress"
+              className={styles.styleProgress}
             >
               <CircularProgress
                 checkinsPerLevel={checkinsPerLevel}
@@ -203,7 +198,7 @@ export default function Dashboard() {
                 justifyContent: "center",
                 py: 3,
               }}
-              className="style-progress"
+              className={styles.styleProgress}
             >
               <CircularProgress
                 checkinsPerLevel={checkinsPerLevel}

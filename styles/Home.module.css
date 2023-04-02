@@ -3,6 +3,16 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 3rem;
   min-height: 100vh;
+}
+
+@media (max-width: 899px) {
+  .cards {
+    flex-direction: column-reverse !important;
+    margin-bottom: 14px !important;
+  }
+
+  .table {
+    margin-top: 0 !important;
+  }
 }

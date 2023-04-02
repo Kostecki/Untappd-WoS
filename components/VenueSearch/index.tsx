@@ -13,6 +13,8 @@ import {
 import BeersTable from "../BeersTable";
 import { useVenues } from "@/context/venues";
 
+import styles from "./VenueSearch.module.css";
+
 interface Venue {
   is_closed: string;
   is_verified: true;
@@ -90,8 +92,8 @@ export default function VenueSearch() {
                 style={{ textAlign: "left" }}
               >
                 <div>
-                  <span className="venue-name">{option.venue_name} </span>
-                  <span className="venue-location">
+                  <span className={styles.venueName}>{option.venue_name} </span>
+                  <span className={styles.venueLocation}>
                     ({`${option.venue_city}, ${option.venue_country}`})
                   </span>
                 </div>

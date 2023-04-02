@@ -77,8 +77,8 @@ export default function Home() {
       <main className={styles.main}>
         {session && (
           <Container>
-            <Grid2 container spacing={2} className="cards">
-              <Grid2 xs={12} md={6} sx={{ mt: 2 }} className="table">
+            <Grid2 container spacing={2} className={styles.cards}>
+              <Grid2 xs={12} md={6} sx={{ mt: 2 }} className={styles.table}>
                 <StylesTable />
               </Grid2>
               <Grid2 xs={12} md={6} sx={{ mt: 2 }}>
