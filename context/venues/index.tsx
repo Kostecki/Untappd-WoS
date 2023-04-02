@@ -113,8 +113,6 @@ export function VenuesProvider({ children }: Props) {
               return list.push(...menu.items);
             });
 
-            console.log();
-
             beers.push({
               beers: list,
               menu: e.menu.menu_name,

@@ -80,7 +80,6 @@ export default function VenueSearch() {
           }
           onChange={(_event, newValue) => setSelectedVenue(newValue)}
           onInputChange={(_event, newInputValue) => {
-            console.log("change", newInputValue);
             searchForVenues(newInputValue);
           }}
           renderOption={(props, option) => {
