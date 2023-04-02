@@ -2,9 +2,10 @@ name: Untappd WoS
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
   workflow_dispatch:
-  
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -37,23 +38,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v1.3.0
-        with:
-          NEXTAUTH_URL: ${{ env.NEXTAUTH_URL }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          UNTAPPD_ID: ${{ secrets.UNTAPPD_ID }}
-          UNTAPPD_SECRET: ${{ secrets.UNTAPPD_SECRET }}
-          fail_on_empty: true
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
+          secrets: |
+            "TOKENS=${{ secrets.TOKENS }}"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      
+
       - name: Ping Portainer
         uses: fjogeleit/http-request-action@v1
         with:
