@@ -47,8 +47,6 @@ export function StylesProvider({ children }: Props) {
       const { accessToken, wosBadgeId, apiBase } = session.user;
       const url = `${apiBase}/badges/view/${wosBadgeId}?access_token=${accessToken}`;
 
-      console.log("url", session.user);
-
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
