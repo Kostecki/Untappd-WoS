@@ -2,7 +2,8 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const apiBaseURL = "https://api.untappd.com/v4";
-const device_udid = "00008030-000024C22292802E";
+const deviceUDID = "00008030-000024C22292802E";
+const wosTypeId = 5115;
 
 const getBadgeId = async (offset = 0, token) => {
   return await fetch(
@@ -14,7 +15,7 @@ const getBadgeId = async (offset = 0, token) => {
         console.error("Couldn't find badge id for wheel of styles");
       } else {
         const badges = data.response.items;
-        const wosBadge = badges.find((e) => e.badge_id === 5115);
+        const wosBadge = badges.find((e) => e.badge_id === wosTypeId);
         if (wosBadge) {
           return wosBadge.user_badge_id;
         } else {
@@ -37,6 +38,8 @@ export default NextAuth({
       if (account) {
         token.user = user;
         token.user.wosBadgeId = await getBadgeId(0, user.accessToken);
+        token.user.apiBase = apiBaseURL;
+        token.user.deviceUdid = deviceUDID;
       }
       return token;
     },
@@ -52,7 +55,7 @@ export default NextAuth({
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `user_name=${credentials.username}&user_password=${credentials.password}&device_udid=9b5e46525304d62a`,
+          body: `user_name=${credentials.username}&user_password=${credentials.password}&device_udid=${deviceUDID}`,
         });
 
         if (!authResponse) {

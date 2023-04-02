@@ -32,7 +32,10 @@ export default function CircularProgress({
           strokeWidth={4}
           value={Math.floor(haveHadCount / checkinsPerLevel)}
           maxValue={Math.floor(totalStyles / checkinsPerLevel)}
-          styles={{ path: { stroke: theme.palette.primary.main } }}
+          styles={{
+            path: { stroke: theme.palette.primary.main },
+            trail: { stroke: "#d6d6d6" },
+          }}
         />
       </div>
       <div

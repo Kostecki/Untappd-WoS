@@ -21,6 +21,8 @@ declare module "next-auth" {
     };
     dateJoined: string;
     wosBadgeId?: number;
+    apiBase: string;
+    deviceUdid: string;
   }
   export interface Session {
     user: User;

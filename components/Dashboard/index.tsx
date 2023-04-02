@@ -1,7 +1,8 @@
+import { useEffect } from "react";
+
 import {
   Avatar,
   Box,
-  Button,
   Divider,
   FormControlLabel,
   FormGroup,
@@ -9,31 +10,40 @@ import {
   Switch,
   Typography,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useSession, signOut } from "next-auth/react";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import { useMobileMode } from "@/context/mobileMode";
+import { useStyles } from "@/context/styles";
 
 import CircularProgress from "../CircularProgress";
+import Spinner from "../Spinner";
 
 export default function Dashboard() {
   const { data: session } = useSession();
   const { mobileMode } = useMobileMode();
+  const {
+    totalStyles,
+    haveHadCount,
+    loading: stylesLoading,
+    showHaveHad,
+    fetchStyles,
+    toggleShowHaveHad,
+  } = useStyles();
 
   const checkinsPerLevel = 5;
-  const haveHadCount = 158; // TODO: API
-  const totalStyles = 252; // TODO: API
 
   const calcLeftToNextLevel = () => haveHadCount % checkinsPerLevel;
+  const refreshData = () => fetchStyles();
 
-  // TODO: Make toggle work
-  const showHaveHad = false;
-  const toggleHaveHad = () => {
-    console.log("toggleHaveHad");
-  };
-  const refreshData = () => {
-    console.log("refreshData");
-  };
+  useEffect(() => {
+    if (totalStyles === 0) {
+      fetchStyles();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -73,13 +83,22 @@ export default function Dashboard() {
       >
         <FormGroup>
           <FormControlLabel
-            control={<Switch checked={showHaveHad} onChange={toggleHaveHad} />}
+            control={
+              <Switch
+                checked={showHaveHad}
+                onChange={() => toggleShowHaveHad()}
+              />
+            }
             label='Show "have had"'
           />
         </FormGroup>
-        <Button variant="outlined" onClick={refreshData}>
+        <LoadingButton
+          variant="outlined"
+          loading={stylesLoading}
+          onClick={refreshData}
+        >
           Refresh data
-        </Button>
+        </LoadingButton>
       </Box>
       <Box sx={{ my: 2 }}>
         <Divider />
@@ -92,118 +111,125 @@ export default function Dashboard() {
         >
           Wheel of Styles
         </Typography>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
+        {stylesLoading && (
+          <Box sx={{ display: "flex", justifyContent: "center", pt: 3, pb: 1 }}>
+            <Spinner height={145} />
+          </Box>
+        )}
+        {!stylesLoading && (
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
-              py: 3,
+              justifyContent: "space-between",
             }}
-            className="style-progress"
           >
-            <CircularProgress
-              checkinsPerLevel={checkinsPerLevel}
-              totalStyles={totalStyles}
-              haveHadCount={haveHadCount}
-              mobile={mobileMode}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                py: 3,
+              }}
+              className="style-progress"
             >
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginBottom: 4,
-                  position: mobileMode ? "absolute" : "relative",
-                  top: mobileMode ? "-50px" : "unset",
-                  textAlign: "center",
-                }}
+              <CircularProgress
+                checkinsPerLevel={checkinsPerLevel}
+                totalStyles={totalStyles}
+                haveHadCount={haveHadCount}
+                mobile={mobileMode}
               >
-                Level progress
-              </div>
-              <div style={{ fontSize: 14 }}>
-                {Math.floor(haveHadCount / checkinsPerLevel)}
-                {" / "}
-                {Math.floor(totalStyles / checkinsPerLevel)}
-              </div>
-            </CircularProgress>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              py: 3,
-            }}
-            className="style-progress"
-          >
-            <CircularProgress
-              checkinsPerLevel={checkinsPerLevel}
-              totalStyles={totalStyles}
-              haveHadCount={haveHadCount}
-              mobile={mobileMode}
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    marginBottom: 4,
+                    position: mobileMode ? "absolute" : "relative",
+                    top: mobileMode ? "-50px" : "unset",
+                    textAlign: "center",
+                  }}
+                >
+                  Badge progress
+                </div>
+                <div style={{ fontSize: 14 }}>
+                  {Math.floor(haveHadCount / checkinsPerLevel)}
+                  {" / "}
+                  {Math.floor(totalStyles / checkinsPerLevel)}
+                </div>
+              </CircularProgress>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                py: 3,
+              }}
+              className="style-progress"
             >
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginBottom: 4,
-                  position: mobileMode ? "absolute" : "relative",
-                  top: mobileMode ? "-50px" : "unset",
-                  textAlign: "center",
-                }}
+              <CircularProgress
+                checkinsPerLevel={checkinsPerLevel}
+                totalStyles={totalStyles}
+                haveHadCount={haveHadCount}
+                mobile={mobileMode}
               >
-                Style progress
-              </div>
-              <div style={{ fontSize: 14 }}>
-                {haveHadCount} / {totalStyles}
-              </div>
-              <div
-                style={{
-                  fontSize: 14,
-                  marginTop: 5,
-                  fontStyle: "italic",
-                  textAlign: "center",
-                }}
-              >
-                Missing: {mobileMode && <br />} {totalStyles - haveHadCount}
-              </div>
-            </CircularProgress>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              py: 3,
-            }}
-            className="style-progress"
-          >
-            <CircularProgress
-              checkinsPerLevel={checkinsPerLevel}
-              totalStyles={totalStyles}
-              haveHadCount={haveHadCount}
-              mobile={mobileMode}
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    marginBottom: 4,
+                    position: mobileMode ? "absolute" : "relative",
+                    top: mobileMode ? "-50px" : "unset",
+                    textAlign: "center",
+                  }}
+                >
+                  Style progress
+                </div>
+                <div style={{ fontSize: 14 }}>
+                  {haveHadCount} / {totalStyles}
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    marginTop: 5,
+                    fontStyle: "italic",
+                    textAlign: "center",
+                  }}
+                >
+                  Missing: {mobileMode && <br />} {totalStyles - haveHadCount}
+                </div>
+              </CircularProgress>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                py: 3,
+              }}
+              className="style-progress"
             >
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginBottom: 4,
-                  position: mobileMode ? "absolute" : "relative",
-                  top: mobileMode ? "-50px" : "unset",
-                  textAlign: "center",
-                }}
+              <CircularProgress
+                checkinsPerLevel={checkinsPerLevel}
+                totalStyles={totalStyles}
+                haveHadCount={haveHadCount}
+                mobile={mobileMode}
               >
-                Level progress
-              </div>
-              <div style={{ fontSize: 14 }}>
-                {calcLeftToNextLevel()} / {checkinsPerLevel}
-              </div>
-            </CircularProgress>
+                <div
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    marginBottom: 4,
+                    position: mobileMode ? "absolute" : "relative",
+                    top: mobileMode ? "-50px" : "unset",
+                    textAlign: "center",
+                  }}
+                >
+                  Level progress
+                </div>
+                <div style={{ fontSize: 14 }}>
+                  {calcLeftToNextLevel()} / {checkinsPerLevel}
+                </div>
+              </CircularProgress>
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
     </>
   );

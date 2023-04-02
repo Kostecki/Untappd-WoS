@@ -6,28 +6,20 @@ type stylesContextType = {
   checkinsPerLevel: number;
   totalStyles: number;
   haveHadCount: number;
+  styles: Style[];
+  showHaveHad: boolean;
+  toggleShowHaveHad: () => void;
   fetchStyles: () => void;
 };
-
-interface BadgeStyle {
-  item_id: number;
-  item_name: string;
-}
-
-interface NotHadStyle {
-  style_id: number;
-  style_name: string;
-}
-
-interface CombinedStyle extends NotHadStyle {
-  had: boolean;
-}
 
 const stylesContextValues: stylesContextType = {
   loading: false,
   checkinsPerLevel: 5,
   totalStyles: 0,
   haveHadCount: 0,
+  styles: [],
+  showHaveHad: false,
+  toggleShowHaveHad: () => {},
   fetchStyles: () => {},
 };
 
@@ -45,23 +37,22 @@ export function StylesProvider({ children }: Props) {
   const { data: session } = useSession();
 
   const [loading, setLoading] = useState(false);
-  const [styles, setStyles] = useState([]);
-
-  const apiBaseURL = "https://api.untappd.com/v4";
+  const [styles, setStyles] = useState<Style[]>([]);
+  const [showHaveHad, setShowHaveHad] = useState(false);
 
   const fetchStyles = async () => {
     setLoading(true);
 
     if (session?.user) {
-      const { accessToken, wosBadgeId } = session.user;
-      const url = `${apiBaseURL}/badges/view/${wosBadgeId}?access_token=${accessToken}`;
+      const { accessToken, wosBadgeId, apiBase } = session.user;
+      const url = `${apiBase}/badges/view/${wosBadgeId}?access_token=${accessToken}`;
+
+      console.log("url", session.user);
 
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
           const items = data.response.badge.special_status_list.items[0].items;
-
-          console.log(items[0]);
 
           const stylesHad = items.map((style: BadgeStyle) => ({
             style_id: style.item_id,
@@ -76,9 +67,9 @@ export function StylesProvider({ children }: Props) {
 
   const getStylesNotHad = (stylesHad: CombinedStyle[]) => {
     if (session?.user) {
-      const { accessToken } = session.user;
+      const { apiBase, accessToken } = session.user;
 
-      fetch(`${apiBaseURL}/badges/styles_not_had?access_token=${accessToken}`)
+      fetch(`${apiBase}/badges/styles_not_had?access_token=${accessToken}`)
         .then((response) => response.json())
         .then((data) => {
           const items = data.response.items;
@@ -97,7 +88,6 @@ export function StylesProvider({ children }: Props) {
               : 0
           );
 
-          // @ts-ignore // TODO: fix
           setStyles(payload);
           setLoading(false);
         })
@@ -105,11 +95,18 @@ export function StylesProvider({ children }: Props) {
     }
   };
 
+  const toggleShowHaveHad = () => {
+    setShowHaveHad(!showHaveHad);
+  };
+
   const value = {
     loading,
     checkinsPerLevel: stylesContextValues.checkinsPerLevel,
     totalStyles: styles.length,
     haveHadCount: styles.filter((e: CombinedStyle) => e.had).length,
+    styles,
+    showHaveHad,
+    toggleShowHaveHad,
     fetchStyles,
   };
 

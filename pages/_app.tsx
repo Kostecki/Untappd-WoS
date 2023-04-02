@@ -6,12 +6,13 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 
 import { MobileModeProvider } from "@/context/mobileMode";
+import { StylesProvider } from "@/context/styles";
+import { VenuesProvider } from "@/context/venues";
 
 import lightThemeOptions from "../styles/theme/lightThemeOptions";
 import createEmotionCache from "../utils/createEmotionCache";
 
 import "@/styles/globals.css";
-import { StylesProvider } from "@/context/styles";
 
 interface AppPropsCustom extends AppProps {
   emotionCache?: EmotionCache;
@@ -34,7 +35,9 @@ export default function App({
           <main className={inter.className}>
             <MobileModeProvider>
               <StylesProvider>
-                <Component {...pageProps} />
+                <VenuesProvider>
+                  <Component {...pageProps} />
+                </VenuesProvider>
               </StylesProvider>
             </MobileModeProvider>
           </main>

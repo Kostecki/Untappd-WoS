@@ -1,18 +1,20 @@
 import { useEffect } from "react";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
-import { Container, Grid, Paper, useTheme } from "@mui/material";
+import { Container, Paper } from "@mui/material";
+import Grid2 from "@mui/material/Unstable_Grid2";
 
 import { useMobileMode } from "@/context/mobileMode";
 import { useStyles } from "@/context/styles";
+
 import Login from "@/components/Login";
 import Dashboard from "@/components/Dashboard";
+import VenueSearch from "@/components/VenueSearch";
+import StylesTable from "@/components/StylesTable";
 
 import styles from "@/styles/Home.module.css";
 
 export default function Home() {
-  const theme = useTheme();
-
   const { data: session } = useSession();
   const { updateMobileMode } = useMobileMode();
   const { fetchStyles } = useStyles();
@@ -75,43 +77,19 @@ export default function Home() {
       <main className={styles.main}>
         {session && (
           <Container>
-            <Grid container spacing={2} className="cards">
-              <Grid xs={12} md={6} sx={{ mt: 2 }} className="table">
-                StylesTable
-                {/* <StylesTable
-                  data={styles}
-                  showHaveHad={showHaveHad}
-                  apiBaseURL={apiBaseURL}
-                  authData={authData}
-                /> */}
-              </Grid>
-              <Grid xs={12} md={6} sx={{ mt: 2 }}>
+            <Grid2 container spacing={2} className="cards">
+              <Grid2 xs={12} md={6} sx={{ mt: 2 }} className="table">
+                <StylesTable />
+              </Grid2>
+              <Grid2 xs={12} md={6} sx={{ mt: 2 }}>
                 <Paper sx={{ mb: 2, p: 2 }}>
                   <Dashboard />
-                  {/* <Dashboard
-                    userData={userData}
-                    showHaveHad={showHaveHad}
-                    styles={styles}
-                    isMobile={isMobile}
-                    setShowHaveHad={setShowHaveHad}
-                    getStylesHad={getStylesHad}
-                    logOut={logOut}
-                  /> */}
                 </Paper>
                 <Paper sx={{ mb: 2, p: 2 }}>
-                  VenueSearch
-                  {/* <VenueSearch
-                    options={options}
-                    searchVenues={searchVenues}
-                    venueBeers={venueBeers}
-                    styles={styles}
-                    getVenuesLoading={getVenuesLoading}
-                    getVenueBeersLoading={getVenueBeersLoading}
-                    getVenueBeers={getVenueBeers}
-                  /> */}
+                  <VenueSearch />
                 </Paper>
-              </Grid>
-            </Grid>
+              </Grid2>
+            </Grid2>
           </Container>
         )}
         {!session && <Login />}
