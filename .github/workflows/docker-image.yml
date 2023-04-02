@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature/barcode-scanner
   workflow_dispatch:
 
 env:
