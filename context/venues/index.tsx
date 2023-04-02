@@ -51,6 +51,8 @@ export function VenuesProvider({ children }: Props) {
       if (!query || query === "") {
         setVenues([]);
         setVenueBeers([]);
+
+        return;
       }
 
       setVenuesLoading(true);

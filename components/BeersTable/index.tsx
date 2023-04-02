@@ -92,15 +92,15 @@ export default function BeersTable({ selectedVenue }: Props) {
       {venueBeers.length > 0 && (
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={value} onChange={handleChange}>
-            {venueBeers.map((venue: VenueOffering) => (
-              <Tab label={venue.menu} key={venue.venueId} />
+            {venueBeers.map((venue: VenueOffering, index: number) => (
+              <Tab label={venue.menu} key={index} />
             ))}
           </Tabs>
         </Box>
       )}
 
       {venueBeers.map((menu: VenueOffering, index: number) => (
-        <TabPanel value={value} index={index} key={menu.venueId}>
+        <TabPanel value={value} index={index} key={index}>
           {menu.beers.map((beer: FullBeer) => {
             if (!beer.beer.has_had && !hasHad(beer.beer.beer_style)) {
               const beerId = beer.beer.bid;
