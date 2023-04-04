@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Box, Typography, Divider, IconButton } from "@mui/material";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 const BarcodeScannerComponent = dynamic(
   () => import("react-qr-barcode-scanner"),
@@ -11,11 +12,43 @@ const BarcodeScannerComponent = dynamic(
 );
 
 export default function Scanner() {
-  const [barcode, setBarcode] = useState();
+  const { data: session } = useSession();
+
+  const [barcode, setBarcode] = useState("");
   const [beers, setBeers] = useState([]);
   const [noResult, setNoResult] = useState(false);
 
   const [data, setData] = useState("Not Found");
+
+  const fetchBeers = () => {
+    if (session?.user) {
+      const { apiBase, accessToken } = session.user;
+
+      fetch(
+        `${apiBase}/beer/checkbarcodemultiple?upc=${barcode}&access_token=${accessToken}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          const resp = data.response.items;
+
+          console.log("fetched");
+
+          if (resp?.length) {
+            const result = resp.filter((beer: any) => !beer.beer.has_had);
+            setBeers(result);
+            console.log("result", result);
+          } else {
+            setBeers([]);
+            console.log("no results");
+          }
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchBeers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barcode]);
 
   return (
     <>
@@ -47,7 +80,7 @@ export default function Scanner() {
         {barcode && !beers.length && !noResult && (
           <>
             <Typography variant="h6">No New Style</Typography>
-            <Typography>You&apos;ve relady had this style</Typography>
+            <Typography>You&apos;ve already had this style</Typography>
           </>
         )}
         {barcode && beers.length >= 1 && (
@@ -90,12 +123,12 @@ export default function Scanner() {
         )}
         <>
           <BarcodeScannerComponent
-            width={300}
-            height={300}
-            onUpdate={(err, result) => {
-              if (err) console.log(err);
-              if (result) setData(result.getText());
-              else setData("Not Found");
+            width={"100%"}
+            height={"100%"}
+            onUpdate={(_err, result) => {
+              if (result) {
+                setBarcode(result.getText());
+              }
             }}
           />
           <p>{data}</p>
