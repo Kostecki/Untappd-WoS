@@ -6,12 +6,13 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import BeerSearch from "../BeerSearch";
 const BarcodeScannerComponent = dynamic(
   () => import("react-qr-barcode-scanner"),
   { ssr: false }
 );
 
-export default function Scanner() {
+export default function Checker() {
   const { data: session } = useSession();
 
   const [barcode, setBarcode] = useState("");
@@ -19,6 +20,8 @@ export default function Scanner() {
   const [noResult, setNoResult] = useState(false);
 
   const [data, setData] = useState("Not Found");
+
+  const enableScanner = false;
 
   const fetchBeers = () => {
     if (session?.user) {
@@ -46,7 +49,9 @@ export default function Scanner() {
   };
 
   useEffect(() => {
-    fetchBeers();
+    if (enableScanner) {
+      fetchBeers();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode]);
 
@@ -59,7 +64,7 @@ export default function Scanner() {
           alignItems: "center",
         }}
       >
-        <Typography variant="h5">Barcode scanner</Typography>
+        <Typography variant="h5">Check Beer</Typography>
 
         <IconButton aria-label="logout">
           <CropFreeIcon />
@@ -122,16 +127,21 @@ export default function Scanner() {
           </>
         )}
         <>
-          <BarcodeScannerComponent
-            width={"100%"}
-            height={"100%"}
-            onUpdate={(_err, result) => {
-              if (result) {
-                setBarcode(result.getText());
-              }
-            }}
-          />
-          <p>{data}</p>
+          {enableScanner && (
+            <Box>
+              <BarcodeScannerComponent
+                width={"100%"}
+                height={"100%"}
+                onUpdate={(_err, result) => {
+                  if (result) {
+                    setBarcode(result.getText());
+                  }
+                }}
+              />
+              <p>{data}</p>
+            </Box>
+          )}
+          <BeerSearch />
         </>
       </Box>
     </>
