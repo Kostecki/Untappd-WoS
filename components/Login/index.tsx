@@ -35,6 +35,7 @@ export default function Login() {
         background: "white",
         borderRadius: 2,
         padding: 2,
+        mt: 2,
         [theme.breakpoints.up("md")]: {
           minWidth: "450px",
         },
