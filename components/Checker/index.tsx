@@ -14,8 +14,7 @@ export default function Checker() {
   const { data: session } = useSession();
   const { mobileMode } = useMobileMode();
 
-  const [loading, setLoading] = useState(false);
-  const [scanEnabled, setScanEnabled] = useState(true);
+  const [scanEnabled, setScanEnabled] = useState(false);
   const [barcode, setBarcode] = useState<Barcode | undefined>(undefined);
   const [beers, setBeers] = useState([]);
 
@@ -27,8 +26,6 @@ export default function Checker() {
     if (session?.user && barcode) {
       const { apiBase, accessToken } = session.user;
 
-      setLoading(true);
-
       // For some reason Untappd handles all barcodes as UPC
       fetch(
         `${apiBase}/beer/checkbarcodemultiple?upc=${barcode?.value}&access_token=${accessToken}`
@@ -36,7 +33,6 @@ export default function Checker() {
         .then((response) => response.json())
         .then((data) => {
           setBeers(data.response.items);
-          setLoading(false);
         });
     }
   };
