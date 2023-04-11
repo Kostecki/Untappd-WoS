@@ -16,10 +16,10 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/lab": "^5.0.0-alpha.124",
     "@mui/material": "^5.11.15",
-    "@thewirv/react-barcode-scanner": "^3.2.3",
     "@types/node": "18.15.5",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
+    "@zxing/library": "^0.19.2",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "next": "13.2.4",
@@ -27,7 +27,7 @@
     "react": "18.2.0",
     "react-circular-progressbar": "^2.1.0",
     "react-dom": "18.2.0",
-    "react-qr-barcode-scanner": "^1.0.6",
+    "react-zxing": "^1.1.4",
     "sharp": "^0.32.0",
     "typescript": "5.0.2"
   }

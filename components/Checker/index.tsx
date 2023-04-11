@@ -2,58 +2,64 @@ import React, { useState, useEffect } from "react";
 
 import { Box, Typography, Divider, IconButton } from "@mui/material";
 import CropFreeIcon from "@mui/icons-material/CropFree";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import SearchIcon from "@mui/icons-material/Search";
 
 import { useSession } from "next-auth/react";
-import dynamic from "next/dynamic";
 import BeerSearch from "../BeerSearch";
-const BarcodeScannerComponent = dynamic(
-  () => import("react-qr-barcode-scanner"),
-  { ssr: false }
-);
+import BarcodeScanner from "../BarcodeScanner";
+import BarcodeResult from "../BarcodeResult";
+import { useMobileMode } from "@/context/mobileMode";
 
 export default function Checker() {
   const { data: session } = useSession();
+  const { mobileMode } = useMobileMode();
 
-  const [barcode, setBarcode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [scanEnabled, setScanEnabled] = useState(true);
+  const [barcode, setBarcode] = useState<Barcode | undefined>(undefined);
   const [beers, setBeers] = useState([]);
-  const [noResult, setNoResult] = useState(false);
 
-  const [data, setData] = useState("Not Found");
-
-  const enableScanner = false;
+  const scanSuccessHandler = (result: Barcode) => {
+    setBarcode(result);
+  };
 
   const fetchBeers = () => {
-    if (session?.user) {
+    if (session?.user && barcode) {
       const { apiBase, accessToken } = session.user;
 
+      setLoading(true);
+
+      // For some reason Untappd handles all barcodes as UPC
       fetch(
-        `${apiBase}/beer/checkbarcodemultiple?upc=${barcode}&access_token=${accessToken}`
+        `${apiBase}/beer/checkbarcodemultiple?upc=${barcode?.value}&access_token=${accessToken}`
       )
         .then((response) => response.json())
         .then((data) => {
-          const resp = data.response.items;
-
-          console.log("fetched");
-
-          if (resp?.length) {
-            const result = resp.filter((beer: any) => !beer.beer.has_had);
-            setBeers(result);
-            console.log("result", result);
-          } else {
-            setBeers([]);
-            console.log("no results");
-          }
+          setBeers(data.response.items);
+          setLoading(false);
         });
     }
   };
 
+  const resetScan = () => {
+    setScanEnabled(true);
+    setBarcode(undefined);
+    setBeers([]);
+  };
+
   useEffect(() => {
-    if (enableScanner) {
+    if (barcode) {
       fetchBeers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode]);
+
+  useEffect(() => {
+    if (mobileMode) {
+      setScanEnabled(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -66,84 +72,38 @@ export default function Checker() {
       >
         <Typography variant="h5">Check Beer</Typography>
 
-        <IconButton aria-label="logout">
-          <CropFreeIcon />
-        </IconButton>
+        {mobileMode && (
+          <Box>
+            <IconButton onClick={() => setScanEnabled(false)}>
+              <SearchIcon />
+            </IconButton>
+            <IconButton onClick={resetScan}>
+              <CropFreeIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
       <Box sx={{ mt: 2, mb: 4 }}>
         <Divider />
       </Box>
-      <Box>
-        {barcode && !beers.length && noResult && (
+      {scanEnabled && (
+        <Box>
           <>
-            <Typography variant="h6">No Match</Typography>
-            <Typography>
-              We couldn&apos;t find any beers that match the barcode.
-            </Typography>
-          </>
-        )}
-        {barcode && !beers.length && !noResult && (
-          <>
-            <Typography variant="h6">No New Style</Typography>
-            <Typography>You&apos;ve already had this style</Typography>
-          </>
-        )}
-        {barcode && beers.length >= 1 && (
-          <>
-            <Typography>There are new styles!</Typography>
-            {/* {beers.map((beer) => (
-              <List disablePadding key={beer.beer.bid}>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component="a"
-                    href={`https://untappd.com/b/${beer.beer.beer_slug}/${beer.beer.bid}`}
-                    target="_blank"
-                  >
-                    <Typography
-                      sx={{
-                        display: "inline-flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                      }}
-                    >
-                      <Box>
-                        <Box>
-                          <Box component="span" sx={{ fontWeight: "500" }}>
-                            {beer.beer.beer_name}{" "}
-                          </Box>
-                          <Box component="span" sx={{ fontStyle: "italic" }}>
-                            ({beer.beer.beer_style})
-                          </Box>
-                        </Box>
-                        <Box>{beer.brewery.brewery_name}</Box>
-                      </Box>
-                      <OpenInNewIcon sx={{ opacity: 0.5 }} />
-                    </Typography>
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            ))} */}
-          </>
-        )}
-        <>
-          {enableScanner && (
-            <Box>
-              <BarcodeScannerComponent
-                width={"100%"}
-                height={"100%"}
-                onUpdate={(_err, result) => {
-                  if (result) {
-                    setBarcode(result.getText());
-                  }
-                }}
+            {barcode && <BarcodeResult result={beers} />}
+            {!barcode && (
+              <BarcodeScanner
+                paused={!scanEnabled}
+                onSuccess={scanSuccessHandler}
               />
-              <p>{data}</p>
-            </Box>
-          )}
+            )}
+          </>
+        </Box>
+      )}
+      {!scanEnabled && (
+        <Box>
           <BeerSearch />
-        </>
-      </Box>
+        </Box>
+      )}
     </>
   );
 }
