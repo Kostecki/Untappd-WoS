@@ -13,7 +13,7 @@ interface Beer {
   beer_ibu: number;
   beer_slug: string;
   beer_description: string;
-  is_in_production: numberM;
+  is_in_production: number;
   beer_style_id: number;
   beer_style: string;
   rating_score: number;
@@ -43,6 +43,20 @@ interface Brewery {
     lng: number;
   };
   brewery_active: number;
+}
+
+interface SearchableBeer {
+  bid: number;
+  beer_name: string;
+  beer_slug: string;
+  beer_style: string;
+  beer_label: string;
+  beer_abv: number;
+  beer_description: string;
+  brewery_id: number;
+  brewery_name: string;
+  hadBeer: boolean;
+  hadStyle: boolean;
 }
 
 interface FullBeer {

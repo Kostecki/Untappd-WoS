@@ -13,6 +13,7 @@ import lightThemeOptions from "../styles/theme/lightThemeOptions";
 import createEmotionCache from "../utils/createEmotionCache";
 
 import "@/styles/globals.css";
+import { BeersProvider } from "@/context/beers";
 
 interface AppPropsCustom extends AppProps {
   emotionCache?: EmotionCache;
@@ -36,7 +37,9 @@ export default function App({
             <MobileModeProvider>
               <StylesProvider>
                 <VenuesProvider>
-                  <Component {...pageProps} />
+                  <BeersProvider>
+                    <Component {...pageProps} />
+                  </BeersProvider>
                 </VenuesProvider>
               </StylesProvider>
             </MobileModeProvider>
