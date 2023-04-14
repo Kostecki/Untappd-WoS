@@ -6,12 +6,6 @@ import { useBeers } from "@/context/beers";
 
 import BeerPanel from "../BeerPanel";
 
-interface BeerPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
 export default function BeerSearch() {
   const [selectedBeer, setSelectedBeer] = useState<SearchableBeer | null>(null);
 
