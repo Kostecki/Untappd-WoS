@@ -15,7 +15,12 @@ interface Props {
 }
 
 const hints = new Map();
-const formats = [BarcodeFormat.EAN_8, BarcodeFormat.EAN_13];
+const formats = [
+  BarcodeFormat.EAN_8,
+  BarcodeFormat.EAN_13,
+  BarcodeFormat.UPC_A,
+  BarcodeFormat.UPC_E,
+];
 hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
 
 export default function BarcodeScanner({ paused, onSuccess }: Props) {
@@ -33,7 +38,6 @@ export default function BarcodeScanner({ paused, onSuccess }: Props) {
       })
       .then((stream) => {
         const id = stream.getVideoTracks()[0].getSettings().deviceId;
-        console.log(id);
         setDeviceId(id);
       })
       .catch((err) => console.error(err));
