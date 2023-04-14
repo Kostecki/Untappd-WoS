@@ -34,7 +34,8 @@ export default function Login() {
       sx={{
         background: "white",
         borderRadius: 2,
-        padding: 2,
+        p: 2,
+        mt: 2,
         [theme.breakpoints.up("md")]: {
           minWidth: "450px",
         },
