@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-import { Box, Typography, Divider, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Divider,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -14,6 +20,7 @@ export default function Checker() {
   const { data: session } = useSession();
   const { mobileMode } = useMobileMode();
 
+  const [loading, setLoading] = useState(false);
   const [scanEnabled, setScanEnabled] = useState(false);
   const [barcode, setBarcode] = useState<Barcode | undefined>(undefined);
   const [beers, setBeers] = useState([]);
@@ -26,13 +33,20 @@ export default function Checker() {
     if (session?.user && barcode) {
       const { apiBase, accessToken } = session.user;
 
+      setLoading(true);
+
       // For some reason Untappd handles all barcodes as UPC
       fetch(
         `${apiBase}/beer/checkbarcodemultiple?upc=${barcode?.value}&access_token=${accessToken}`
       )
         .then((response) => response.json())
         .then((data) => {
+          setLoading(false);
           setBeers(data.response.items);
+        })
+        .catch((err) => {
+          setLoading(false);
+          console.error(err);
         });
     }
   };
@@ -79,14 +93,19 @@ export default function Checker() {
           </Box>
         )}
       </Box>
-      <Box sx={{ mt: 2, mb: 4 }}>
+      <Box sx={{ my: 2 }}>
         <Divider />
       </Box>
       {scanEnabled && (
         <Box>
           <>
-            {barcode && <BarcodeResult result={beers} />}
-            {!barcode && (
+            {loading && (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+                <CircularProgress />
+              </Box>
+            )}
+            {!loading && barcode && <BarcodeResult result={beers} />}
+            {!loading && !barcode && (
               <BarcodeScanner
                 paused={!scanEnabled}
                 onSuccess={scanSuccessHandler}
