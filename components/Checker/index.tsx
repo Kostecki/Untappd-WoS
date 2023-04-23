@@ -64,13 +64,6 @@ export default function Checker() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode]);
 
-  useEffect(() => {
-    if (mobileMode) {
-      setScanEnabled(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <>
       <Box
