@@ -33,9 +33,9 @@ export default function Login() {
       component="form"
       sx={{
         background: "white",
-        borderRadius: 2,
+        borderRadius: 1,
         p: 2,
-        mt: 2,
+        m: 2,
         [theme.breakpoints.up("md")]: {
           minWidth: "450px",
         },
@@ -44,7 +44,7 @@ export default function Login() {
       noValidate
       autoComplete="off"
     >
-      <Typography variant="h3" color="black" sx={{ mt: 2 }}>
+      <Typography variant="h3" color="black" sx={{ mt: 2, fontSize: 44 }}>
         Wheel of Styles
       </Typography>
       <Typography
