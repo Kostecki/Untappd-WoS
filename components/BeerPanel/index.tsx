@@ -78,35 +78,23 @@ export default function BeerPanel({ beer }: Props) {
               alignItems: "center",
             }}
           >
-            {beer.hadStyle ? (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ fontSize: 25 }}>🤷‍♂️</Box>
-                <Typography sx={{ fontSize: 12 }}>Style: Yes</Typography>
-                <Typography sx={{ fontSize: 12 }}>
-                  Beer: {beer.hadStyle ? "Yes" : "No"}
-                </Typography>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Box sx={{ fontSize: 25 }}>👍</Box>
-                <Typography sx={{ fontSize: 12 }}>Style: No</Typography>
-                <Typography sx={{ fontSize: 12 }}>
-                  Beer: {beer.hadStyle ? "Yes" : "No"}
-                </Typography>
-              </Box>
-            )}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ fontSize: 25 }}>{`${
+                beer.hadStyle ? "🤷‍♂️" : "👍"
+              } `}</Box>
+              <Typography sx={{ fontSize: 12 }}>{`Style: ${
+                beer.hadStyle ? "Yes" : "No"
+              }`}</Typography>
+              <Typography sx={{ fontSize: 12 }}>
+                Beer: {beer.hadBeer ? "Yes" : "No"}
+              </Typography>
+            </Box>
           </Grid>
         </Grid>
       </CardActionArea>
