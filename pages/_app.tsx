@@ -8,12 +8,13 @@ import { CacheProvider, EmotionCache } from "@emotion/react";
 import { MobileModeProvider } from "@/context/mobileMode";
 import { StylesProvider } from "@/context/styles";
 import { VenuesProvider } from "@/context/venues";
+import { BeersProvider } from "@/context/beers";
+import { ListsProvider } from "@/context/lists";
 
 import lightThemeOptions from "../styles/theme/lightThemeOptions";
 import createEmotionCache from "../utils/createEmotionCache";
 
 import "@/styles/globals.css";
-import { BeersProvider } from "@/context/beers";
 
 interface AppPropsCustom extends AppProps {
   emotionCache?: EmotionCache;
@@ -35,13 +36,15 @@ export default function App({
         <ThemeProvider theme={lightTheme}>
           <main className={inter.className}>
             <MobileModeProvider>
-              <StylesProvider>
-                <VenuesProvider>
-                  <BeersProvider>
-                    <Component {...pageProps} />
-                  </BeersProvider>
-                </VenuesProvider>
-              </StylesProvider>
+              <ListsProvider>
+                <StylesProvider>
+                  <VenuesProvider>
+                    <BeersProvider>
+                      <Component {...pageProps} />
+                    </BeersProvider>
+                  </VenuesProvider>
+                </StylesProvider>
+              </ListsProvider>
             </MobileModeProvider>
           </main>
         </ThemeProvider>

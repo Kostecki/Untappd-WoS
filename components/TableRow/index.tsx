@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { useSession } from "next-auth/react";
-import Cookies from "universal-cookie";
 
 import {
   TableCell,
@@ -34,8 +33,6 @@ type Props = {
 };
 
 export default function TR({ style }: Props) {
-  const cookies = new Cookies();
-
   const { data: session } = useSession();
   const { showHaveHad } = useStyles();
 
