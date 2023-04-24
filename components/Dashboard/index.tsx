@@ -20,9 +20,9 @@ import { useStyles } from "@/context/styles";
 
 import CircularProgress from "../CircularProgress";
 import Spinner from "../Spinner";
+import SettingsModal from "../SettingsModal";
 
 import styles from "./Dashboard.module.css";
-import SettingsModal from "../SettingsModal";
 
 export default function Dashboard() {
   const { data: session } = useSession();

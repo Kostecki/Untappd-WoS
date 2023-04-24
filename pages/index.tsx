@@ -1,26 +1,37 @@
 import { useEffect } from "react";
+
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { Container, Paper } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
+import Cookies from "universal-cookie";
 
 import { useMobileMode } from "@/context/mobileMode";
+import { useLists } from "@/context/lists";
 import { useStyles } from "@/context/styles";
 
 import Login from "@/components/Login";
 import Dashboard from "@/components/Dashboard";
 import VenueSearch from "@/components/VenueSearch";
 import StylesTable from "@/components/StylesTable";
-
-import styles from "@/styles/Home.module.css";
 import Checker from "@/components/Checker";
 
+import styles from "@/styles/Home.module.css";
+
 export default function Home() {
+  const cookies = new Cookies();
+
   const { data: session } = useSession();
   const { updateMobileMode } = useMobileMode();
+  const { setSelectedList } = useLists();
   const { fetchStyles } = useStyles();
 
   useEffect(() => {
+    const listId = cookies.get("stock-list");
+    if (listId) {
+      setSelectedList(listId);
+    }
+
     if (session?.user) {
       fetchStyles();
     }
