@@ -1,5 +1,7 @@
 import { createContext, useContext, ReactNode, useState } from "react";
+
 import { useSession } from "next-auth/react";
+import Cookies from "universal-cookie";
 
 type stylesContextType = {
   loading: boolean;
@@ -34,6 +36,8 @@ type Props = {
 };
 
 export function StylesProvider({ children }: Props) {
+  const cookies = new Cookies();
+
   const { data: session } = useSession();
 
   const [loading, setLoading] = useState(false);
@@ -69,7 +73,7 @@ export function StylesProvider({ children }: Props) {
 
       fetch(`${apiBase}/badges/styles_not_had?access_token=${accessToken}`)
         .then((response) => response.json())
-        .then((data) => {
+        .then(async (data) => {
           const items = data.response.items;
           const stylesNotHad = items.map((style: NotHadStyle) => ({
             style_id: style.style_id,
@@ -86,10 +90,48 @@ export function StylesProvider({ children }: Props) {
               : 0
           );
 
+          const storedListName = cookies.get("stockList");
+          if (storedListName) {
+            const personalStock = await loadFromPersonalStock();
+
+            payload.forEach((e, i) => {
+              if (personalStock.includes(e.style_id)) {
+                payload[i].onList = storedListName;
+              }
+            });
+          }
+
           setStyles(payload);
           setLoading(false);
         })
         .catch((error) => console.error("Error:", error));
+    }
+  };
+
+  const loadFromPersonalStock = async () => {
+    if (session?.user) {
+      const { apiBase, accessToken } = session.user;
+
+      const storedListName = cookies.get("stockList");
+      if (storedListName) {
+        const listId = await fetch(
+          `${apiBase}/custom_lists/userlists?access_token=${accessToken}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            return data.response.items.find(
+              (list: UserLists) => list.list_name === storedListName
+            ).list_id;
+          });
+
+        return fetch(
+          `${apiBase}/custom_lists/view/${listId}?styles=true&access_token=${accessToken}`
+        )
+          .then((response) => response.json())
+          .then((data) =>
+            data.response.items.map((item: Userlist) => item.beer.beer_style_id)
+          );
+      }
     }
   };
 

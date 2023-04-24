@@ -2,6 +2,7 @@ interface Style {
   had: boolean;
   style_id: number;
   style_name: string;
+  onList?: string;
 }
 
 interface BadgeStyle {

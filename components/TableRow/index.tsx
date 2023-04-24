@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useSession } from "next-auth/react";
+import Cookies from "universal-cookie";
 
 import {
   TableCell,
@@ -33,6 +34,8 @@ type Props = {
 };
 
 export default function TR({ style }: Props) {
+  const cookies = new Cookies();
+
   const { data: session } = useSession();
   const { showHaveHad } = useStyles();
 
@@ -129,11 +132,25 @@ export default function TR({ style }: Props) {
               },
             }}
           >
-            <TableCell component="th" scope="row" sx={{ fontWeight: "bold" }}>
-              {style.style_name}
+            <TableCell
+              component="th"
+              scope="row"
+              sx={{ fontWeight: "bold", display: "flex" }}
+            >
+              {style.style_name}{" "}
+              {style.onList && (
+                <Box sx={{ ml: 1, fontStyle: "italic", opacity: 0.5 }}>
+                  (List: {style.onList})
+                </Box>
+              )}
             </TableCell>
             <TableCell padding="checkbox" align="center">
-              <Checkbox color="primary" checked={style.had} disabled />
+              <Checkbox
+                color="primary"
+                checked={style.had}
+                indeterminate={style.onList ? true : false}
+                disabled
+              />
             </TableCell>
           </TableRow>
           <TableRow>
