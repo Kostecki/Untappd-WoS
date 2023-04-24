@@ -2,6 +2,8 @@ import { Box, Typography, Card, CardActionArea } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 
 import Image from "next/image";
+
+import { useStyles } from "@/context/styles";
 import deepLinker from "@/utils/deepLinkFromBrowser";
 
 import styles from "./BeerPanel.module.css";
@@ -11,6 +13,12 @@ interface Props {
 }
 
 export default function BeerPanel({ beer }: Props) {
+  const { styles: stylesList } = useStyles();
+
+  const onList = () =>
+    stylesList.find((style: Style) => style.style_name === beer.beer_style)
+      ?.onList;
+
   const clickHandler = () => {
     const { bid, beer_slug } = beer;
     const appUrl = `untappd://beer/${bid}`;
@@ -91,6 +99,11 @@ export default function BeerPanel({ beer }: Props) {
               <Typography sx={{ fontSize: 12 }}>{`Style: ${
                 beer.hadStyle ? "Yes" : "No"
               }`}</Typography>
+              {onList() && (
+                <Typography
+                  sx={{ fontSize: 12 }}
+                >{`List: ${onList()}`}</Typography>
+              )}
               <Typography sx={{ fontSize: 12 }}>
                 Beer: {beer.hadBeer ? "Yes" : "No"}
               </Typography>

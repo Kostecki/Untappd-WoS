@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useStyles } from "@/context/styles";
+
 import {
   List,
   ListItem,
@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
+import { useStyles } from "@/context/styles";
 import { useVenues } from "@/context/venues";
 import deepLinker from "../../utils/deepLinkFromBrowser";
 
@@ -33,6 +34,10 @@ export default function BeersTable({ selectedVenue }: Props) {
 
   const hasHad = (styleName: string) => {
     return styles.find((style: Style) => style.style_name === styleName)?.had;
+  };
+
+  const onList = (styleId: number) => {
+    return styles.find((style: Style) => style.style_id === styleId)?.onList;
   };
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -107,7 +112,9 @@ export default function BeersTable({ selectedVenue }: Props) {
               const beerSlug = beer.beer.beer_slug;
               const beerName = beer.beer.beer_name;
               const beerStyle = beer.beer.beer_style;
+              const styleId = beer.beer.beer_style_id;
               const breweryName = beer.brewery.brewery_name;
+              const stockList = onList(styleId);
 
               return (
                 <List disablePadding key={beerId}>
@@ -125,14 +132,29 @@ export default function BeersTable({ selectedVenue }: Props) {
                       >
                         <Box>
                           <Box>
-                            <Box component="span" sx={{ fontWeight: "500" }}>
-                              {beerName}{" "}
+                            <Box
+                              component="div"
+                              sx={{ fontWeight: "500", display: "flex" }}
+                            >
+                              {`${beerName} (${breweryName})`}
                             </Box>
-                            <Box component="span" sx={{ fontStyle: "italic" }}>
-                              ({beerStyle})
+                            <Box
+                              component="div"
+                              sx={{ display: "flex", fontStyle: "italic" }}
+                            >
+                              {beerStyle}
+                              {stockList && (
+                                <Box
+                                  sx={{
+                                    opacity: 0.5,
+                                    ml: 1,
+                                  }}
+                                >
+                                  (List: {stockList})
+                                </Box>
+                              )}
                             </Box>
                           </Box>
-                          <Box>{breweryName}</Box>
                         </Box>
                         <OpenInNewIcon sx={{ opacity: 0.5 }} />
                       </Typography>
