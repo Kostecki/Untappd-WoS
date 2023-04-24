@@ -77,6 +77,11 @@ export default function BeerPanel({ beer }: Props) {
             <Typography variant="h6" sx={{ fontSize: 12, fontWeight: "bold" }}>
               {beer.beer_style}
             </Typography>
+            {onList() && (
+              <Typography
+                sx={{ fontSize: 12, fontStyle: "italic", mt: 0.5 }}
+              >{`List: ${onList()}`}</Typography>
+            )}
           </Grid>
           <Grid
             xs={3}
@@ -99,11 +104,6 @@ export default function BeerPanel({ beer }: Props) {
               <Typography sx={{ fontSize: 12 }}>{`Style: ${
                 beer.hadStyle ? "Yes" : "No"
               }`}</Typography>
-              {onList() && (
-                <Typography
-                  sx={{ fontSize: 12 }}
-                >{`List: ${onList()}`}</Typography>
-              )}
               <Typography sx={{ fontSize: 12 }}>
                 Beer: {beer.hadBeer ? "Yes" : "No"}
               </Typography>
