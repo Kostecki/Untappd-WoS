@@ -1,3 +1,5 @@
+// https://gist.github.com/diachedelic/0d60233dab3dcae3215da8a4dfdcd434
+
 function deepLinker(options) {
   if (!options) {
     throw new Error("no options");
