@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Avatar,
@@ -13,6 +13,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { useSession, signOut } from "next-auth/react";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useMobileMode } from "@/context/mobileMode";
 import { useStyles } from "@/context/styles";
@@ -21,6 +22,7 @@ import CircularProgress from "../CircularProgress";
 import Spinner from "../Spinner";
 
 import styles from "./Dashboard.module.css";
+import SettingsModal from "../SettingsModal";
 
 export default function Dashboard() {
   const { data: session } = useSession();
@@ -34,6 +36,8 @@ export default function Dashboard() {
     toggleShowHaveHad,
   } = useStyles();
 
+  const [showSettings, setShowSettings] = useState(false);
+
   const checkinsPerLevel = 5;
 
   const calcLeftToNextLevel = () => haveHadCount % checkinsPerLevel;
@@ -43,7 +47,6 @@ export default function Dashboard() {
     if (totalStyles === 0) {
       fetchStyles();
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -72,9 +75,14 @@ export default function Dashboard() {
             </Typography>
           </>
         </Box>
-        <IconButton onClick={() => signOut()} aria-label="logout">
-          <LogoutIcon />
-        </IconButton>
+        <Box>
+          <IconButton sx={{ mr: 1 }} onClick={() => setShowSettings(true)}>
+            <SettingsIcon />
+          </IconButton>
+          <IconButton onClick={() => signOut()} aria-label="logout">
+            <LogoutIcon />
+          </IconButton>
+        </Box>
       </Box>
       <Box sx={{ my: 2 }}>
         <Divider />
@@ -226,6 +234,8 @@ export default function Dashboard() {
           </Box>
         )}
       </Box>
+
+      <SettingsModal open={showSettings} openHandler={setShowSettings} />
     </>
   );
 }
