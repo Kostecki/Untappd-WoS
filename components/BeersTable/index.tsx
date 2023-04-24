@@ -117,7 +117,7 @@ export default function BeersTable({ selectedVenue }: Props) {
       {venueBeers.map((menu: VenueOffering, index: number) => (
         <TabPanel value={value} index={index} key={index}>
           {!hasBeers(menu.beers) && (
-            <Typography sx={{ ml: 2, mt: 2 }}>No new styles..</Typography>
+            <Typography sx={{ ml: 2, mt: 2 }}>No new styles here..</Typography>
           )}
           {menu.beers.map((beer: FullBeer) => {
             if (!beer.beer.has_had && !hasHad(beer.beer.beer_style)) {
