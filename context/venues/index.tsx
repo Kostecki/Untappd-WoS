@@ -101,28 +101,51 @@ export function VenuesProvider({ children }: Props) {
 
       setVenueBeersLoading(true);
       const { venue_id, venue_name, venue_slug } = venue;
+      const isMBCC = venue_id === 99991337;
 
-      fetch(
-        `${apiBase}/inventory/view/${venue_id}?hasNotHadBefore=true&access_token=${accessToken}`
-      )
+      let url = `${apiBase}/inventory/view/${venue_id}?hasNotHadBefore=true&access_token=${accessToken}`;
+
+      // Handle special case MBCC
+      if (isMBCC) {
+        url = "api/mbcc";
+      }
+
+      fetch(url)
         .then((response) => response.json())
         .then((data) => {
           const beers: VenueOffering[] = [];
 
-          data.response.items.forEach((e: MenuItem) => {
-            const list: FullBeer[] = [];
-            e.menu.sections.items.forEach((menu: Menu) => {
-              return list.push(...menu.items);
-            });
+          if (isMBCC) {
+            Object.keys(data).forEach((e: any) => {
+              const list: FullBeer[] = [];
+              data[e].forEach((beer: any) => list.push(beer));
 
-            beers.push({
-              beers: list,
-              menu: e.menu.menu_name,
-              venueId: venue_id,
-              venueName: venue_name,
-              venueSlug: venue_slug,
+              beers.push({
+                beers: list,
+                menu: e,
+                venueId: venue_id,
+                venueName: venue_name,
+                venueSlug: venue_slug,
+              });
             });
-          });
+          } else {
+            data.response.items.forEach((e: MenuItem) => {
+              const list: FullBeer[] = [];
+
+              e.menu.sections.items.forEach((menu: Menu) => {
+                console.log(menu);
+                return list.push(...menu.items);
+              });
+
+              beers.push({
+                beers: list,
+                menu: e.menu.menu_name,
+                venueId: venue_id,
+                venueName: venue_name,
+                venueSlug: venue_slug,
+              });
+            });
+          }
 
           setVenueBeers(beers);
           setVenueBeersLoading(false);
