@@ -117,7 +117,6 @@ export function StylesProvider({ children }: Props) {
         )
           .then((response) => response.json())
           .then((data) => {
-            console.log(data.response);
             return {
               styleIds: data.response.items.map(
                 (item: UserListDetails) => item.beer.beer_style_id

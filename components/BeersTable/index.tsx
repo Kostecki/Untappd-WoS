@@ -34,8 +34,18 @@ export default function BeersTable({ selectedVenue }: Props) {
 
   // TODO: Fix type
   const hasBeers = (beerMenu: FullBeer[]) => {
+    // Handle MBCC beers without styleId but not rely on name === name for ALL beers
+    if (!beerMenu[0].beer.beer_style_id) {
+      const venueMenuBeerIds = beerMenu.map(
+        (beer: FullBeer) => beer.beer.beer_style
+      );
+      return styles.some(
+        (style) => venueMenuBeerIds.includes(style.style_name) && !style.had
+      );
+    }
+
     const venueMenuBeerIds = beerMenu.map(
-      (beer: FullBeer) => beer.beer.beer_style_id
+      (beer: FullBeer) => beer.beer.beer_style_id ?? beer.beer.beer_style
     );
     return styles.some(
       (style) => venueMenuBeerIds.includes(style.style_id) && !style.had
@@ -46,8 +56,11 @@ export default function BeersTable({ selectedVenue }: Props) {
     return styles.find((style: Style) => style.style_name === styleName)?.had;
   };
 
-  const onList = (styleId: number) => {
-    return styles.find((style: Style) => style.style_id === styleId)?.onList;
+  const onList = (styleInput: number | string) => {
+    return styles.find(
+      (style: Style) =>
+        style.style_id == styleInput || style.style_name === styleInput
+    )?.onList;
   };
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -120,14 +133,18 @@ export default function BeersTable({ selectedVenue }: Props) {
             <Typography sx={{ ml: 2, mt: 2 }}>No new styles here..</Typography>
           )}
           {menu.beers.map((beer: FullBeer) => {
-            if (!beer.beer.has_had && !hasHad(beer.beer.beer_style)) {
+            if (
+              beer.beer.bid &&
+              !beer.beer.has_had &&
+              !hasHad(beer.beer.beer_style)
+            ) {
               const beerId = beer.beer.bid;
               const beerSlug = beer.beer.beer_slug;
               const beerName = beer.beer.beer_name;
               const beerStyle = beer.beer.beer_style;
               const styleId = beer.beer.beer_style_id;
               const breweryName = beer.brewery.brewery_name;
-              const stockList = onList(styleId);
+              const stockList = onList(styleId ?? beerStyle);
 
               return (
                 <List disablePadding key={beerId}>

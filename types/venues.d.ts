@@ -1,15 +1,15 @@
 interface Venue {
-  is_closed: string;
-  is_verified: true;
+  is_closed: number;
+  is_verified: boolean;
   location: string;
   primary_category: string;
   venue_address: string;
   venue_city: string;
   venue_country: string;
   venue_icon: {
-    sm: string;
-    md: string;
-    lg: string;
+    sm?: string;
+    md?: string;
+    lg?: string;
   };
   venue_id: number;
   venue_name: string;

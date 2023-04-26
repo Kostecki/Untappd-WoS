@@ -15,25 +15,6 @@ import { useVenues } from "@/context/venues";
 
 import styles from "./VenueSearch.module.css";
 
-interface Venue {
-  is_closed: string;
-  is_verified: true;
-  location: string;
-  primary_category: string;
-  venue_address: string;
-  venue_city: string;
-  venue_country: string;
-  venue_icon: {
-    sm: string;
-    md: string;
-    lg: string;
-  };
-  venue_id: number;
-  venue_name: string;
-  venue_slug: string;
-  venue_state: string;
-}
-
 export default function VenueSearch() {
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
@@ -44,6 +25,23 @@ export default function VenueSearch() {
     searchForVenues,
     fetchVenueBeers,
   } = useVenues();
+
+  const mbcc = [
+    {
+      venue_id: 99991337,
+      venue_name: "MBCC 2023",
+      is_closed: 0,
+      primary_category: "Nightlife Spot",
+      venue_slug: "",
+      location: "København, Region Hovedstaden",
+      venue_address: "Jernbanegade 7",
+      venue_city: "København",
+      venue_state: "Region Hovedstaden",
+      venue_country: "Danmark",
+      is_verified: true,
+      venue_icon: {},
+    },
+  ];
 
   useEffect(() => {
     if (selectedVenue) {
@@ -69,7 +67,7 @@ export default function VenueSearch() {
         <Autocomplete
           disablePortal
           id="combo-box-demo"
-          options={venues}
+          options={[...mbcc, ...venues]}
           getOptionLabel={(option) =>
             `${option.venue_name} (${option.venue_city}, ${option.venue_country})`
           }
@@ -119,7 +117,7 @@ export default function VenueSearch() {
           )}
         />
       </Box>
-      {venueBeers.length > 0 && (
+      {venueBeers.length > 0 && venueBeers[0].venueSlug && (
         <Box sx={{ mb: 4 }}>
           <Typography>
             <Link
