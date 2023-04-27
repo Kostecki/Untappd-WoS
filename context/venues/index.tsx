@@ -116,13 +116,13 @@ export function VenuesProvider({ children }: Props) {
           const beers: VenueOffering[] = [];
 
           if (isMBCC) {
-            Object.keys(data).forEach((e: any) => {
+            Object.keys(data).forEach((session: string) => {
               const list: FullBeer[] = [];
-              data[e].forEach((beer: any) => list.push(beer));
+              data[session].forEach((beer: any) => list.push(beer));
 
               beers.push({
                 beers: list,
-                menu: e,
+                menu: session,
                 venueId: venue_id,
                 venueName: venue_name,
                 venueSlug: venue_slug,
