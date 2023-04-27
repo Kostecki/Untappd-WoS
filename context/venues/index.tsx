@@ -44,6 +44,9 @@ export function VenuesProvider({ children }: Props) {
   const [venueBeers, setVenueBeers] = useState<VenueOffering[]>([]);
   const [venueBeersLoading, setVenueBeersLoading] = useState(false);
 
+  // MBCC session order
+  const sessions = ["yellow", "blue", "red", "green"];
+
   const searchForVenues = debounce((query) => {
     if (session?.user) {
       const { apiBase, accessToken } = session.user;
@@ -147,7 +150,11 @@ export function VenuesProvider({ children }: Props) {
             });
           }
 
-          setVenueBeers(beers);
+          const MBCCSort = beers.sort(
+            (a, b) => sessions.indexOf(a.menu) - sessions.indexOf(b.menu)
+          );
+
+          setVenueBeers(isMBCC ? beers : MBCCSort);
           setVenueBeersLoading(false);
         })
         .catch((error) => {
