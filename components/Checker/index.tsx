@@ -86,7 +86,7 @@ export default function Checker() {
           </Box>
         )}
       </Box>
-      <Box sx={{ my: 2 }}>
+      <Box sx={{ mt: 2, mb: 4 }}>
         <Divider />
       </Box>
       {scanEnabled && (
