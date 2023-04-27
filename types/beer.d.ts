@@ -1,7 +1,6 @@
 interface Price {
   value: string;
   currency: string;
-  curreny_symbol: string;
   currency_symbol: string;
 }
 
@@ -65,4 +64,33 @@ interface FullBeer {
   serving_type: string;
   beer: Beer;
   brewery: Brewery;
+}
+
+interface JonPackerBeer {
+  name: string;
+  ut_bid: number;
+  brewery: string;
+  session: string;
+  superstyle: string;
+}
+
+interface JonPackerBeerFiltered {
+  beer: {
+    bid: number;
+    beer_name: string;
+    beer_style: string;
+  };
+  brewery: {
+    brewery_name: string;
+  };
+  session: string;
+  created_at: string;
+  price: Price;
+  serving_type: string;
+}
+
+interface JonPayload {
+  session: string;
+  order: number;
+  beers: JonPackerBeerFiltered[];
 }

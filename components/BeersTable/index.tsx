@@ -32,7 +32,6 @@ export default function BeersTable({ selectedVenue }: Props) {
   const { styles } = useStyles();
   const { venueBeers, venueBeersLoading } = useVenues();
 
-  // TODO: Fix type
   const hasBeers = (beerMenu: FullBeer[]) => {
     // Handle MBCC beers without styleId but not rely on name === name for ALL beers
     if (!beerMenu[0].beer.beer_style_id) {

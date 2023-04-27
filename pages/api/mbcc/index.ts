@@ -11,7 +11,7 @@ export default async function handler(
     .then((res) => res.json())
     .then((data) => data.beers);
 
-  const transformed = beers.map((beer: any) => {
+  const transformed = beers.map((beer: JonPackerBeer) => {
     return {
       beer: {
         bid: beer.ut_bid,
@@ -25,16 +25,22 @@ export default async function handler(
     };
   });
 
-  const filtered = transformed.filter((beer: any) =>
+  const filtered = transformed.filter((beer: JonPackerBeerFiltered) =>
     sessions.includes(beer.session)
   );
 
-  const splitBySession = filtered.reduce((acc: any, obj: any) => {
-    const key = obj["session"];
-    const curGroup = acc[key] ?? [];
+  const splitBySession = filtered.reduce(
+    (
+      acc: { [key: string]: JonPackerBeerFiltered[] },
+      obj: JonPackerBeerFiltered
+    ) => {
+      const key = obj["session"];
+      const curGroup = acc[key] ?? [];
 
-    return { ...acc, [key]: [...curGroup, obj] };
-  }, {});
+      return { ...acc, [key]: [...curGroup, obj] };
+    },
+    {}
+  );
 
   res.status(200).json(splitBySession);
 }
