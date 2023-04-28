@@ -6,8 +6,8 @@ import { Container, Paper } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
 import Cookies from "universal-cookie";
 
+import { useSettings } from "@/context/settings";
 import { useMobileMode } from "@/context/mobileMode";
-import { useLists } from "@/context/lists";
 import { useStyles } from "@/context/styles";
 
 import Login from "@/components/Login";
@@ -17,29 +17,31 @@ import StylesTable from "@/components/StylesTable";
 import Checker from "@/components/Checker";
 
 import styles from "@/styles/Home.module.css";
+import Countries from "@/components/Countries";
 
 export default function Home() {
   const cookies = new Cookies();
 
   const { data: session } = useSession();
+
+  const { featureCountryBadges, updateSettings } = useSettings();
   const { updateMobileMode } = useMobileMode();
-  const { setSelectedList } = useLists();
   const { fetchStyles } = useStyles();
 
   useEffect(() => {
-    const listId = cookies.get("stock-list");
-    if (listId) {
-      setSelectedList(listId);
+    const settings = cookies.get("settings");
+    if (settings) {
+      updateSettings(settings);
     }
 
     if (session?.user) {
       fetchStyles();
     }
 
-    function handleResize() {
+    const handleResize = () => {
       const width = window.innerWidth;
       updateMobileMode(width < 800);
-    }
+    };
 
     window.addEventListener("resize", handleResize);
     handleResize();
@@ -103,6 +105,11 @@ export default function Home() {
                 <Paper sx={{ mb: 2, p: 2 }}>
                   <Checker />
                 </Paper>
+                {featureCountryBadges && (
+                  <Paper sx={{ mb: 2, p: 2 }}>
+                    <Countries />
+                  </Paper>
+                )}
               </Grid2>
             </Grid2>
           </Container>

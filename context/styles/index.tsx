@@ -1,8 +1,14 @@
-import { createContext, useContext, ReactNode, useState } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 
 import { useSession } from "next-auth/react";
 
-import { useLists } from "../lists";
+import { useSettings } from "../settings";
 
 type stylesContextType = {
   loading: boolean;
@@ -12,7 +18,7 @@ type stylesContextType = {
   styles: Style[];
   showHaveHad: boolean;
   toggleShowHaveHad: () => void;
-  fetchStyles: () => void;
+  fetchStyles: (stockListId?: number) => void;
 };
 
 const stylesContextValues: stylesContextType = {
@@ -38,13 +44,14 @@ type Props = {
 
 export function StylesProvider({ children }: Props) {
   const { data: session } = useSession();
-  const { selectedListId } = useLists();
+
+  const { stockListId: settingsStockListId } = useSettings();
 
   const [loading, setLoading] = useState(false);
   const [styles, setStyles] = useState<Style[]>([]);
   const [showHaveHad, setShowHaveHad] = useState(false);
 
-  const fetchStyles = async () => {
+  const fetchStyles = async (stockListId?: number) => {
     setLoading(true);
 
     if (session?.user) {
@@ -62,12 +69,15 @@ export function StylesProvider({ children }: Props) {
             had: true,
           }));
 
-          getStylesNotHad(stylesHad);
+          getStylesNotHad(stylesHad, stockListId ?? settingsStockListId);
         });
     }
   };
 
-  const getStylesNotHad = (stylesHad: CombinedStyle[]) => {
+  const getStylesNotHad = (
+    stylesHad: CombinedStyle[],
+    stockListId?: number
+  ) => {
     if (session?.user) {
       const { apiBase, accessToken } = session.user;
 
@@ -90,8 +100,8 @@ export function StylesProvider({ children }: Props) {
               : 0
           );
 
-          if (selectedListId) {
-            const personalStock = await loadFromPersonalStock();
+          if (stockListId) {
+            const personalStock = await loadFromPersonalStock(stockListId);
 
             payload.forEach((e, i) => {
               if (personalStock?.styleIds.includes(e.style_id)) {
@@ -107,13 +117,13 @@ export function StylesProvider({ children }: Props) {
     }
   };
 
-  const loadFromPersonalStock = async () => {
+  const loadFromPersonalStock = async (stockListId?: number) => {
     if (session?.user) {
       const { apiBase, accessToken } = session.user;
 
-      if (selectedListId) {
+      if (stockListId) {
         return fetch(
-          `${apiBase}/custom_lists/view/${selectedListId}?styles=true&access_token=${accessToken}`
+          `${apiBase}/custom_lists/view/${stockListId}?styles=true&access_token=${accessToken}`
         )
           .then((response) => response.json())
           .then((data) => {

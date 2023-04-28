@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 import {
   Dialog,
@@ -13,7 +19,13 @@ import {
   InputLabel,
   CircularProgress,
   Box,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  Typography,
 } from "@mui/material";
+
+import { useSettings } from "@/context/settings";
 import { useLists } from "@/context/lists";
 import { useStyles } from "@/context/styles";
 
@@ -24,34 +36,44 @@ interface Props {
 
 export default function SettingsModal({ open, openHandler }: Props) {
   const {
-    userLists,
-    selectedListId,
-    fetchUserLists,
-    setSelectedList,
-    loading,
-  } = useLists();
+    saveSettings,
+    stockListId: settingsStockListId,
+    featureCountryBadges,
+  } = useSettings();
+  const { userLists, fetchUserLists, loading } = useLists();
   const { fetchStyles } = useStyles();
 
   const [touched, setTouched] = useState(false);
+  const [stockListId, setStockListId] = useState<number | undefined>(undefined);
+  const [countryBadges, setCountryBadges] = useState(false);
 
-  const handleChange = (event: SelectChangeEvent) => {
-    const listId = event.target.value as string;
-    setSelectedList(listId);
+  const handleListUpdate = (event: SelectChangeEvent) => {
+    const listId = parseInt(event.target.value as string);
+    setStockListId(listId);
 
-    if (listId !== selectedListId) {
+    if (listId !== settingsStockListId) {
       setTouched(true);
     }
   };
 
-  const closeHandler = () => {
+  const handleChange = () => {
+    saveSettings({
+      stockListId,
+      featureCountryBadges: countryBadges,
+    });
+
     if (touched) {
-      fetchStyles();
+      fetchStyles(stockListId);
+      setTouched(false);
     }
 
     openHandler(false);
   };
 
   useEffect(() => {
+    setStockListId(settingsStockListId);
+    setCountryBadges(featureCountryBadges);
+
     if (!userLists.length && open) {
       fetchUserLists();
     }
@@ -78,8 +100,8 @@ export default function SettingsModal({ open, openHandler }: Props) {
             <Select
               id="stock-list-select"
               label="Stock list"
-              value={selectedListId}
-              onChange={handleChange}
+              value={stockListId?.toString()}
+              onChange={handleListUpdate}
             >
               <MenuItem value="">
                 <em>None</em>
@@ -92,9 +114,23 @@ export default function SettingsModal({ open, openHandler }: Props) {
             </Select>
           </FormControl>
         )}
+        <Box sx={{ mt: 4 }}>
+          <Typography sx={{ fontWeight: "bold" }}>Extra features</Typography>
+          <FormGroup sx={{ mt: 1 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={countryBadges}
+                  onChange={(_event, checked) => setCountryBadges(checked)}
+                />
+              }
+              label="Country badges"
+            />
+          </FormGroup>
+        </Box>
       </DialogContent>
       <DialogActions sx={{ mr: 1 }}>
-        <Button onClick={() => closeHandler()}>Close</Button>
+        <Button onClick={handleChange}>Save</Button>
       </DialogActions>
     </Dialog>
   );
