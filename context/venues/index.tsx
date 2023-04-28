@@ -135,10 +135,9 @@ export function VenuesProvider({ children }: Props) {
             data.response.items.forEach((e: MenuItem) => {
               const list: FullBeer[] = [];
 
-              e.menu.sections.items.forEach((menu: Menu) => {
-                console.log(menu);
-                return list.push(...menu.items);
-              });
+              e.menu.sections.items.forEach((menu: Menu) =>
+                list.push(...menu.items)
+              );
 
               beers.push({
                 beers: list,

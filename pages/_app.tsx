@@ -5,11 +5,13 @@ import { Inter } from "next/font/google";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 
+import { SettingsProvider } from "@/context/settings";
 import { MobileModeProvider } from "@/context/mobileMode";
 import { StylesProvider } from "@/context/styles";
 import { VenuesProvider } from "@/context/venues";
 import { BeersProvider } from "@/context/beers";
 import { ListsProvider } from "@/context/lists";
+import { CountriesProvider } from "@/context/countries";
 
 import lightThemeOptions from "../styles/theme/lightThemeOptions";
 import createEmotionCache from "../utils/createEmotionCache";
@@ -35,17 +37,21 @@ export default function App({
       <CacheProvider value={emotionCache}>
         <ThemeProvider theme={lightTheme}>
           <main className={inter.className}>
-            <MobileModeProvider>
-              <ListsProvider>
-                <StylesProvider>
-                  <VenuesProvider>
-                    <BeersProvider>
-                      <Component {...pageProps} />
-                    </BeersProvider>
-                  </VenuesProvider>
-                </StylesProvider>
-              </ListsProvider>
-            </MobileModeProvider>
+            <SettingsProvider>
+              <MobileModeProvider>
+                <ListsProvider>
+                  <StylesProvider>
+                    <VenuesProvider>
+                      <BeersProvider>
+                        <CountriesProvider>
+                          <Component {...pageProps} />
+                        </CountriesProvider>
+                      </BeersProvider>
+                    </VenuesProvider>
+                  </StylesProvider>
+                </ListsProvider>
+              </MobileModeProvider>
+            </SettingsProvider>
           </main>
         </ThemeProvider>
       </CacheProvider>

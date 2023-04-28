@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { signIn } from "next-auth/react";
+
 import { Box, Typography, useTheme, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
@@ -63,6 +65,7 @@ export default function Login() {
           value={username}
           onChange={handleUsername}
           onKeyDown={clickHandler}
+          disabled={loading}
         />
       </div>
       <div>
@@ -74,6 +77,7 @@ export default function Login() {
           value={password}
           onChange={handlePassword}
           onKeyDown={clickHandler}
+          disabled={loading}
         />
       </div>
       <Box sx={{ textAlign: "right" }}>
