@@ -26,23 +26,6 @@ export default function VenueSearch() {
     fetchVenueBeers,
   } = useVenues();
 
-  const mbcc = [
-    {
-      venue_id: 99991337,
-      venue_name: "MBCC 2023",
-      is_closed: 0,
-      primary_category: "Nightlife Spot",
-      venue_slug: "",
-      location: "København, Region Hovedstaden",
-      venue_address: "Jernbanegade 7",
-      venue_city: "København",
-      venue_state: "Region Hovedstaden",
-      venue_country: "Danmark",
-      is_verified: true,
-      venue_icon: {},
-    },
-  ];
-
   useEffect(() => {
     if (selectedVenue) {
       fetchVenueBeers(selectedVenue);
@@ -67,7 +50,7 @@ export default function VenueSearch() {
         <Autocomplete
           disablePortal
           id="combo-box-demo"
-          options={[...mbcc, ...venues]}
+          options={venues}
           getOptionLabel={(option) =>
             `${option.venue_name} (${option.venue_city}, ${option.venue_country})`
           }
