@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { useSession } from "next-auth/react";
-
 import {
   TableCell,
   TableRow,
@@ -15,7 +14,6 @@ import {
   Typography,
 } from "@mui/material";
 
-import deepLinker from "@/utils/deepLinkFromBrowser";
 import { useStyles } from "@/context/styles";
 import Spinner from "../Spinner";
 
@@ -90,23 +88,6 @@ export default function TR({ style }: Props) {
     }
   };
 
-  const clickHandler = (beerId: number, beerSlug: string) => {
-    const appUrl = `untappd://beer/${beerId}`;
-    const webUrl = `https://untappd.com/b/${beerSlug}/${beerId}`;
-
-    if ("ontouchstart" in document.documentElement) {
-      const linker = new deepLinker({
-        onIgnored: function () {
-          window.open(webUrl, "_blank");
-        },
-      });
-
-      linker.openURL(appUrl);
-    } else {
-      window.open(webUrl, "_blank");
-    }
-  };
-
   useEffect(() => {
     if (openRowId) {
       loadRelatedBeers();
@@ -166,7 +147,8 @@ export default function TR({ style }: Props) {
                   {relatedBeers.map((beer: Beer) => (
                     <ListItem key={beer.bid}>
                       <ListItemButton
-                        onClick={() => clickHandler(beer.beerId, beer.beerSlug)}
+                        href={`https://untappd.com/b/${beer.beerSlug}/${beer.beerId}`}
+                        target="_blank"
                       >
                         <ListItemText
                           primary={`${beer.beerName}`}
