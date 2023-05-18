@@ -1,10 +1,8 @@
 import { Box, Typography, Card, CardActionArea } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-
 import Image from "next/image";
 
 import { useStyles } from "@/context/styles";
-import deepLinker from "@/utils/deepLinkFromBrowser";
 
 import styles from "./BeerPanel.module.css";
 
@@ -19,27 +17,13 @@ export default function BeerPanel({ beer }: Props) {
     stylesList.find((style: Style) => style.style_name === beer.beer_style)
       ?.onList;
 
-  const clickHandler = () => {
-    const { bid, beer_slug } = beer;
-    const appUrl = `untappd://beer/${bid}`;
-    const webUrl = `https://untappd.com/b/${beer_slug}/${bid}`;
-
-    if ("ontouchstart" in document.documentElement) {
-      const linker = new deepLinker({
-        onIgnored: function () {
-          window.open(webUrl, "_blank");
-        },
-      });
-
-      linker.openURL(appUrl);
-    } else {
-      window.open(webUrl, "_blank");
-    }
-  };
-
   return (
-    <Card onClick={clickHandler}>
-      <CardActionArea sx={{ p: 1 }}>
+    <Card>
+      <CardActionArea
+        href={`https://untappd.com/b/${beer.beer_slug}/${beer.bid}`}
+        target="_blank"
+        sx={{ p: 1 }}
+      >
         <Grid container spacing={2}>
           <Grid
             xs={2}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   List,
@@ -14,7 +14,6 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { useStyles } from "@/context/styles";
 import { useVenues } from "@/context/venues";
-import deepLinker from "../../utils/deepLinkFromBrowser";
 
 interface Props {
   selectedVenue: Venue;
@@ -68,23 +67,6 @@ export default function BeersTable({ selectedVenue }: Props) {
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
-  };
-
-  const clickHandler = (beerId: number, beerSlug: string) => {
-    const appUrl = `untappd://beer/${beerId}`;
-    const webUrl = `https://untappd.com/b/${beerSlug}/${beerId}`;
-
-    if ("ontouchstart" in document.documentElement) {
-      const linker = new deepLinker({
-        onIgnored: function () {
-          window.open(webUrl, "_blank");
-        },
-      });
-
-      linker.openURL(appUrl);
-    } else {
-      window.open(webUrl, "_blank");
-    }
   };
 
   function TabPanel(props: TabPanelProps) {
@@ -153,7 +135,8 @@ export default function BeersTable({ selectedVenue }: Props) {
                 <List disablePadding key={beerId}>
                   <ListItem disablePadding>
                     <ListItemButton
-                      onClick={() => clickHandler(beerId, beerSlug)}
+                      href={`https://untappd.com/b/${beerSlug}/${beerId}`}
+                      target="_blank"
                     >
                       <Typography
                         sx={{
