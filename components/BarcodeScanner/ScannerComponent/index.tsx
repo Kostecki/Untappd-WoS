@@ -20,31 +20,29 @@ export default function ScannerComponent({ onSuccess }: Props) {
       style={{ position: "relative" }}
       className={styles.scannerContainer}
     >
-      <>
-        <canvas
-          className="drawingBuffer"
-          style={{
-            position: "absolute",
-            top: "0px",
-          }}
-          width="640"
-          height="480"
+      <canvas
+        className="drawingBuffer"
+        style={{
+          position: "absolute",
+          top: "0px",
+        }}
+        width="640"
+        height="480"
+      />
+      <Box className={styles.overlay}>
+        <Image
+          className={styles.image}
+          src={focusBorder}
+          fill={true}
+          alt="crosshair"
         />
-        <Box className={styles.overlay}>
-          <Image
-            className={styles.image}
-            src={focusBorder}
-            fill={true}
-            alt="crosshair"
-          />
-        </Box>
-        <ScannerLogic
-          scannerRef={scannerRef}
-          onDetected={(result: any) =>
-            onSuccess({ value: result.code, type: result.format })
-          }
-        />
-      </>
+      </Box>
+      <ScannerLogic
+        scannerRef={scannerRef}
+        onDetected={(result: any) =>
+          onSuccess({ value: result.code, type: result.format })
+        }
+      />
     </div>
   );
 }
