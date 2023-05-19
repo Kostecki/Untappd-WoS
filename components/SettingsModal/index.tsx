@@ -17,6 +17,7 @@ import {
   FormControlLabel,
   Switch,
   Typography,
+  Link,
 } from "@mui/material";
 
 import { useSettings } from "@/context/settings";
@@ -126,9 +127,14 @@ export default function SettingsModal({ open, openHandler }: Props) {
       <DialogActions
         sx={{ ml: 2, mr: 1, display: "flex", justifyContent: "space-between" }}
       >
-        <Typography variant="caption" sx={{ fontStyle: "italic" }}>
+        <Link
+          href={`https://github.com/Kostecki/Untappd-WoS/commit/${process.env.COMMIT_HASH}`}
+          target="_blank"
+          variant="caption"
+          sx={{ fontStyle: "italic" }}
+        >
           Commit: {process.env.COMMIT_HASH}
-        </Typography>
+        </Link>
         <Button onClick={handleChange}>Save</Button>
       </DialogActions>
     </Dialog>
