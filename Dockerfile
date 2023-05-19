@@ -21,6 +21,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+RUN apk add --no-cache git
+
 # Create .env file with tokens required for building
 # NEXTAUTH_URL
 # NEXTAUTH_SECRET

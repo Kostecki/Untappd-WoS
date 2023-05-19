@@ -2,13 +2,14 @@ import { Box, List, ListItem, ListItemButton, Typography } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { useStyles } from "@/context/styles";
-import BeerPanel from "../BeerPanel";
+import BeerPanel from "../../BeerPanel";
 
 interface Props {
   result: FullBeer[];
+  barcode: any;
 }
 
-export default function BarcodeResult({ result }: Props) {
+export default function BarcodeResult({ result, barcode }: Props) {
   const { styles } = useStyles();
 
   const haveHad = (styleId: number) => {
