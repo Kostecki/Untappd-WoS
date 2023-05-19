@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import BarcodeScanner from "../Scanner";
 
@@ -9,11 +9,12 @@ interface Props {
   onSuccess: (payload: Barcode) => void;
 }
 
-export default function ScannerComponent({
-  paused: isPaused,
-  onSuccess,
-}: Props) {
+export default function ScannerComponent({ paused, onSuccess }: Props) {
   const scannerRef = useRef(null);
+
+  useEffect(() => {
+    console.log("useEffect, paused", paused);
+  }, [paused]);
 
   return (
     <div
@@ -30,7 +31,7 @@ export default function ScannerComponent({
         width="640"
         height="480"
       />
-      {!isPaused ? (
+      {!paused ? (
         <BarcodeScanner
           scannerRef={scannerRef}
           onDetected={(result: any) =>

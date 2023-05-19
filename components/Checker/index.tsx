@@ -49,6 +49,7 @@ export default function Checker() {
   };
 
   const resetScan = () => {
+    console.log("resetScan");
     setScanEnabled(true);
     setBarcode(undefined);
     setBeers([]);
@@ -60,6 +61,10 @@ export default function Checker() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode]);
+
+  useEffect(() => {
+    console.log("useEffect, scanEnabled", scanEnabled);
+  }, [scanEnabled]);
 
   return (
     <>
