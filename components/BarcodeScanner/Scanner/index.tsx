@@ -71,12 +71,6 @@ export default function BarcodeScanner({
     [onDetected]
   );
 
-  useEffect(() => {
-    if (paused) {
-      Quagga.stop();
-    }
-  }, [paused]);
-
   useLayoutEffect(
     () => {
       Quagga.init(
@@ -99,7 +93,7 @@ export default function BarcodeScanner({
           if (err) {
             return console.log("Error starting Quagga:", err);
           }
-          if (scannerRef && scannerRef.current) {
+          if (scannerRef && scannerRef.current && !paused) {
             Quagga.start();
             if (onScannerReady) {
               onScannerReady();
