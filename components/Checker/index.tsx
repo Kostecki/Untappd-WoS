@@ -91,7 +91,9 @@ export default function Checker() {
                 <CircularProgress />
               </Box>
             )}
-            {!loading && barcode && <BarcodeResult result={beers} />}
+            {!loading && barcode && (
+              <BarcodeResult result={beers} barcode={barcode} />
+            )}
             {!loading && !barcode && (
               <ScannerComponent
                 paused={!scanEnabled}

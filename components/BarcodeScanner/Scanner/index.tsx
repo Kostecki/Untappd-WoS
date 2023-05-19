@@ -4,7 +4,6 @@ import Quagga from "@ericblade/quagga2";
 interface Props {
   onDetected: any;
   scannerRef: any;
-  paused: boolean;
   onScannerReady?: any;
   cameraId?: string;
   facingMode?: string;
@@ -33,12 +32,12 @@ function getMedianOfCodeErrors(decodedCodes: any) {
 }
 
 const defaultConstraints = {
-  width: 640,
-  height: 480,
+  width: { min: 640, ideal: 1920, max: 4096 },
+  height: { min: 480, ideal: 1080, max: 2400 },
 };
 
 const defaultLocatorSettings = {
-  patchSize: "x-large",
+  patchSize: "large",
   halfSample: true,
 };
 
@@ -47,7 +46,6 @@ const defaultDecoders = ["ean_reader"];
 export default function BarcodeScanner({
   onDetected,
   scannerRef,
-  paused,
   onScannerReady,
   cameraId,
   facingMode,

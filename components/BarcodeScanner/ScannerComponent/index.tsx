@@ -15,7 +15,7 @@ export default function ScannerComponent({
 }: Props) {
   const scannerRef = useRef(null);
 
-  return (
+  return !isPaused ? (
     <div
       ref={scannerRef}
       style={{ position: "relative" }}
@@ -32,11 +32,10 @@ export default function ScannerComponent({
       />
       <BarcodeScanner
         scannerRef={scannerRef}
-        paused={isPaused}
         onDetected={(result: any) =>
           onSuccess({ value: result.code, type: result.format })
         }
       />
     </div>
-  );
+  ) : null;
 }

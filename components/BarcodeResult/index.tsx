@@ -6,9 +6,10 @@ import BeerPanel from "../BeerPanel";
 
 interface Props {
   result: FullBeer[];
+  barcode: any;
 }
 
-export default function BarcodeResult({ result }: Props) {
+export default function BarcodeResult({ result, barcode }: Props) {
   const { styles } = useStyles();
 
   const haveHad = (styleId: number) => {
@@ -48,6 +49,7 @@ export default function BarcodeResult({ result }: Props) {
     return (
       <>
         <Typography>
+          {`${barcode.value}, ${barcode.type}`} <br />
           We couldn&apos;t find any beers that match the barcode. Try searching
           instead.
         </Typography>
