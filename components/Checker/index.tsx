@@ -84,21 +84,21 @@ export default function Checker() {
       <Box sx={{ mt: 2, mb: 4 }}>
         <Divider />
       </Box>
-      <Box>
-        <>
+      {scanEnabled && (
+        <Box>
           {loading && (
             <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
               <CircularProgress />
             </Box>
           )}
-          {scanEnabled && !loading && barcode && (
+          {!loading && barcode && (
             <BarcodeResult result={beers} barcode={barcode} />
           )}
-          {scanEnabled && !loading && !barcode && (
+          {!loading && !barcode && (
             <ScannerComponent onSuccess={scanSuccessHandler} />
           )}
-        </>
-      </Box>
+        </Box>
+      )}
       {!scanEnabled && (
         <Box>
           <BeerSearch />
