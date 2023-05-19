@@ -1,10 +1,4 @@
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import {
   Dialog,
@@ -28,6 +22,8 @@ import {
 import { useSettings } from "@/context/settings";
 import { useLists } from "@/context/lists";
 import { useStyles } from "@/context/styles";
+
+import meta from "@/meta.json";
 
 interface Props {
   open: boolean;
@@ -129,7 +125,12 @@ export default function SettingsModal({ open, openHandler }: Props) {
           </FormGroup>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ mr: 1 }}>
+      <DialogActions
+        sx={{ ml: 2, mr: 1, display: "flex", justifyContent: "space-between" }}
+      >
+        <Typography variant="caption" sx={{ fontStyle: "italic" }}>
+          Version: {meta.version}
+        </Typography>
         <Button onClick={handleChange}>Save</Button>
       </DialogActions>
     </Dialog>
