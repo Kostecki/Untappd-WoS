@@ -39,6 +39,7 @@ const defaultConstraints = {
 const defaultLocatorSettings = {
   patchSize: "large",
   halfSample: true,
+  willReadFrequently: true,
 };
 
 const defaultDecoders = ["ean_reader"];
@@ -81,6 +82,7 @@ export default function BarcodeScanner({
               ...(!cameraId && { facingMode }),
             },
             target: scannerRef.current,
+            willReadFrequently: true,
           },
           locator,
           numOfWorkers,

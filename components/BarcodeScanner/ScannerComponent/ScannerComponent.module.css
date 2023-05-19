@@ -1,3 +1,7 @@
+.scannerContainer {
+  overflow: hidden;
+}
+
 .scannerContainer > video {
   width: 100%;
 }
