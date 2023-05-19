@@ -2,7 +2,7 @@ import { Box, List, ListItem, ListItemButton, Typography } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 import { useStyles } from "@/context/styles";
-import BeerPanel from "../BeerPanel";
+import BeerPanel from "../../BeerPanel";
 
 interface Props {
   result: FullBeer[];

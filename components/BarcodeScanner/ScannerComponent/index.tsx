@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef } from "react";
 
 import Image from "next/image";
 import { Box } from "@mui/material";
 
-import BarcodeScanner from "../Scanner";
+import ScannerLogic from "../ScannerLogic";
 import focusBorder from "@/public/focusBorder.svg";
 import styles from "./ScannerComponent.module.css";
 
@@ -38,7 +38,7 @@ export default function ScannerComponent({ onSuccess }: Props) {
             alt="crosshair"
           />
         </Box>
-        <BarcodeScanner
+        <ScannerLogic
           scannerRef={scannerRef}
           onDetected={(result: any) =>
             onSuccess({ value: result.code, type: result.format })

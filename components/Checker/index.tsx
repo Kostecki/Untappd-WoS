@@ -11,7 +11,7 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import SearchIcon from "@mui/icons-material/Search";
 
 import BeerSearch from "../BeerSearch";
-import BarcodeResult from "../BarcodeResult";
+import BarcodeResult from "../BarcodeScanner/Result";
 import ScannerComponent from "../BarcodeScanner/ScannerComponent";
 
 export default function Checker() {

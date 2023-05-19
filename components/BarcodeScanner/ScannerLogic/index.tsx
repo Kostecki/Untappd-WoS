@@ -44,7 +44,7 @@ const defaultLocatorSettings = {
 
 const defaultDecoders = ["ean_reader"];
 
-export default function BarcodeScanner({
+export default function ScannerLogic({
   onDetected,
   scannerRef,
   onScannerReady,
