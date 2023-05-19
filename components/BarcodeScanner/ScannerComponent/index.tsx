@@ -9,7 +9,10 @@ interface Props {
   onSuccess: (payload: Barcode) => void;
 }
 
-export default function ScannerComponent({ paused, onSuccess }: Props) {
+export default function ScannerComponent({
+  paused: isPaused,
+  onSuccess,
+}: Props) {
   const scannerRef = useRef(null);
 
   return (
@@ -29,7 +32,7 @@ export default function ScannerComponent({ paused, onSuccess }: Props) {
       />
       <BarcodeScanner
         scannerRef={scannerRef}
-        paused={paused}
+        paused={isPaused}
         onDetected={(result: any) =>
           onSuccess({ value: result.code, type: result.format })
         }

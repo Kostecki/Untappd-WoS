@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { useSession } from "next-auth/react";
 import {
   Box,
   Typography,
@@ -10,15 +10,12 @@ import {
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import SearchIcon from "@mui/icons-material/Search";
 
-import { useSession } from "next-auth/react";
 import BeerSearch from "../BeerSearch";
 import BarcodeResult from "../BarcodeResult";
-import { useMobileMode } from "@/context/mobileMode";
 import ScannerComponent from "../BarcodeScanner/ScannerComponent";
 
 export default function Checker() {
   const { data: session } = useSession();
-  const { mobileMode } = useMobileMode();
 
   const [loading, setLoading] = useState(false);
   const [scanEnabled, setScanEnabled] = useState(false);
