@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect } from "react";
+import { useCallback, useEffect } from "react";
 import Quagga from "@ericblade/quagga2";
 
 interface Props {
@@ -70,7 +70,7 @@ export default function BarcodeScanner({
     [onDetected]
   );
 
-  useLayoutEffect(
+  useEffect(
     () => {
       Quagga.init(
         {

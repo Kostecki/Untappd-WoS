@@ -1,7 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+
+import Image from "next/image";
+import { Box } from "@mui/material";
 
 import BarcodeScanner from "../Scanner";
-
+import focusBorder from "@/public/focusBorder.svg";
 import styles from "./ScannerComponent.module.css";
 
 interface Props {
@@ -17,21 +20,31 @@ export default function ScannerComponent({ onSuccess }: Props) {
       style={{ position: "relative" }}
       className={styles.scannerContainer}
     >
-      <canvas
-        className="drawingBuffer"
-        style={{
-          position: "absolute",
-          top: "0px",
-        }}
-        width="640"
-        height="480"
-      />
-      <BarcodeScanner
-        scannerRef={scannerRef}
-        onDetected={(result: any) =>
-          onSuccess({ value: result.code, type: result.format })
-        }
-      />
+      <>
+        <canvas
+          className="drawingBuffer"
+          style={{
+            position: "absolute",
+            top: "0px",
+          }}
+          width="640"
+          height="480"
+        />
+        <Box className={styles.overlay}>
+          <Image
+            className={styles.image}
+            src={focusBorder}
+            fill={true}
+            alt="crosshair"
+          />
+        </Box>
+        <BarcodeScanner
+          scannerRef={scannerRef}
+          onDetected={(result: any) =>
+            onSuccess({ value: result.code, type: result.format })
+          }
+        />
+      </>
     </div>
   );
 }
