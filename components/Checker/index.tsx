@@ -12,9 +12,9 @@ import SearchIcon from "@mui/icons-material/Search";
 
 import { useSession } from "next-auth/react";
 import BeerSearch from "../BeerSearch";
-import BarcodeScanner from "../BarcodeScanner";
 import BarcodeResult from "../BarcodeResult";
 import { useMobileMode } from "@/context/mobileMode";
+import ScannerComponent from "../BarcodeScanner/ScannerComponent";
 
 export default function Checker() {
   const { data: session } = useSession();
@@ -74,17 +74,14 @@ export default function Checker() {
         }}
       >
         <Typography variant="h5">Check Beer</Typography>
-
-        {mobileMode && (
-          <Box>
-            <IconButton onClick={() => setScanEnabled(false)}>
-              <SearchIcon />
-            </IconButton>
-            <IconButton onClick={resetScan}>
-              <CropFreeIcon />
-            </IconButton>
-          </Box>
-        )}
+        <Box>
+          <IconButton onClick={() => setScanEnabled(false)}>
+            <SearchIcon />
+          </IconButton>
+          <IconButton onClick={resetScan}>
+            <CropFreeIcon />
+          </IconButton>
+        </Box>
       </Box>
       <Box sx={{ mt: 2, mb: 4 }}>
         <Divider />
@@ -99,7 +96,7 @@ export default function Checker() {
             )}
             {!loading && barcode && <BarcodeResult result={beers} />}
             {!loading && !barcode && (
-              <BarcodeScanner
+              <ScannerComponent
                 paused={!scanEnabled}
                 onSuccess={scanSuccessHandler}
               />
