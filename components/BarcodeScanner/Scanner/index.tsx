@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect } from "react";
+import { useCallback, useLayoutEffect } from "react";
 import Quagga from "@ericblade/quagga2";
 
 interface Props {
@@ -63,8 +63,8 @@ export default function BarcodeScanner({
         return;
       }
       const err = getMedianOfCodeErrors(result.codeResult.decodedCodes);
-      // if Quagga is at least 80% certain that it read correctly, then accept the code.
-      if (err < 0.2) {
+      // if Quagga is at least 90% certain that it read correctly, then accept the code.
+      if (err < 0.1) {
         onDetected(result.codeResult);
       }
     },
@@ -93,7 +93,7 @@ export default function BarcodeScanner({
           if (err) {
             return console.log("Error starting Quagga:", err);
           }
-          if (scannerRef && scannerRef.current && !paused) {
+          if (scannerRef && scannerRef.current) {
             Quagga.start();
             if (onScannerReady) {
               onScannerReady();
