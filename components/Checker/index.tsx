@@ -62,10 +62,6 @@ export default function Checker() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [barcode]);
 
-  useEffect(() => {
-    console.log("useEffect, scanEnabled", scanEnabled);
-  }, [scanEnabled]);
-
   return (
     <>
       <Box
@@ -88,26 +84,21 @@ export default function Checker() {
       <Box sx={{ mt: 2, mb: 4 }}>
         <Divider />
       </Box>
-      {scanEnabled && (
-        <Box>
-          <>
-            {loading && (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
-                <CircularProgress />
-              </Box>
-            )}
-            {!loading && barcode && (
-              <BarcodeResult result={beers} barcode={barcode} />
-            )}
-            {!loading && !barcode && (
-              <ScannerComponent
-                paused={!scanEnabled}
-                onSuccess={scanSuccessHandler}
-              />
-            )}
-          </>
-        </Box>
-      )}
+      <Box>
+        <>
+          {loading && (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 1 }}>
+              <CircularProgress />
+            </Box>
+          )}
+          {scanEnabled && !loading && barcode && (
+            <BarcodeResult result={beers} barcode={barcode} />
+          )}
+          {scanEnabled && !loading && !barcode && (
+            <ScannerComponent onSuccess={scanSuccessHandler} />
+          )}
+        </>
+      </Box>
       {!scanEnabled && (
         <Box>
           <BeerSearch />
