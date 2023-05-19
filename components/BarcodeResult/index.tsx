@@ -49,7 +49,6 @@ export default function BarcodeResult({ result, barcode }: Props) {
     return (
       <>
         <Typography>
-          {`${barcode.value}, ${barcode.type}`} <br />
           We couldn&apos;t find any beers that match the barcode. Try searching
           instead.
         </Typography>
