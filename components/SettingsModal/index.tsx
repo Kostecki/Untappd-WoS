@@ -23,8 +23,6 @@ import { useSettings } from "@/context/settings";
 import { useLists } from "@/context/lists";
 import { useStyles } from "@/context/styles";
 
-import meta from "@/meta.json";
-
 interface Props {
   open: boolean;
   openHandler: Dispatch<SetStateAction<boolean>>;
@@ -129,7 +127,7 @@ export default function SettingsModal({ open, openHandler }: Props) {
         sx={{ ml: 2, mr: 1, display: "flex", justifyContent: "space-between" }}
       >
         <Typography variant="caption" sx={{ fontStyle: "italic" }}>
-          Version: {meta.version}
+          Commit: {process.env.COMMIT_HASH}
         </Typography>
         <Button onClick={handleChange}>Save</Button>
       </DialogActions>
