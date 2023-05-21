@@ -48,7 +48,15 @@ export function VenuesProvider({ children }: Props) {
   const sessions = ["yellow", "blue", "red", "green"];
 
   const searchForVenues = debounce((query) => {
+    if (!query || query === "") {
+      setVenues([]);
+      setVenueBeers([]);
+
+      return;
+    }
+
     if (session?.user) {
+      console.log("query");
       const { apiBase, accessToken } = session.user;
 
       if (!query || query === "") {
