@@ -18,6 +18,7 @@ import {
   Switch,
   Typography,
   Link,
+  Tooltip,
 } from "@mui/material";
 
 import { useSettings } from "@/context/settings";
@@ -127,14 +128,16 @@ export default function SettingsModal({ open, openHandler }: Props) {
       <DialogActions
         sx={{ ml: 2, mr: 1, display: "flex", justifyContent: "space-between" }}
       >
-        <Link
-          href={`https://github.com/Kostecki/Untappd-WoS/commit/${process.env.COMMIT_HASH}`}
-          target="_blank"
-          variant="caption"
-          sx={{ fontStyle: "italic" }}
-        >
-          Commit: {process.env.COMMIT_HASH}
-        </Link>
+        <Tooltip title={process.env.COMMIT_MESSAGE} arrow>
+          <Link
+            href={`https://github.com/Kostecki/Untappd-WoS/commit/${process.env.COMMIT_HASH}`}
+            target="_blank"
+            variant="caption"
+            sx={{ fontStyle: "italic" }}
+          >
+            Commit: {process.env.COMMIT_HASH}
+          </Link>
+        </Tooltip>
         <Button onClick={handleChange}>Save</Button>
       </DialogActions>
     </Dialog>
