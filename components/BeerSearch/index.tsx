@@ -29,7 +29,13 @@ export default function BeerSearch() {
         }
         onChange={(_event, newValue) => setSelectedBeer(newValue)}
         onInputChange={(_event, newInputValue) => {
-          searchForBeers(newInputValue);
+          if (!newInputValue) {
+            searchForBeers("");
+          }
+
+          if (_event.type === "change") {
+            searchForBeers(newInputValue);
+          }
         }}
         renderOption={(props, option) => {
           return (

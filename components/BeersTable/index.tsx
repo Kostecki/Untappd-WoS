@@ -81,7 +81,7 @@ export default function BeersTable({ selectedVenue }: Props) {
       >
         {value === index && (
           <Box sx={{ py: 2 }}>
-            <Typography>{children}</Typography>
+            <Box>{children}</Box>
           </Box>
         )}
       </div>
@@ -138,7 +138,7 @@ export default function BeersTable({ selectedVenue }: Props) {
                       href={`https://untappd.com/b/${beerSlug}/${beerId}`}
                       target="_blank"
                     >
-                      <Typography
+                      <Box
                         sx={{
                           display: "inline-flex",
                           justifyContent: "space-between",
@@ -173,7 +173,7 @@ export default function BeersTable({ selectedVenue }: Props) {
                           </Box>
                         </Box>
                         <OpenInNewIcon sx={{ opacity: 0.5 }} />
-                      </Typography>
+                      </Box>
                     </ListItemButton>
                   </ListItem>
                 </List>

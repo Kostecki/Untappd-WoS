@@ -63,7 +63,13 @@ export default function VenueSearch() {
           }
           onChange={(_event, newValue) => setSelectedVenue(newValue)}
           onInputChange={(_event, newInputValue) => {
-            searchForVenues(newInputValue);
+            if (!newInputValue) {
+              searchForVenues("");
+            }
+
+            if (_event.type === "change") {
+              searchForVenues(newInputValue);
+            }
           }}
           renderOption={(props, option) => {
             return (
@@ -100,7 +106,7 @@ export default function VenueSearch() {
           )}
         />
       </Box>
-      {venueBeers.length > 0 && venueBeers[0].venueSlug && (
+      {selectedVenue && venueBeers.length > 0 && venueBeers[0].venueSlug && (
         <Box sx={{ mb: 4 }}>
           <Typography>
             <Link

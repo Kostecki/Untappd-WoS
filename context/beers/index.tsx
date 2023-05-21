@@ -35,14 +35,14 @@ export function BeersProvider({ children }: Props) {
   const [beersLoading, setBeersLoading] = useState(false);
 
   const searchForBeers = debounce((query) => {
+    if (!query || query === "") {
+      setBeers([]);
+
+      return;
+    }
+
     if (session?.user) {
       const { apiBase, accessToken } = session.user;
-
-      if (!query || query === "") {
-        setBeers([]);
-
-        return;
-      }
 
       setBeersLoading(true);
 
