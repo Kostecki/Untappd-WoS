@@ -3,17 +3,15 @@ import { useTheme } from "@mui/material";
 import { CircularProgressbar } from "react-circular-progressbar";
 
 interface Props {
-  checkinsPerLevel: number;
-  totalStyles: number;
-  haveHadCount: number;
+  currentValue: number;
+  maxValue: number;
   mobile: boolean;
   children?: ReactNode;
 }
 
 export default function CircularProgress({
-  checkinsPerLevel,
-  totalStyles,
-  haveHadCount,
+  currentValue,
+  maxValue,
   mobile,
   children,
 }: Props) {
@@ -30,8 +28,8 @@ export default function CircularProgress({
       <div style={{ position: "absolute", height: "100%", width: "100%" }}>
         <CircularProgressbar
           strokeWidth={4}
-          value={Math.floor(haveHadCount / checkinsPerLevel)}
-          maxValue={Math.floor(totalStyles / checkinsPerLevel)}
+          value={currentValue}
+          maxValue={maxValue}
           styles={{
             path: { stroke: theme.palette.primary.main },
             trail: { stroke: "#d6d6d6" },
