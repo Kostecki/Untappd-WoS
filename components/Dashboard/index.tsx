@@ -18,7 +18,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useMobileMode } from "@/context/mobileMode";
 import { useStyles } from "@/context/styles";
 
-import CircularProgress from "../CircularProgress";
+import CircularStatus from "../CircularStatus";
 import Spinner from "../Spinner";
 import SettingsModal from "../SettingsModal";
 
@@ -134,10 +134,9 @@ export default function Dashboard() {
               }}
               className={styles.styleProgress}
             >
-              <CircularProgress
-                checkinsPerLevel={checkinsPerLevel}
-                totalStyles={totalStyles}
-                haveHadCount={haveHadCount}
+              <CircularStatus
+                currentValue={Math.floor(haveHadCount / checkinsPerLevel)}
+                maxValue={Math.floor(totalStyles / checkinsPerLevel)}
                 mobile={mobileMode}
               >
                 <div
@@ -157,7 +156,7 @@ export default function Dashboard() {
                   {" / "}
                   {Math.floor(totalStyles / checkinsPerLevel)}
                 </div>
-              </CircularProgress>
+              </CircularStatus>
             </Box>
             <Box
               sx={{
@@ -167,10 +166,9 @@ export default function Dashboard() {
               }}
               className={styles.styleProgress}
             >
-              <CircularProgress
-                checkinsPerLevel={checkinsPerLevel}
-                totalStyles={totalStyles}
-                haveHadCount={haveHadCount}
+              <CircularStatus
+                currentValue={haveHadCount}
+                maxValue={totalStyles}
                 mobile={mobileMode}
               >
                 <div
@@ -198,7 +196,7 @@ export default function Dashboard() {
                 >
                   Missing: {mobileMode && <br />} {totalStyles - haveHadCount}
                 </div>
-              </CircularProgress>
+              </CircularStatus>
             </Box>
             <Box
               sx={{
@@ -208,10 +206,9 @@ export default function Dashboard() {
               }}
               className={styles.styleProgress}
             >
-              <CircularProgress
-                checkinsPerLevel={checkinsPerLevel}
-                totalStyles={totalStyles}
-                haveHadCount={haveHadCount}
+              <CircularStatus
+                currentValue={calcLeftToNextLevel()}
+                maxValue={checkinsPerLevel}
                 mobile={mobileMode}
               >
                 <div
@@ -229,7 +226,7 @@ export default function Dashboard() {
                 <div style={{ fontSize: 14 }}>
                   {calcLeftToNextLevel()} / {checkinsPerLevel}
                 </div>
-              </CircularProgress>
+              </CircularStatus>
             </Box>
           </Box>
         )}
