@@ -23,14 +23,6 @@ COPY . .
 
 RUN apk add --no-cache git
 
-# Create .env file with tokens required for building
-# NEXTAUTH_URL
-# NEXTAUTH_SECRET
-# UNTAPPD_ID
-# UNTAPPD_SECRET
-RUN --mount=type=secret,id=TOKENS \
-  cat /run/secrets/TOKENS >> .env
-
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
