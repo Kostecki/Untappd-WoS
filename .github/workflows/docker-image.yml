@@ -9,7 +9,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PORTAINER_WEBHOOK: ${{ secrets.PORTAINER_WEBHOOK }}
 
 jobs:
   build-and-push-image:
@@ -21,6 +20,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          envkey_NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          envkey_UNTAPPD_ID: ${{ secrets.UNTAPPD_ID }}
+          envkey_UNTAPPD_SECRET: ${{ secrets.UNTAPPD_SECRET }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -43,13 +50,11 @@ jobs:
         with:
           context: .
           push: true
-          secrets: |
-            "TOKENS=${{ secrets.TOKENS }}"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Ping Portainer
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ env.PORTAINER_WEBHOOK }}
+          url: ${{ vars.PORTAINER_WEBHOOK }}
           method: "POST"
