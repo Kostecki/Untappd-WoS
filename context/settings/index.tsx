@@ -1,5 +1,4 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import Cookies from "universal-cookie";
 
 type SettingsInput = {
   stockListId: number | undefined;
@@ -31,14 +30,12 @@ type Props = {
 };
 
 export function SettingsProvider({ children }: Props) {
-  const cookies = new Cookies();
-
   const [stockListId, setStockListId] = useState<number | undefined>(undefined);
   const [featureCountryBadges, setFeatureCountryBadges] = useState(false);
 
   const saveSettings = (update: SettingsInput) => {
     updateSettings(update);
-    cookies.set("settings", update);
+    localStorage.setItem("settings", JSON.stringify(update));
   };
 
   const updateSettings = (settings: SettingsInput) => {

@@ -1,7 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
 import { useSession } from "next-auth/react";
-import Cookies from "universal-cookie";
 
 type listsContextType = {
   loading: boolean;

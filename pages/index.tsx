@@ -4,7 +4,6 @@ import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { Container, Paper } from "@mui/material";
 import Grid2 from "@mui/material/Unstable_Grid2";
-import Cookies from "universal-cookie";
 
 import { useSettings } from "@/context/settings";
 import { useMobileMode } from "@/context/mobileMode";
@@ -20,8 +19,6 @@ import styles from "@/styles/Home.module.css";
 import Countries from "@/components/Countries";
 
 export default function Home() {
-  const cookies = new Cookies();
-
   const { data: session } = useSession();
 
   const { featureCountryBadges, updateSettings } = useSettings();
@@ -29,9 +26,9 @@ export default function Home() {
   const { fetchStyles } = useStyles();
 
   useEffect(() => {
-    const settings = cookies.get("settings");
+    const settings = localStorage.getItem("settings");
     if (settings) {
-      updateSettings(settings);
+      updateSettings(JSON.parse(settings));
     }
 
     if (session?.user) {
