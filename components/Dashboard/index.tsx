@@ -7,6 +7,7 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
+  Link,
   Switch,
   Typography,
 } from "@mui/material";
@@ -64,7 +65,16 @@ export default function Dashboard() {
             alignItems: "center",
           }}
         >
-          <>
+          <Link
+            href={session?.user.untappdUrl}
+            target="_blank"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "black",
+            }}
+          >
             <Avatar
               sx={{ mr: 1 }}
               alt={`${session?.user.firstName} ${session?.user.lastName}`}
@@ -73,7 +83,7 @@ export default function Dashboard() {
             <Typography>
               {session?.user.firstName} {session?.user.lastName}
             </Typography>
-          </>
+          </Link>
         </Box>
         <Box>
           <IconButton sx={{ mr: 1 }} onClick={() => setShowSettings(true)}>
