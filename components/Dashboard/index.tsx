@@ -79,7 +79,10 @@ export default function Dashboard() {
           <IconButton sx={{ mr: 1 }} onClick={() => setShowSettings(true)}>
             <SettingsIcon />
           </IconButton>
-          <IconButton onClick={() => signOut()} aria-label="logout">
+          <IconButton
+            onClick={() => signOut({ redirect: false })}
+            aria-label="logout"
+          >
             <LogoutIcon />
           </IconButton>
         </Box>
