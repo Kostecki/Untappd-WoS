@@ -11,15 +11,7 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleUsername = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
-
-  const handlePassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-
-  const clickHandler = () => {
+  const doSignIn = () => {
     if (username && password) {
       setIsloading(true);
       signIn("untappd", {
@@ -63,8 +55,10 @@ export default function Login() {
           id="input-username"
           label="Username"
           value={username}
-          onChange={handleUsername}
-          onKeyDown={clickHandler}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setUsername(event.target.value);
+          }}
+          onKeyDown={(event) => event.key === "Enter" && doSignIn()}
           disabled={loading}
         />
       </div>
@@ -75,8 +69,10 @@ export default function Login() {
           label="Password"
           type="password"
           value={password}
-          onChange={handlePassword}
-          onKeyDown={clickHandler}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setPassword(event.target.value);
+          }}
+          onKeyDown={(event) => event.key === "Enter" && doSignIn()}
           disabled={loading}
         />
       </div>
@@ -87,7 +83,7 @@ export default function Login() {
           loading={loading}
           sx={{ mt: 4 }}
           variant="outlined"
-          onClick={clickHandler}
+          onClick={doSignIn}
         >
           Login with Untappd
         </LoadingButton>
