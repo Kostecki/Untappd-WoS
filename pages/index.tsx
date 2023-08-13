@@ -84,6 +84,11 @@ export default function Home() {
           content="/favicon/browserconfig.xml"
         />
         <meta name="theme-color" content="#ffffff" />
+        <script
+          async
+          src="https://umami.israndom.win/script.js"
+          data-website-id="84995db7-3b4e-4c2e-8b0c-7f6c8c88f920"
+        ></script>
       </Head>
       <main className={styles.main}>
         {session && (
