@@ -28,7 +28,7 @@ export default function Home() {
   const { fetchStyles } = useStyles();
 
   useEffect(() => {
-    const settings = localStorage.getItem("settings");
+    const settings = localStorage.getItem("settings-wos");
     if (settings) {
       updateSettings(JSON.parse(settings));
     }

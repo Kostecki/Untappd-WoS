@@ -18,6 +18,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useMobileMode } from "@/context/mobileMode";
 import { useStyles } from "@/context/styles";
+import { useSettings } from "@/context/settings";
 
 import CircularStatus from "../CircularStatus";
 import Spinner from "../Spinner";
@@ -33,9 +34,12 @@ export default function Dashboard() {
     haveHadCount,
     loading: stylesLoading,
     showHaveHad,
+    showOnlyOnList,
     fetchStyles,
     toggleShowHaveHad,
+    toggleShowOnlyOnList,
   } = useStyles();
+  const { stockList } = useSettings();
 
   const [showSettings, setShowSettings] = useState(false);
 
@@ -101,7 +105,11 @@ export default function Dashboard() {
         <Divider />
       </Box>
       <Box
-        sx={{ display: "flex", justifyContent: "space-between" }}
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
         className={styles.actions}
       >
         <FormGroup>
@@ -109,12 +117,32 @@ export default function Dashboard() {
             control={
               <Switch
                 checked={showHaveHad}
-                onChange={() => toggleShowHaveHad()}
+                disabled={showOnlyOnList}
+                onChange={(event) => toggleShowHaveHad(event.target.checked)}
               />
             }
             label='Show "have had"'
           />
+          {stockList?.listName && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showOnlyOnList}
+                  onChange={(event) => {
+                    const state = event.target.checked;
+                    if (state) {
+                      toggleShowHaveHad(false);
+                    }
+
+                    toggleShowOnlyOnList(state);
+                  }}
+                />
+              }
+              label={`Show only missing on list "${stockList?.listName}"`}
+            />
+          )}
         </FormGroup>
+
         <LoadingButton
           variant="outlined"
           loading={stylesLoading}

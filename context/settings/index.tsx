@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 
 type SettingsInput = {
-  stockListId: number | undefined;
+  stockList?: StockList;
   featureCountryBadges: boolean;
 };
 
@@ -11,7 +11,10 @@ type settingsContextType = SettingsInput & {
 };
 
 const settingsContextValues: settingsContextType = {
-  stockListId: undefined,
+  stockList: {
+    listId: undefined,
+    listName: undefined,
+  },
   featureCountryBadges: false,
   saveSettings: () => {},
   updateSettings: () => {},
@@ -30,21 +33,21 @@ type Props = {
 };
 
 export function SettingsProvider({ children }: Props) {
-  const [stockListId, setStockListId] = useState<number | undefined>(undefined);
+  const [stockList, setStockList] = useState<StockList | undefined>(undefined);
   const [featureCountryBadges, setFeatureCountryBadges] = useState(false);
 
   const saveSettings = (update: SettingsInput) => {
     updateSettings(update);
-    localStorage.setItem("settings", JSON.stringify(update));
+    localStorage.setItem("settings-wos", JSON.stringify(update));
   };
 
   const updateSettings = (settings: SettingsInput) => {
-    setStockListId(settings.stockListId);
+    setStockList(settings.stockList);
     setFeatureCountryBadges(settings.featureCountryBadges);
   };
 
   const value = {
-    stockListId,
+    stockList,
     featureCountryBadges,
     saveSettings,
     updateSettings,

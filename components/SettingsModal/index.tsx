@@ -33,33 +33,37 @@ interface Props {
 export default function SettingsModal({ open, openHandler }: Props) {
   const {
     saveSettings,
-    stockListId: settingsStockListId,
+    stockList: settingsStockList,
     featureCountryBadges,
   } = useSettings();
   const { userLists, fetchUserLists, loading } = useLists();
   const { fetchStyles } = useStyles();
 
   const [touched, setTouched] = useState(false);
-  const [stockListId, setStockListId] = useState<number | undefined>(undefined);
+  const [stockList, setStockList] = useState<StockList | undefined>(undefined);
   const [countryBadges, setCountryBadges] = useState(false);
 
   const handleListUpdate = (event: SelectChangeEvent) => {
     const listId = parseInt(event.target.value as string);
-    setStockListId(listId);
+    const listName = userLists.find(
+      (list) => list.list_id === listId
+    )?.list_name;
 
-    if (listId !== settingsStockListId) {
+    setStockList({ listId, listName });
+
+    if (listId !== settingsStockList?.listId) {
       setTouched(true);
     }
   };
 
   const handleChange = () => {
     saveSettings({
-      stockListId,
+      stockList,
       featureCountryBadges: countryBadges,
     });
 
     if (touched) {
-      fetchStyles(stockListId);
+      fetchStyles(stockList?.listId);
       setTouched(false);
     }
 
@@ -67,7 +71,7 @@ export default function SettingsModal({ open, openHandler }: Props) {
   };
 
   useEffect(() => {
-    setStockListId(settingsStockListId);
+    setStockList(settingsStockList);
     setCountryBadges(featureCountryBadges);
 
     if (!userLists.length && open) {
@@ -96,7 +100,7 @@ export default function SettingsModal({ open, openHandler }: Props) {
             <Select
               id="stock-list-select"
               label="Stock list"
-              value={stockListId?.toString()}
+              value={stockList?.listId ? stockList?.listId?.toString() : ""}
               onChange={handleListUpdate}
             >
               <MenuItem value="">
