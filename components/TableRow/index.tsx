@@ -32,7 +32,7 @@ type Props = {
 
 export default function TR({ style }: Props) {
   const { data: session } = useSession();
-  const { showHaveHad } = useStyles();
+  const { showHaveHad, showOnlyOnList } = useStyles();
 
   const [isLoading, setIsLoading] = useState(false);
   const [openRowId, setOpenRowId] = useState<number | undefined>(undefined);
@@ -88,6 +88,14 @@ export default function TR({ style }: Props) {
     }
   };
 
+  const show = () => {
+    if (showOnlyOnList) {
+      return !style.had && style.onList;
+    } else {
+      return showHaveHad || !style.had;
+    }
+  };
+
   useEffect(() => {
     if (openRowId) {
       loadRelatedBeers();
@@ -97,7 +105,7 @@ export default function TR({ style }: Props) {
 
   return (
     <>
-      {(showHaveHad || !style.had) && (
+      {show() && (
         <>
           <TableRow
             hover

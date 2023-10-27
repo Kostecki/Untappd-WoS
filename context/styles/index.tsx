@@ -17,7 +17,9 @@ type stylesContextType = {
   haveHadCount: number;
   styles: Style[];
   showHaveHad: boolean;
-  toggleShowHaveHad: () => void;
+  showOnlyOnList: boolean;
+  toggleShowHaveHad: (state: boolean) => void;
+  toggleShowOnlyOnList: (state: boolean) => void;
   fetchStyles: (stockListId?: number) => void;
 };
 
@@ -28,7 +30,9 @@ const stylesContextValues: stylesContextType = {
   haveHadCount: 0,
   styles: [],
   showHaveHad: false,
+  showOnlyOnList: false,
   toggleShowHaveHad: () => {},
+  toggleShowOnlyOnList: () => {},
   fetchStyles: () => {},
 };
 
@@ -45,11 +49,12 @@ type Props = {
 export function StylesProvider({ children }: Props) {
   const { data: session } = useSession();
 
-  const { stockListId: settingsStockListId } = useSettings();
+  const { stockList: settingsStockList } = useSettings();
 
   const [loading, setLoading] = useState(false);
   const [styles, setStyles] = useState<Style[]>([]);
   const [showHaveHad, setShowHaveHad] = useState(false);
+  const [showOnlyOnList, setShowOnlyOnList] = useState(false);
 
   const fetchStyles = async (stockListId?: number) => {
     setLoading(true);
@@ -69,7 +74,7 @@ export function StylesProvider({ children }: Props) {
             had: true,
           }));
 
-          getStylesNotHad(stylesHad, stockListId ?? settingsStockListId);
+          getStylesNotHad(stylesHad, stockListId ?? settingsStockList?.listId);
         });
     }
   };
@@ -138,8 +143,12 @@ export function StylesProvider({ children }: Props) {
     }
   };
 
-  const toggleShowHaveHad = () => {
-    setShowHaveHad(!showHaveHad);
+  const toggleShowHaveHad = (state: boolean) => {
+    setShowHaveHad(state);
+  };
+
+  const toggleShowOnlyOnList = (state: boolean) => {
+    setShowOnlyOnList(state);
   };
 
   const value = {
@@ -149,7 +158,9 @@ export function StylesProvider({ children }: Props) {
     haveHadCount: styles.filter((e: CombinedStyle) => e.had).length,
     styles,
     showHaveHad,
+    showOnlyOnList,
     toggleShowHaveHad,
+    toggleShowOnlyOnList,
     fetchStyles,
   };
 
