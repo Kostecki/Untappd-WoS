@@ -138,7 +138,7 @@ export default function Dashboard() {
                   }}
                 />
               }
-              label={`Show only missing on list "${stockList?.listName}"`}
+              label={`Show only missing and also on list: ${stockList?.listName}`}
             />
           )}
         </FormGroup>
