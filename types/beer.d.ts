@@ -64,6 +64,7 @@ interface FullBeer {
   serving_type: string;
   beer: Beer;
   brewery: Brewery;
+  best_by_date_iso: string;
 }
 
 interface JonPackerBeer {
