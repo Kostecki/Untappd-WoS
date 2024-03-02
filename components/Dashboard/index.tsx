@@ -30,6 +30,7 @@ export default function Dashboard() {
   const { data: session } = useSession();
   const { mobileMode } = useMobileMode();
   const {
+    styles: stylesList,
     totalStyles,
     haveHadCount,
     loading: stylesLoading,
@@ -44,6 +45,10 @@ export default function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
 
   const checkinsPerLevel = 5;
+
+  const haveCount = () => {
+    return stylesList.filter((style) => !style.had && style.onList).length;
+  };
 
   const calcLeftToNextLevel = () => haveHadCount % checkinsPerLevel;
   const refreshData = () => fetchStyles();
@@ -182,7 +187,7 @@ export default function Dashboard() {
               >
                 <div
                   style={{
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: "bold",
                     marginBottom: 4,
                     position: mobileMode ? "absolute" : "relative",
@@ -214,7 +219,7 @@ export default function Dashboard() {
               >
                 <div
                   style={{
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: "bold",
                     marginBottom: 4,
                     position: mobileMode ? "absolute" : "relative",
@@ -235,7 +240,10 @@ export default function Dashboard() {
                     textAlign: "center",
                   }}
                 >
-                  Missing: {mobileMode && <br />} {totalStyles - haveHadCount}
+                  <div>
+                    Missing: {mobileMode && <br />} {totalStyles - haveHadCount}
+                  </div>
+                  <div>Have: {haveCount()}</div>
                 </div>
               </CircularStatus>
             </Box>
@@ -254,7 +262,7 @@ export default function Dashboard() {
               >
                 <div
                   style={{
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: "bold",
                     marginBottom: 4,
                     position: mobileMode ? "absolute" : "relative",
