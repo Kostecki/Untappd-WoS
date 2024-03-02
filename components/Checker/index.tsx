@@ -6,6 +6,7 @@ import {
   Divider,
   IconButton,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import SearchIcon from "@mui/icons-material/Search";
@@ -63,7 +64,7 @@ export default function Checker() {
   }, [barcode]);
 
   return (
-    <>
+    <Paper sx={{ mb: 2, p: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -104,6 +105,6 @@ export default function Checker() {
           <BeerSearch />
         </Box>
       )}
-    </>
+    </Paper>
   );
 }

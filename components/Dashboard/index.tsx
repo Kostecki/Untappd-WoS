@@ -8,6 +8,7 @@ import {
   FormGroup,
   IconButton,
   Link,
+  Paper,
   Switch,
   Typography,
 } from "@mui/material";
@@ -61,7 +62,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <>
+    <Paper sx={{ mb: 2, p: 2 }}>
       <Box
         sx={{
           display: "flex",
@@ -282,6 +283,6 @@ export default function Dashboard() {
       </Box>
 
       <SettingsModal open={showSettings} openHandler={setShowSettings} />
-    </>
+    </Paper>
   );
 }

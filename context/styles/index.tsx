@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from "react";
+import { createContext, useContext, ReactNode, useState } from "react";
 
 import { useSession } from "next-auth/react";
 

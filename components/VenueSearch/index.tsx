@@ -8,6 +8,7 @@ import {
   Divider,
   Link,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 
 import BeersTable from "../BeersTable";
@@ -34,7 +35,7 @@ export default function VenueSearch() {
   }, [selectedVenue]);
 
   return (
-    <>
+    <Paper sx={{ mb: 2, p: 2 }}>
       <Box>
         <Typography variant="h5">Venue styles</Typography>
       </Box>
@@ -119,6 +120,6 @@ export default function VenueSearch() {
         </Box>
       )}
       <Box>{selectedVenue && <BeersTable selectedVenue={selectedVenue} />}</Box>
-    </>
+    </Paper>
   );
 }

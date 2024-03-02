@@ -15,9 +15,10 @@ import Dashboard from "@/components/Dashboard";
 import VenueSearch from "@/components/VenueSearch";
 import StylesTable from "@/components/StylesTable";
 import Checker from "@/components/Checker";
+import NextToDrink from "@/components/NextToDrink";
+import Countries from "@/components/Countries";
 
 import styles from "@/styles/Home.module.css";
-import Countries from "@/components/Countries";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -110,20 +111,11 @@ export default function Home() {
                 <StylesTable />
               </Grid2>
               <Grid2 xs={12} md={6} sx={{ mt: 2 }}>
-                <Paper sx={{ mb: 2, p: 2 }}>
-                  <Dashboard />
-                </Paper>
-                <Paper sx={{ mb: 2, p: 2 }}>
-                  <VenueSearch />
-                </Paper>
-                <Paper sx={{ mb: 2, p: 2 }}>
-                  <Checker />
-                </Paper>
-                {featureCountryBadges && (
-                  <Paper sx={{ mb: 2, p: 2 }}>
-                    <Countries />
-                  </Paper>
-                )}
+                <Dashboard />
+                <NextToDrink />
+                <VenueSearch />
+                <Checker />
+                {featureCountryBadges && <Countries />}
               </Grid2>
             </Grid2>
           </Container>
