@@ -22,6 +22,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+RUN apk add --no-cache git
+
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN \
