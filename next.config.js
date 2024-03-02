@@ -21,7 +21,7 @@ const nextConfig = {
         protocol: "https",
         hostname: "assets.untappd.com",
         port: "",
-        pathname: "/site/beer_logos/**",
+        pathname: "*/**",
       },
     ],
   },
