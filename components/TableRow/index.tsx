@@ -119,7 +119,7 @@ export default function TR({ style }: Props) {
             }}
           >
             <TableCell
-              component="th"
+              component="td"
               scope="row"
               sx={{ fontWeight: "bold", display: "flex" }}
             >
