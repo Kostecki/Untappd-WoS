@@ -53,7 +53,7 @@ export default function NextToDrink() {
           <Box>
             <Typography variant="h5">Next to drink</Typography>
           </Box>
-          <Box sx={{ mt: 2, mb: 4 }}>
+          <Box sx={{ mt: 2, mb: 2 }}>
             <Divider />
           </Box>
           <Box
