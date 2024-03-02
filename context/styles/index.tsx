@@ -23,6 +23,8 @@ type stylesContextType = {
   fetchStyles: (stockListId?: number) => void;
 };
 
+type StockData = { styleIds: number[]; listName: string };
+
 const stylesContextValues: stylesContextType = {
   loading: false,
   checkinsPerLevel: 5,
@@ -122,25 +124,42 @@ export function StylesProvider({ children }: Props) {
     }
   };
 
-  const loadFromPersonalStock = async (stockListId?: number) => {
+  const loadFromPersonalStock = async (
+    stockListId?: number,
+    offset: number = 0,
+    accumulatedData: StockData = {
+      styleIds: [],
+      listName: "",
+    }
+  ): Promise<StockData | undefined> => {
     if (session?.user) {
       const { apiBase, accessToken } = session.user;
 
       if (stockListId) {
-        return fetch(
-          `${apiBase}/custom_lists/view/${stockListId}?styles=true&access_token=${accessToken}`
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            return {
-              styleIds: data.response.items.map(
-                (item: UserListDetails) => item.beer.beer_style_id
-              ),
-              listName: data.response.list.list_name,
-            };
+        const response = await fetch(
+          `${apiBase}/custom_lists/view/${stockListId}?styles=true&access_token=${accessToken}&offset=${offset}`
+        );
+        const data = await response.json();
+        const styleIds = [
+          ...accumulatedData.styleIds,
+          ...data.response.items.map(
+            (item: UserListDetails) => item.beer.beer_style_id
+          ),
+        ];
+        const listName = data.response.list.list_name;
+
+        if (data.response.pagination.next_url !== "") {
+          // recurse to get next page data
+          return await loadFromPersonalStock(stockListId, offset + 25, {
+            styleIds,
+            listName,
           });
+        } else {
+          return { styleIds, listName };
+        }
       }
     }
+    return undefined;
   };
 
   const toggleShowHaveHad = (state: boolean) => {
