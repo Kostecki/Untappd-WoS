@@ -139,7 +139,7 @@ export default function SettingsModal({ open, openHandler }: Props) {
             variant="caption"
             sx={{ fontStyle: "italic" }}
           >
-            Commit: {process.env.COMMIT_HASH}
+            Last commit: {process.env.COMMIT_HASH}
           </Link>
         </Tooltip>
         <Button onClick={handleChange}>Save</Button>
