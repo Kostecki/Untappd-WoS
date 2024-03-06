@@ -71,7 +71,10 @@ export default function BeerPanelBestBefore({ beer }: Props) {
               flexDirection: "column",
             }}
           >
-            <Typography variant="h6" sx={{ fontSize: 13, fontWeight: "bold" }}>
+            <Typography
+              variant="h6"
+              sx={{ fontSize: 13, fontWeight: "bold", textAlign: "center" }}
+            >
               Best Before
             </Typography>
             <Typography variant="h6" sx={{ fontSize: 12, fontWeight: 500 }}>
