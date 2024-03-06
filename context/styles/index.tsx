@@ -11,8 +11,10 @@ type stylesContextType = {
   haveHadCount: number;
   styles: Style[];
   showHaveHad: boolean;
+  showMissing: boolean;
   showOnlyOnList: boolean;
   toggleShowHaveHad: (state: boolean) => void;
+  toggleShowMissing: (state: boolean) => void;
   toggleShowOnlyOnList: (state: boolean) => void;
   fetchStyles: (stockListId?: number) => void;
 };
@@ -26,8 +28,10 @@ const stylesContextValues: stylesContextType = {
   haveHadCount: 0,
   styles: [],
   showHaveHad: false,
+  showMissing: false,
   showOnlyOnList: false,
   toggleShowHaveHad: () => {},
+  toggleShowMissing: () => {},
   toggleShowOnlyOnList: () => {},
   fetchStyles: () => {},
 };
@@ -50,6 +54,7 @@ export function StylesProvider({ children }: Props) {
   const [loading, setLoading] = useState(false);
   const [styles, setStyles] = useState<Style[]>([]);
   const [showHaveHad, setShowHaveHad] = useState(false);
+  const [showMissing, setShowMissing] = useState(false);
   const [showOnlyOnList, setShowOnlyOnList] = useState(false);
 
   const fetchStyles = async (stockListId?: number) => {
@@ -160,6 +165,10 @@ export function StylesProvider({ children }: Props) {
     setShowHaveHad(state);
   };
 
+  const toggleShowMissing = (state: boolean) => {
+    setShowMissing(state);
+  };
+
   const toggleShowOnlyOnList = (state: boolean) => {
     setShowOnlyOnList(state);
   };
@@ -171,8 +180,10 @@ export function StylesProvider({ children }: Props) {
     haveHadCount: styles.filter((e: CombinedStyle) => e.had).length,
     styles,
     showHaveHad,
+    showMissing,
     showOnlyOnList,
     toggleShowHaveHad,
+    toggleShowMissing,
     toggleShowOnlyOnList,
     fetchStyles,
   };

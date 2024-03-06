@@ -32,7 +32,7 @@ type Props = {
 
 export default function TR({ style }: Props) {
   const { data: session } = useSession();
-  const { showHaveHad, showOnlyOnList } = useStyles();
+  const { showHaveHad, showMissing, showOnlyOnList } = useStyles();
 
   const [isLoading, setIsLoading] = useState(false);
   const [openRowId, setOpenRowId] = useState<number | undefined>(undefined);
@@ -89,7 +89,9 @@ export default function TR({ style }: Props) {
   };
 
   const show = () => {
-    if (showOnlyOnList) {
+    if (showMissing) {
+      return !style.had && !style.onList;
+    } else if (showOnlyOnList) {
       return !style.had && style.onList;
     } else {
       return showHaveHad || !style.had;
