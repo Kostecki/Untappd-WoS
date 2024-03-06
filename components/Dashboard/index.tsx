@@ -36,9 +36,11 @@ export default function Dashboard() {
     haveHadCount,
     loading: stylesLoading,
     showHaveHad,
+    showMissing,
     showOnlyOnList,
     fetchStyles,
     toggleShowHaveHad,
+    toggleShowMissing,
     toggleShowOnlyOnList,
   } = useStyles();
   const { stockList } = useSettings();
@@ -123,11 +125,35 @@ export default function Dashboard() {
             control={
               <Switch
                 checked={showHaveHad}
-                disabled={showOnlyOnList}
-                onChange={(event) => toggleShowHaveHad(event.target.checked)}
+                onChange={(event) => {
+                  const state = event.target.checked;
+                  if (state) {
+                    toggleShowMissing(false);
+                    toggleShowOnlyOnList(false);
+                  }
+
+                  toggleShowHaveHad(event.target.checked);
+                }}
               />
             }
             label='Show "have had"'
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showMissing}
+                onChange={(event) => {
+                  const state = event.target.checked;
+                  if (state) {
+                    toggleShowHaveHad(false);
+                    toggleShowOnlyOnList(false);
+                  }
+
+                  toggleShowMissing(event.target.checked);
+                }}
+              />
+            }
+            label="Show only missing"
           />
           {stockList?.listName && (
             <FormControlLabel
@@ -138,6 +164,7 @@ export default function Dashboard() {
                     const state = event.target.checked;
                     if (state) {
                       toggleShowHaveHad(false);
+                      toggleShowMissing(false);
                     }
 
                     toggleShowOnlyOnList(state);
