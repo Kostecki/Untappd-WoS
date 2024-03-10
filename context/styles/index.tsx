@@ -54,7 +54,7 @@ export function StylesProvider({ children }: Props) {
   const [loading, setLoading] = useState(false);
   const [styles, setStyles] = useState<Style[]>([]);
   const [showHaveHad, setShowHaveHad] = useState(false);
-  const [showMissing, setShowMissing] = useState(false);
+  const [showMissing, setShowMissing] = useState(true);
   const [showOnlyOnList, setShowOnlyOnList] = useState(false);
 
   const fetchStyles = async (stockListId?: number) => {

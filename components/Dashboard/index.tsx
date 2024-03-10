@@ -171,7 +171,7 @@ export default function Dashboard() {
                   }}
                 />
               }
-              label={`Show only missing and also on list: ${stockList?.listName}`}
+              label={`Show missing and also on list: ${stockList?.listName}`}
             />
           )}
         </FormGroup>
@@ -223,7 +223,7 @@ export default function Dashboard() {
                     textAlign: "center",
                   }}
                 >
-                  Badge progress
+                  Badge
                 </div>
                 <div style={{ fontSize: 14 }}>
                   {Math.floor(haveHadCount / checkinsPerLevel)}
@@ -255,7 +255,7 @@ export default function Dashboard() {
                     textAlign: "center",
                   }}
                 >
-                  Style progress
+                  Style
                 </div>
                 <div style={{ fontSize: 14 }}>
                   {haveHadCount} / {totalStyles}
@@ -268,9 +268,7 @@ export default function Dashboard() {
                     textAlign: "center",
                   }}
                 >
-                  <div>
-                    Missing: {mobileMode && <br />} {totalStyles - haveHadCount}
-                  </div>
+                  <div>Left: {totalStyles - haveHadCount}</div>
                   <div>Have: {haveCount()}</div>
                 </div>
               </CircularStatus>
@@ -298,7 +296,7 @@ export default function Dashboard() {
                     textAlign: "center",
                   }}
                 >
-                  Level progress
+                  Level
                 </div>
                 <div style={{ fontSize: 14 }}>
                   {calcLeftToNextLevel()} / {checkinsPerLevel}
