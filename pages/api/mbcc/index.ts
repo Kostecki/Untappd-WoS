@@ -9,7 +9,11 @@ export default async function handler(
 
   const beers = await fetch(jsonURL)
     .then((res) => res.json())
-    .then((data) => data.beers);
+    .then((data) => data.beers)
+    .catch((err) => {
+      console.error(err);
+      res.status(400).json([]);
+    });
 
   const transformed = beers.map((beer: JonPackerBeer) => {
     return {
