@@ -35,6 +35,22 @@ type Props = {
   children: ReactNode;
 };
 
+// Hardcoded MBCC entry
+const mbcc = {
+  venue_id: 99991337,
+  venue_name: "MBCC 2024",
+  is_closed: 0,
+  primary_category: "Nightlife Spot",
+  venue_slug: "",
+  location: "København, Region Hovedstaden",
+  venue_address: "Jernbanegade 7",
+  venue_city: "København",
+  venue_state: "Region Hovedstaden",
+  venue_country: "Danmark",
+  is_verified: true,
+  venue_icon: {},
+};
+
 export function VenuesProvider({ children }: Props) {
   const { data: session } = useSession();
 
@@ -47,6 +63,41 @@ export function VenuesProvider({ children }: Props) {
   // MBCC session order
   const sessions = ["yellow", "blue", "red", "green"];
 
+  async function isMBCCSeason(): Promise<boolean> {
+    try {
+      const response = await fetch("api/mbcc");
+      const data = await response.json();
+
+      const isNonEmptyObject =
+        typeof data === "object" &&
+        data !== null &&
+        !Array.isArray(data) &&
+        Object.keys(data).length > 0;
+
+      const isEmptyArray = Array.isArray(data) && data.length === 0;
+
+      return isNonEmptyObject && !isEmptyArray;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return false;
+    }
+  }
+
+  // Remove beers with null style or weird "Other"-style
+  function cleanup(venue: VenueOffering[]) {
+    return venue.map((menu) => {
+      const filteredBeers = menu.beers.filter(
+        (beer) =>
+          beer.beer.beer_style !== null && beer.beer.beer_style !== "Other"
+      );
+
+      return {
+        ...menu,
+        beers: filteredBeers,
+      };
+    });
+  }
+
   const searchForVenues = debounce((query) => {
     if (!query || query === "") {
       setVenues([]);
@@ -56,7 +107,6 @@ export function VenuesProvider({ children }: Props) {
     }
 
     if (session?.user) {
-      console.log("query");
       const { apiBase, accessToken } = session.user;
 
       if (!query || query === "") {
@@ -70,7 +120,7 @@ export function VenuesProvider({ children }: Props) {
 
       fetch(`${apiBase}/search/venue?q=${query}&access_token=${accessToken}`)
         .then((response) => response.json())
-        .then((data) => {
+        .then(async (data) => {
           if (data) {
             const options = data.response.venues.items.map(
               (e: VenueResponse) => e.venue
@@ -93,6 +143,13 @@ export function VenuesProvider({ children }: Props) {
               return 0;
             });
 
+            // Add MBCC if relevant
+            await isMBCCSeason().then((isMBCCSeason) => {
+              if (isMBCCSeason) {
+                sorted.unshift(mbcc);
+              }
+            });
+
             setVenues(sorted);
             setVenuesLoading(false);
           }
@@ -112,26 +169,26 @@ export function VenuesProvider({ children }: Props) {
 
       setVenueBeersLoading(true);
       const { venue_id, venue_name, venue_slug } = venue;
-      const isMBCC = venue_id === 99991337;
+      const isVenueMBCC = venue_id === 99991337;
 
       let url = `${apiBase}/inventory/view/${venue_id}?hasNotHadBefore=true&access_token=${accessToken}`;
 
       // Handle special case MBCC
-      if (isMBCC) {
+      if (isVenueMBCC) {
         url = "api/mbcc";
       }
 
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          const beers: VenueOffering[] = [];
+          const venue: VenueOffering[] = [];
 
-          if (isMBCC) {
+          if (isVenueMBCC) {
             Object.keys(data).forEach((session: string) => {
               const list: FullBeer[] = [];
               data[session].forEach((beer: any) => list.push(beer));
 
-              beers.push({
+              venue.push({
                 beers: list,
                 menu: session,
                 venueId: venue_id,
@@ -147,7 +204,7 @@ export function VenuesProvider({ children }: Props) {
                 list.push(...menu.items)
               );
 
-              beers.push({
+              venue.push({
                 beers: list,
                 menu: e.menu.menu_name,
                 venueId: venue_id,
@@ -157,11 +214,9 @@ export function VenuesProvider({ children }: Props) {
             });
           }
 
-          const MBCCSort = beers.sort(
-            (a, b) => sessions.indexOf(a.menu) - sessions.indexOf(b.menu)
-          );
+          const cleanedBeers = cleanup(venue);
 
-          setVenueBeers(isMBCC ? beers : MBCCSort);
+          setVenueBeers(cleanedBeers);
           setVenueBeersLoading(false);
         })
         .catch((error) => {
