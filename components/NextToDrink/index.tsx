@@ -1,5 +1,4 @@
 import { Box, Divider, Paper, Typography } from "@mui/material";
-import BeerPanel from "../BeerPanel";
 import { useSession } from "next-auth/react";
 import { useSettings } from "@/context/settings";
 import { useEffect, useState } from "react";
@@ -31,13 +30,15 @@ export default function NextToDrink() {
             )
               .then((response) => response.json())
               .then((data) => {
-                const beer = data.response.items.filter(
-                  (beer: FullBeer) =>
-                    !styleIds.includes(beer.beer.beer_style_id) &&
-                    beer.best_by_date_iso !== "0000-00-00"
-                )[0];
+                if (data?.response?.items) {
+                  const beer = data.response.items.filter(
+                    (beer: FullBeer) =>
+                      !styleIds.includes(beer.beer.beer_style_id) &&
+                      beer.best_by_date_iso !== "0000-00-00"
+                  )[0];
 
-                setNextBeer(beer);
+                  setNextBeer(beer);
+                }
               });
           });
       }
