@@ -144,11 +144,11 @@ export function VenuesProvider({ children }: Props) {
             });
 
             // Add MBCC if relevant
-            await isMBCCSeason().then((isMBCCSeason) => {
-              if (isMBCCSeason) {
-                sorted.unshift(mbcc);
-              }
-            });
+            // await isMBCCSeason().then((isMBCCSeason) => {
+            //   if (isMBCCSeason) {
+            //     sorted.unshift(mbcc);
+            //   }
+            // });
 
             setVenues(sorted);
             setVenuesLoading(false);
@@ -168,7 +168,7 @@ export function VenuesProvider({ children }: Props) {
       if (!venue) return setVenueBeers([]);
 
       setVenueBeersLoading(true);
-      const { venue_id, venue_name, venue_slug } = venue;
+      const { venue_id, venue_name, venue_slug, is_verified } = venue;
       const isVenueMBCC = venue_id === 99991337;
 
       let url = `${apiBase}/inventory/view/${venue_id}?hasNotHadBefore=true&access_token=${accessToken}`;
@@ -186,7 +186,7 @@ export function VenuesProvider({ children }: Props) {
           if (isVenueMBCC) {
             Object.keys(data).forEach((session: string) => {
               const list: FullBeer[] = [];
-              data[session].forEach((beer: any) => list.push(beer));
+              data[session].forEach((beer: any) => list.push(beer)); // TODO: Fix any
 
               venue.push({
                 beers: list,
@@ -194,6 +194,7 @@ export function VenuesProvider({ children }: Props) {
                 venueId: venue_id,
                 venueName: venue_name,
                 venueSlug: venue_slug,
+                isVerified: is_verified,
               });
             });
           } else {
@@ -210,6 +211,7 @@ export function VenuesProvider({ children }: Props) {
                 venueId: venue_id,
                 venueName: venue_name,
                 venueSlug: venue_slug,
+                isVerified: is_verified,
               });
             });
           }
