@@ -39,9 +39,9 @@ export default function ScannerComponent({ onSuccess }: Props) {
       </Box>
       <ScannerLogic
         scannerRef={scannerRef}
-        onDetected={(result: any) =>
-          onSuccess({ value: result.code, type: result.format })
-        }
+        onDetected={(
+          result: any // TODO: Fix any
+        ) => onSuccess({ value: result.code, type: result.format })}
       />
     </div>
   );

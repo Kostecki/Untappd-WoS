@@ -25,6 +25,7 @@ export default function Countries() {
 
   const [showUnlocked, setShowUnlocked] = useState(false);
 
+  // TODO: Fix any
   const randomIndex = (country: any) => {
     const flags = country.flag.length;
     return flags === 1 ? 0 : Math.floor(Math.random() * (flags - 1));
