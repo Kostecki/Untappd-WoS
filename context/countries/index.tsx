@@ -507,6 +507,7 @@ const countryBadgesDefault = [
   },
 ];
 
+// TODO: Fix any
 type countriesContextType = {
   countryBadges: any[];
   loading: boolean;
@@ -553,6 +554,7 @@ export function CountriesProvider({ children }: Props) {
 
           const payload = countryBadges;
           badges.forEach((badge: any) => {
+            // TODO: Fix any
             if (ids.includes(badge.badge_id)) {
               const badgeIndex = payload.findIndex(
                 (e) => e.badgeId === badge.badge_id

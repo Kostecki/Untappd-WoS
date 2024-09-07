@@ -1,6 +1,8 @@
 import { useCallback, useEffect } from "react";
 import Quagga from "@ericblade/quagga2";
 
+// TODO: Fix any (if possible?)
+
 interface Props {
   onDetected: any;
   scannerRef: any;

@@ -6,7 +6,7 @@ import BeerPanel from "../../BeerPanel";
 
 interface Props {
   result: FullBeer[];
-  barcode: any;
+  barcode: any; // TODO: Fix any
 }
 
 export default function BarcodeResult({ result, barcode }: Props) {
