@@ -15,6 +15,7 @@ interface Venue {
   venue_name: string;
   venue_slug: string;
   venue_state: string;
+  is_verified: boolean;
 }
 
 interface VenueResponse {
@@ -27,6 +28,7 @@ interface VenueOffering {
   venueId: number;
   venueName: string;
   venueSlug: string;
+  isVerified: boolean;
 }
 
 interface Menu {
