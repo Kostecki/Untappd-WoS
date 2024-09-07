@@ -144,11 +144,11 @@ export function VenuesProvider({ children }: Props) {
             });
 
             // Add MBCC if relevant
-            // await isMBCCSeason().then((isMBCCSeason) => {
-            //   if (isMBCCSeason) {
-            //     sorted.unshift(mbcc);
-            //   }
-            // });
+            await isMBCCSeason().then((isMBCCSeason) => {
+              if (isMBCCSeason) {
+                sorted.unshift(mbcc);
+              }
+            });
 
             setVenues(sorted);
             setVenuesLoading(false);

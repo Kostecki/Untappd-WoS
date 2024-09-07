@@ -1,11 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 const jsonURL = "https://mbcc.jonpacker.com/latest.json";
 
+const enableMBCC = false;
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const sessions = ["yellow", "blue", "red", "green"];
+
+  if (!enableMBCC) {
+    res.status(200).json({});
+    return;
+  }
 
   const beers = await fetch(jsonURL)
     .then((res) => res.json())
