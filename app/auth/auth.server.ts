@@ -7,7 +7,7 @@ export type SessionUser = {
   userName: string;
   firstName: string;
   lastName: string;
-  userAvatar: string;
+  userAvatarURL: string;
   accessToken: string;
 };
 
@@ -62,7 +62,7 @@ authenticator.use(
       userName: user_name,
       firstName: first_name,
       lastName: last_name,
-      userAvatar: user_avatar_hd,
+      userAvatarURL: user_avatar_hd,
       accessToken,
     };
   }),

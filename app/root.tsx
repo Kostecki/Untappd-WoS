@@ -6,12 +6,29 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ColorSchemeScript, createTheme, MantineProvider } from "@mantine/core";
 
 import stylesheet from "./app.css?url";
 import "@mantine/core/styles.css";
 
 import type { Route } from "./+types/root";
+
+const theme = createTheme({
+  colors: {
+    untappd: [
+      "#fffbe1",
+      "#fff5cb",
+      "#ffea9a",
+      "#ffde64",
+      "#ffd438",
+      "#ffcd1c",
+      "#ffca09",
+      "#e3b200",
+      "#ca9e00",
+      "#af8800",
+    ],
+  },
+});
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -38,7 +55,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider theme={theme}>{children}</MantineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

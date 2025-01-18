@@ -9,7 +9,7 @@ import { authenticator } from "~/auth/auth.server";
 import { commitSession, getSession } from "~/auth/session.server";
 import { userSessionGet } from "~/auth/user.server";
 
-import Login from "~/components/auth/login";
+import Login from "~/components/Auth/login";
 
 import type { Route } from "./+types/login";
 
