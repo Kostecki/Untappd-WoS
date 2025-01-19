@@ -1,6 +1,13 @@
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
-import invariant from "tiny-invariant";
+
+import {
+  API_BASE_URL,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  DEVICE_UDID,
+} from "~/routes/untappd/config";
+import { getUserSpecificWoSBadgeId } from "./untappd";
 
 export type SessionUser = {
   id: number;
@@ -8,19 +15,11 @@ export type SessionUser = {
   firstName: string;
   lastName: string;
   userAvatarURL: string;
+  wosBadgeId: number;
   accessToken: string;
 };
 
 export const authenticator = new Authenticator<SessionUser>();
-
-const API_BASE_URL = process.env.UNTAPPD_API_URL;
-const DEVICE_UDID = process.env.UNTAPPD_DEVICE_UDID;
-const CLIENT_ID = process.env.UNTAPPD_CLIENT_ID;
-const CLIENT_SECRET = process.env.UNTAPPD_CLIENT_SECRET;
-invariant(API_BASE_URL, "API_BASE_URL must be set in .env");
-invariant(DEVICE_UDID, "DEVICE_UDID must be set in .env");
-invariant(CLIENT_ID, "CLIENT_ID must be set in .env");
-invariant(CLIENT_SECRET, "CLIENT_SECRET must be set in .env");
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
@@ -30,7 +29,7 @@ authenticator.use(
     const formData = new FormData();
     formData.append("user_name", username);
     formData.append("user_password", password);
-    formData.append("device_udid", DEVICE_UDID);
+    formData.append("device_udid", String(DEVICE_UDID));
 
     const url = `${API_BASE_URL}/xauth?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
     const response = await fetch(url, {
@@ -57,12 +56,15 @@ authenticator.use(
     const { id, user_name, first_name, last_name, user_avatar_hd } =
       userData.response.user;
 
+    const userSpecificBadgeId = await getUserSpecificWoSBadgeId(0, accessToken);
+
     return {
       id,
       userName: user_name,
       firstName: first_name,
       lastName: last_name,
       userAvatarURL: user_avatar_hd,
+      wosBadgeId: userSpecificBadgeId,
       accessToken,
     };
   }),

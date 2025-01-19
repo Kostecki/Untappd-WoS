@@ -3,12 +3,14 @@ import { Box, Container, Grid } from "@mantine/core";
 
 import { userSessionGet } from "~/auth/user.server";
 
+import { getStylesInfo } from "./loader";
+
 import { Profile } from "~/components/Profile";
 import { VenueStyles } from "~/components/VenueStyles";
-
-import type { Route } from "./+types/home";
 import { CheckBeer } from "~/components/CheckBeer";
-import { StyleTable } from "~/components/StyleTable";
+import { StylesTable } from "~/components/StylesTable";
+
+import type { Route } from "./+types/index";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Wheel of Styles" }];
@@ -21,21 +23,23 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect("/login");
   }
 
-  return { user };
+  const stylesInfo = await getStylesInfo(user);
+
+  return { user, stylesInfo };
 }
 
 export default function Home() {
   const data = useLoaderData<typeof loader>();
-  const { user } = data;
+  const { user, stylesInfo } = data;
 
   return (
     <Container size="1200">
       <Grid mt="lg">
         <Grid.Col span={6}>
-          <StyleTable />
+          <StylesTable styles={stylesInfo.styles} />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Profile user={user} />
+          <Profile user={user} stats={stylesInfo.stats} />
           <Box my="md">
             <VenueStyles />
           </Box>
