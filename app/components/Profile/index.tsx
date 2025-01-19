@@ -17,10 +17,17 @@ import { Ring } from "../Ring";
 
 interface InputProps {
   user: SessionUser;
+  stats: any;
 }
 
-export const Profile = ({ user }: InputProps) => {
+export const Profile = ({ user, stats }: InputProps) => {
   const fullName = `${user.firstName} ${user.lastName}`;
+  const {
+    hadCount,
+    notHadCount,
+    totalCount,
+    level: { currentLevel, progressToNext, checkInsPerLevel, maxLevel },
+  } = stats;
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -43,9 +50,9 @@ export const Profile = ({ user }: InputProps) => {
 
       <Group justify="space-between">
         <Stack>
-          <Switch label='Show "have had' />
-          <Switch label="Show missing" />
-          <Switch label="Show missing and also on list: [name]" />
+          <Switch label='Show "Have Had"' />
+          <Switch label="Show Missing" />
+          <Switch label='Show Only List "[Name]"' />
         </Stack>
         <Button variant="outline" color="untappd">
           Refresh Data
@@ -55,39 +62,39 @@ export const Profile = ({ user }: InputProps) => {
       <Divider my="md" />
 
       <Flex justify="space-between">
-        <Ring value={52} maxValue={53}>
+        <Ring value={currentLevel} maxValue={maxLevel}>
           <Flex justify="center" direction="column">
             <Text size="md" ta="center" fw="bold">
               Badge
             </Text>
             <Text size="sm" ta="center">
-              52 / 53
+              {currentLevel} / {maxLevel}
             </Text>
           </Flex>
         </Ring>
-        <Ring value={264} maxValue={269}>
+        <Ring value={hadCount} maxValue={totalCount}>
           <Flex justify="center" direction="column">
             <Text size="md" ta="center" fw="bold">
               Style
             </Text>
             <Text size="sm" ta="center">
-              264 / 269
+              {hadCount} / {totalCount}
             </Text>
             <Text size="sm" fs="italic" ta="center" mt="3" mb="-5">
-              Left: 5
+              Left: {notHadCount}
             </Text>
             <Text size="sm" fs="italic" ta="center">
               Have: 0
             </Text>
           </Flex>
         </Ring>
-        <Ring value={4} maxValue={5}>
+        <Ring value={progressToNext} maxValue={checkInsPerLevel}>
           <Flex justify="center" direction="column">
             <Text size="md" ta="center" fw="bold">
               Level
             </Text>
             <Text size="sm" ta="center">
-              4 / 5
+              {progressToNext} / {checkInsPerLevel}
             </Text>
           </Flex>
         </Ring>
