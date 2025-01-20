@@ -1,3 +1,9 @@
+interface Container {
+  container_id: number;
+  container_name: string;
+  container_image_url: string;
+}
+
 interface Beer {
   bid: number;
   beer_name: string;
@@ -17,6 +23,19 @@ interface Beer {
   has_had: boolean;
 }
 
+interface BreweryContact {
+  twitter: string;
+  facebook: string;
+  url: string;
+}
+
+interface BreweryLocation {
+  brewery_city: string;
+  brewery_state: string;
+  lat: number;
+  lng: number;
+}
+
 interface Brewery {
   brewery_id: number;
   brewery_name: string;
@@ -24,42 +43,12 @@ interface Brewery {
   brewery_page_url: string;
   brewery_label: string;
   country_name: string;
-  contact: {
-    twitter: string;
-    facebook: string;
-    url: string;
-  };
-  location: {
-    brewery_city: string;
-    brewery_state: string;
-    lat: number;
-    lng: number;
-  };
+  contact: BreweryContact;
+  location: BreweryLocation;
   brewery_active: number;
 }
 
 interface FullBeer {
   beer: Beer;
   brewery: Brewery;
-}
-
-interface BadgeMedia {
-  badge_image_sm: string;
-  badge_image_md: string;
-  badge_image_lg: string;
-}
-
-interface Badge {
-  badge_id: number;
-  user_badge_id: number;
-  checkin_id: number;
-  badge_name: string;
-  badge_description: string;
-  badge_hint: string;
-  badge_active_status: number;
-  media: BadgeMedia;
-  earned_at: string;
-  created_at: string;
-  is_level: boolean;
-  category_id: number;
 }

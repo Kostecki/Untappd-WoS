@@ -8,28 +8,58 @@ import {
   Switch,
   Text,
   Tooltip,
+  type ComboboxItem,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconSettings } from "@tabler/icons-react";
 
 import type { SessionUser } from "~/auth/auth.server";
+import { setSettings, Settings } from "~/utils";
 
 interface InputProps {
   user: SessionUser;
+  userLists: UserLists[];
+  stockList?: StockList;
+  setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
 }
 
-export const SettingsModal = ({ user }: InputProps) => {
+export const SettingsModal = ({
+  user,
+  userLists,
+  stockList,
+  setStockList,
+}: InputProps) => {
   const [opened, { open, close }] = useDisclosure(false);
+
+  const lists = userLists
+    .map((list) => ({
+      value: String(list.list_id),
+      label: list.list_name,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  const handleListSelect = (option: ComboboxItem) => {
+    const newStockList = {
+      listId: option.value,
+      listName: option.label,
+    };
+
+    setStockList(newStockList);
+    setSettings(Settings.STOCK_LIST, newStockList);
+  };
 
   return (
     <>
       <Modal opened={opened} onClose={close} title="User Settings">
-        {/* TODO: Actually implement this */}
         <Select
           label="Your lists on Untappd"
           description={`Select a list with beers you already have. Used for features like "have the beer, but it's not yet checked in"`}
           placeholder="Select a list"
-          data={["React", "Angular", "Vue", "Svelte"]}
+          data={lists}
+          value={stockList ? stockList.listId : null}
+          allowDeselect
+          clearable
+          onChange={(_, option) => handleListSelect(option)}
         />
 
         <Text mt="xl" mb="xs">

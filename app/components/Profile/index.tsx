@@ -10,17 +10,21 @@ import {
   Switch,
   Text,
 } from "@mantine/core";
-import { IconLogout, IconSettings } from "@tabler/icons-react";
+import { IconLogout } from "@tabler/icons-react";
+import { Link } from "react-router";
 
 import type { SessionUser } from "~/auth/auth.server";
 
 import { Ring } from "../Ring";
 import { SettingsModal } from "../SettingsModal";
-import { Link } from "react-router";
+import { setSettings, Settings } from "~/utils";
 
 interface InputProps {
   user: SessionUser;
-  stats: any; // TODO: Add type
+  stats: Stats;
+  userLists: UserLists[];
+  stockList?: StockList;
+  setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
   setProfileFilters: React.Dispatch<React.SetStateAction<Filters>>;
   profileFilters: Filters;
 }
@@ -28,6 +32,9 @@ interface InputProps {
 export const Profile = ({
   user,
   stats,
+  userLists,
+  stockList,
+  setStockList,
   setProfileFilters,
   profileFilters,
 }: InputProps) => {
@@ -40,12 +47,17 @@ export const Profile = ({
   } = stats;
 
   const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.currentTarget.checked;
+    const { name, checked } = event.currentTarget;
 
-    setProfileFilters((prevFilters) => ({
-      ...prevFilters,
-      showHaveHad: newValue,
-    }));
+    const newFilters = {
+      ...profileFilters,
+      [name]: checked,
+      showHaveHad: name === "showHaveHad" ? checked : false,
+      showOnlyMissingOnList: name === "showOnlyMissingOnList" ? checked : false,
+    };
+
+    setProfileFilters(newFilters);
+    setSettings(Settings.TABLE_FILTERS, newFilters);
   };
 
   return (
@@ -57,7 +69,12 @@ export const Profile = ({
             <Text>{fullName}</Text>
           </Group>
           <Group>
-            <SettingsModal user={user} />
+            <SettingsModal
+              user={user}
+              userLists={userLists}
+              stockList={stockList}
+              setStockList={setStockList}
+            />
             <ActionIcon
               component={Link}
               variant="transparent"
@@ -75,17 +92,23 @@ export const Profile = ({
         <Group justify="space-between">
           <Stack>
             <Switch
+              name="showHaveHad"
               label='Show "Have Had"'
+              description="Also show styles already checked in"
               color="untappd"
               checked={profileFilters.showHaveHad}
               onChange={handleToggle}
             />
-            {/* <Switch
-            label='Show Only List "[Name]"'
-            color="untappd"
-            checked={showOnlyMissingOnList}
-            onChange={() => setProfileFilters(prev => ({ ...prev, showOnlyMissingOnList: !prev.showOnlyMissingOnList }))}
-          /> */}
+            {stockList && (
+              <Switch
+                name="showOnlyMissingOnList"
+                label={`Show Only On List: "${stockList.listName}"`}
+                description="Only show missing styles that are also on the list"
+                color="untappd"
+                checked={profileFilters.showOnlyMissingOnList}
+                onChange={handleToggle}
+              />
+            )}
           </Stack>
           <Button variant="outline" color="untappd">
             Refresh Data

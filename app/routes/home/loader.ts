@@ -79,4 +79,18 @@ const getStylesInfo = async (user: SessionUser) => {
   return payload;
 };
 
-export { getStylesInfo };
+const getUserLists = async (user: SessionUser): Promise<UserLists[]> => {
+  const url = `${API_BASE_URL}/custom_lists/userlists?access_token=${user.accessToken}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    console.error("Failed to get user lists", response);
+    return [];
+  }
+
+  const data = await response.json();
+
+  return data.response.items;
+};
+
+export { getStylesInfo, getUserLists };
