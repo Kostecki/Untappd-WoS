@@ -8,7 +8,6 @@ import {
 export default [
   index("routes/home/index.tsx"),
   route("login", "./routes/auth/login.tsx"),
-  ...prefix("api", [
-    route("relatedBeers/:styleId", "./routes/untappd/relatedBeers.ts"),
-  ]),
+  route("logout", "./routes/auth/logout.ts"),
+  ...prefix("api", [route("related/:styleId", "./routes/untappd/related.ts")]),
 ] satisfies RouteConfig;
