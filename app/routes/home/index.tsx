@@ -1,5 +1,6 @@
 import { redirect, useLoaderData } from "react-router";
 import { Box, Container, Grid } from "@mantine/core";
+import { useState } from "react";
 
 import { userSessionGet } from "~/auth/user.server";
 
@@ -32,14 +33,28 @@ export default function Home() {
   const data = useLoaderData<typeof loader>();
   const { user, stylesInfo } = data;
 
+  const [profileFilters, setProfileFilters] = useState<Filters>({
+    showHaveHad: false,
+    showOnlyMissingOnList: false,
+  });
+
+  const filteredStyles = stylesInfo.styles.filter(
+    (style) => profileFilters.showHaveHad || !style.had
+  );
+
   return (
     <Container size="1200">
       <Grid mt="lg">
         <Grid.Col span={6}>
-          <StylesTable styles={stylesInfo.styles} />
+          <StylesTable styles={filteredStyles} />
         </Grid.Col>
         <Grid.Col span={6}>
-          <Profile user={user} stats={stylesInfo.stats} />
+          <Profile
+            user={user}
+            stats={stylesInfo.stats}
+            setProfileFilters={setProfileFilters}
+            profileFilters={profileFilters}
+          />
           <Box my="md">
             <VenueStyles />
           </Box>
