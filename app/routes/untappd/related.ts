@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "./config";
 import { userSessionGet } from "~/auth/user.server";
 
-import type { Route } from "./+types/relatedBeers";
+import type { Route } from "./+types/related";
 
 const lat = 55.6397;
 const lng = 12.0874;
