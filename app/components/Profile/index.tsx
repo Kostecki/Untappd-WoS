@@ -103,16 +103,13 @@ export const Profile = ({
               <Switch
                 name="showOnlyMissingOnList"
                 label={`Show Only On List: "${stockList.listName}"`}
-                description="Only show missing styles that are also on the list"
+                description="Only show missing styles that are also on the selected stock list"
                 color="untappd"
                 checked={profileFilters.showOnlyMissingOnList}
                 onChange={handleToggle}
               />
             )}
           </Stack>
-          <Button variant="outline" color="untappd">
-            Refresh Data
-          </Button>
         </Group>
 
         <Divider my="md" />
