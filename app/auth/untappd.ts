@@ -3,7 +3,11 @@ import { API_BASE_URL } from "~/routes/untappd/config";
 const wosTypeId = 5115;
 
 const getUserSpecificWoSBadgeId = async (offset = 0, accessToken: string) => {
-  const url = `${API_BASE_URL}/user/badges?offset=${offset}&access_token=${accessToken}`;
+  const searchParams = new URLSearchParams({
+    offset: String(offset),
+    access_token: accessToken,
+  });
+  const url = `${API_BASE_URL}/user/badges?${searchParams}`;
   const response = await fetch(url);
 
   if (!response.ok) {

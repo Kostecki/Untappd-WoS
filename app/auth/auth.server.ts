@@ -36,7 +36,11 @@ authenticator.use(
     formData.append("user_password", password);
     formData.append("device_udid", String(DEVICE_UDID));
 
-    const url = `${API_BASE_URL}/xauth?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
+    const searchParams = new URLSearchParams({
+      client_id: String(CLIENT_ID),
+      client_secret: String(CLIENT_SECRET),
+    });
+    const url = `${API_BASE_URL}/xauth?${searchParams}`;
     const response = await fetch(url, {
       method: "POST",
       body: formData,
