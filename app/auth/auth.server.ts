@@ -1,5 +1,6 @@
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
+import invariant from "tiny-invariant";
 
 import {
   API_BASE_URL,
@@ -17,9 +18,13 @@ export type SessionUser = {
   userAvatarURL: string;
   wosBadgeId: number;
   accessToken: string;
+  isAdmin: boolean;
 };
 
 export const authenticator = new Authenticator<SessionUser>();
+
+const ADMIN_USER_ID = process.env.ADMIN_USER_ID;
+invariant(ADMIN_USER_ID, "ADMIN_USER_ID must be set in .env");
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
@@ -66,6 +71,7 @@ authenticator.use(
       userAvatarURL: user_avatar_hd,
       wosBadgeId: userSpecificBadgeId,
       accessToken,
+      isAdmin: id === Number(ADMIN_USER_ID),
     };
   }),
   "form"
