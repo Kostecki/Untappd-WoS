@@ -12,5 +12,7 @@ export default [
   ...prefix("api", [
     route("related/:styleId", "./routes/untappd/related.ts"),
     route("list/:listId", "./routes/untappd/list.ts"),
+    route("venues/:searchQuery", "./routes/untappd/venues.ts"),
+    route("venue/:venueId", "./routes/untappd/venue.ts"),
   ]),
 ] satisfies RouteConfig;

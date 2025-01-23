@@ -101,7 +101,7 @@ export default function Home() {
             setProfileFilters={setProfileFilters}
           />
           <Box my="md">
-            <VenueStyles />
+            <VenueStyles styles={stylesInfo.styles} />
           </Box>
           <CheckBeer />
         </Grid.Col>
