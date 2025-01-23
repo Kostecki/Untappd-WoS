@@ -136,7 +136,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
         Venue Styles
       </Text>
       <Text fs="italic" mt="xs" c="dimmed">
-        Pick a verified venue to see what styles they currently have
+        Pick a verified venue to see what new styles they might have
       </Text>
 
       <Divider mt="xs" mb="lg" />
