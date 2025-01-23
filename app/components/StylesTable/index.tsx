@@ -113,7 +113,10 @@ export const StylesTable = ({ styles }: InputProps) => {
                         <ActionIcon
                           variant="transparent"
                           aria-label="Copy"
-                          onClick={copy}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            copy();
+                          }}
                         >
                           {copied ? (
                             <IconCheck color="gray" stroke={1.5} />
