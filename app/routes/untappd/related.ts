@@ -12,7 +12,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const user = await userSessionGet(request);
   const styleId = params.styleId;
 
-  const url = `${API_BASE_URL}/beer/trending?lat=${lat}&lng=${lng}&radius=${distance}&type_id=${styleId}&type=${type}&range=${distance}&access_token=${user.accessToken}`;
+  const searchParams = new URLSearchParams({
+    lat: String(lat),
+    lng: String(lng),
+    radius: String(distance),
+    type_id: String(styleId),
+    type: String(type),
+    range: String(distance),
+    access_token: user.accessToken,
+  });
+  const url = `${API_BASE_URL}/beer/trending?${searchParams}`;
   const response = await fetch(url);
 
   if (!response.ok) {
