@@ -103,7 +103,7 @@ export default function Home() {
           <Box my="md">
             <VenueStyles styles={stylesInfo.styles} />
           </Box>
-          <CheckBeer />
+          <CheckBeer styles={stylesInfo.styles} />
         </Grid.Col>
       </Grid>
     </Container>

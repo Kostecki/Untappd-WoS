@@ -7,8 +7,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const user = await userSessionGet(request);
   const query = params.searchQuery;
 
-  console.log("request", query);
-
   const searchParams = new URLSearchParams({
     q: query,
     access_token: user.accessToken,
