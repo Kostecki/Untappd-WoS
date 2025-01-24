@@ -2,22 +2,16 @@ import {
   Anchor,
   Box,
   Card,
-  CloseButton,
-  Combobox,
   Divider,
   Flex,
-  Group,
-  Image,
-  Loader,
-  ScrollArea,
   Tabs,
   Text,
-  TextInput,
-  useCombobox,
+  type ComboboxStore,
 } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useState } from "react";
+
 import { BeerCard } from "../BeerCard";
+import { SearchSelect } from "../SearchSelect";
 
 interface InputProps {
   styles: { styleId: number; styleName: string; had: boolean }[];
@@ -25,56 +19,18 @@ interface InputProps {
 
 export const VenueStyles = ({ styles }: InputProps) => {
   const [loading, setLoading] = useState(false);
-  const [venues, setVenues] = useState<[] | null>(null);
-  const [searchQuery, setSearchQuery] = useState(""); // Separate search query state
-  const [selectedVenue, setSelectedVenue] = useState<any>(null); // Store full venue object
-  const [empty, setEmpty] = useState(false);
+  const [selectedVenue, setSelectedVenue] = useState<any>(null);
   const [venueDetails, setVenueDetails] = useState<any>(null);
 
-  const abortController = useRef<AbortController | null>(null);
-
-  const [debouncedSearch] = useDebouncedValue(searchQuery, 300);
-
-  const combobox = useCombobox({
-    onDropdownClose: () => combobox.resetSelectedOption(),
-  });
-
-  useEffect(() => {
-    const getVenues = async (query: string) => {
-      abortController.current?.abort();
-      abortController.current = new AbortController();
-
-      if (!query) {
-        setVenues(null);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/venues/${query}`);
-        const data = await response.json();
-        setVenues(data);
-        setEmpty(data.length === 0);
-      } catch (error) {
-        console.error("Failed to get venues", error);
-      }
-      setLoading(false);
-    };
-
-    if (debouncedSearch.trim()) {
-      getVenues(debouncedSearch);
-    } else {
-      setVenues(null);
-      setEmpty(false);
-    }
-  }, [debouncedSearch]);
-
-  const handleVenueSelect = async (optionValue: string) => {
+  const handleVenueSelect = async (
+    optionValue: string,
+    venues: any,
+    combobox: ComboboxStore
+  ) => {
     setLoading(true);
 
     const venue = venues?.find(
-      (v: any) => v.venue.venue_id.toString() === optionValue
+      (venue: any) => venue.venue.venue_id.toString() === optionValue
     );
     if (venue) {
       setSelectedVenue(venue.venue); // TODO: Fix type
@@ -103,32 +59,10 @@ export const VenueStyles = ({ styles }: InputProps) => {
 
       setVenueDetails(filteredMenus);
     }
+
     setLoading(false);
     combobox.closeDropdown();
   };
-
-  const options = (venues || []).map((venue: any) => (
-    <Combobox.Option
-      value={venue.venue.venue_id.toString()}
-      key={venue.venue.venue_id}
-    >
-      <Flex justify="space-between">
-        <Group gap="6">
-          <Image
-            src={venue.venue.is_verified ? "verified.svg" : "unverified.svg"}
-            h={16}
-            w={16}
-            mt="2px"
-            style={{ opacity: venue.venue.is_verified ? 1 : 0.3 }}
-          />
-          {venue.venue.venue_name}
-        </Group>
-        <Group>
-          ({venue.venue.venue_city}, {venue.venue.venue_country})
-        </Group>
-      </Flex>
-    </Combobox.Option>
-  ));
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -141,62 +75,18 @@ export const VenueStyles = ({ styles }: InputProps) => {
 
       <Divider mt="xs" mb="lg" />
 
-      <Combobox onOptionSubmit={handleVenueSelect} store={combobox}>
-        <Combobox.Target>
-          <TextInput
-            placeholder="Find venue"
-            value={selectedVenue?.venue_name || searchQuery}
-            onChange={(event) => {
-              setSearchQuery(event.currentTarget.value);
-              setSelectedVenue(null);
-              combobox.openDropdown();
-            }}
-            onClick={() => combobox.openDropdown()}
-            onFocus={() => combobox.openDropdown()}
-            onBlur={() => combobox.closeDropdown()}
-            leftSection={
-              selectedVenue ? (
-                <Image
-                  src={
-                    selectedVenue.is_verified
-                      ? "verified.svg"
-                      : "unverified.svg"
-                  }
-                  h={16}
-                  w={16}
-                  mt="2px"
-                  style={{ opacity: selectedVenue.is_verified ? 1 : 0.3 }}
-                />
-              ) : null
-            }
-            rightSection={
-              loading ? (
-                <Loader size={18} />
-              ) : searchQuery || selectedVenue ? (
-                <CloseButton
-                  size="sm"
-                  onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedVenue(null);
-                    setVenues(null);
-                    setVenueDetails(null);
-                  }}
-                />
-              ) : null
-            }
-          />
-        </Combobox.Target>
-
-        <Combobox.Dropdown hidden={venues === null}>
-          <Combobox.Options>
-            <ScrollArea.Autosize type="scroll" mah={200}>
-              {options}
-              {empty && <Combobox.Empty>No venues found</Combobox.Empty>}
-            </ScrollArea.Autosize>
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
+      <SearchSelect
+        apiURL="/api/venues"
+        placeholder="Search for a venue"
+        emptyText="No venues found"
+        loading={loading}
+        setLoading={setLoading}
+        selected={selectedVenue}
+        setSelected={setSelectedVenue}
+        setDetails={setVenueDetails}
+        optionSelectHandler={handleVenueSelect}
+        leftSection={true}
+      />
 
       {venueDetails && (
         <Box mt="lg">
