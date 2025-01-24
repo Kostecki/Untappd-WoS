@@ -3,7 +3,7 @@ import {
   Box,
   Card,
   Divider,
-  Flex,
+  Stack,
   Tabs,
   Text,
   type ComboboxStore,
@@ -23,9 +23,10 @@ export const VenueStyles = ({ styles }: InputProps) => {
   const [venueDetails, setVenueDetails] = useState<any>(null);
 
   const handleVenueSelect = async (
-    optionValue: string,
-    venues: any,
-    combobox: ComboboxStore
+    venues?: any,
+    barcode?: number,
+    optionValue?: string,
+    combobox?: ComboboxStore
   ) => {
     setLoading(true);
 
@@ -61,7 +62,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
     }
 
     setLoading(false);
-    combobox.closeDropdown();
+    combobox?.closeDropdown();
   };
 
   return (
@@ -121,20 +122,22 @@ export const VenueStyles = ({ styles }: InputProps) => {
 
               return (
                 <Tabs.Panel key={menu_id} value={String(menu_id)}>
-                  <Flex justify="space-between" align="center" mt="xs" mb="md">
+                  <Stack mt="xs" mb="md" gap="0">
                     <Text fs="italic" size="sm" c="dimmed">
                       {menu_description}
                     </Text>
-                    <Anchor
-                      href={selectedVenue.url}
-                      target="_blank"
-                      c="untappd"
-                      underline="always"
-                      size="sm"
-                    >
-                      Menu on Untappd
-                    </Anchor>
-                  </Flex>
+                    <Text c="untappd" size="sm" ta="right">
+                      <Anchor
+                        href={selectedVenue.url}
+                        target="_blank"
+                        c="untappd"
+                        underline="always"
+                        size="sm"
+                      >
+                        Menu on Untappd
+                      </Anchor>
+                    </Text>
+                  </Stack>
 
                   {sections.items.map((section: any) => {
                     const { section_id, section_name, items, count } = section;

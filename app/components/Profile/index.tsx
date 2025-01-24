@@ -16,7 +16,8 @@ import type { SessionUser } from "~/auth/auth.server";
 
 import { Ring } from "../Ring";
 import { SettingsModal } from "../SettingsModal";
-import { setSettings, Settings } from "~/utils";
+import { isMobile, setSettings, Settings } from "~/utils";
+import { useElementSize, useViewportSize } from "@mantine/hooks";
 
 interface InputProps {
   user: SessionUser;
@@ -37,6 +38,9 @@ export const Profile = ({
   setProfileFilters,
   profileFilters,
 }: InputProps) => {
+  const { ref, width } = useElementSize();
+  const mobile = isMobile();
+
   const fullName = `${user.firstName} ${user.lastName}`;
   const {
     hadCount,
@@ -58,6 +62,22 @@ export const Profile = ({
     setProfileFilters(newFilters);
     setSettings(Settings.TABLE_FILTERS, newFilters);
   };
+
+  const BadgeLabel = () => (
+    <Text size="md" ta="center" fw="bold">
+      Badge
+    </Text>
+  );
+  const StyleLabel = () => (
+    <Text size="md" ta="center" fw="bold">
+      Style
+    </Text>
+  );
+  const LevelLabel = () => (
+    <Text size="md" ta="center" fw="bold">
+      Level
+    </Text>
+  );
 
   return (
     <>
@@ -112,44 +132,50 @@ export const Profile = ({
         </Group>
 
         <Divider my="md" />
-
-        <Flex justify="space-between">
-          <Ring value={currentLevel} maxValue={maxLevel}>
-            <Flex justify="center" direction="column">
-              <Text size="md" ta="center" fw="bold">
-                Badge
-              </Text>
-              <Text size="sm" ta="center">
-                {currentLevel} / {maxLevel}
-              </Text>
-            </Flex>
-          </Ring>
-          <Ring value={hadCount} maxValue={totalCount}>
-            <Flex justify="center" direction="column">
-              <Text size="md" ta="center" fw="bold">
-                Style
-              </Text>
-              <Text size="sm" ta="center">
-                {hadCount} / {totalCount}
-              </Text>
-              <Text size="sm" fs="italic" ta="center" mt="3" mb="-5">
-                Left: {notHadCount}
-              </Text>
-              <Text size="sm" fs="italic" ta="center">
-                Have: 0
-              </Text>
-            </Flex>
-          </Ring>
-          <Ring value={progressToNext} maxValue={checkInsPerLevel}>
-            <Flex justify="center" direction="column">
-              <Text size="md" ta="center" fw="bold">
-                Level
-              </Text>
-              <Text size="sm" ta="center">
-                {progressToNext} / {checkInsPerLevel}
-              </Text>
-            </Flex>
-          </Ring>
+        <Flex justify="space-between" ref={ref}>
+          <Flex direction="column">
+            {mobile && <BadgeLabel />}
+            <Ring size={width / 3} value={currentLevel} maxValue={maxLevel}>
+              <Flex justify="center" direction="column">
+                {!mobile && <BadgeLabel />}
+                <Text size="sm" ta="center">
+                  {currentLevel} / {maxLevel}
+                </Text>
+              </Flex>
+            </Ring>
+          </Flex>
+          <Flex direction="column">
+            {mobile && <StyleLabel />}
+            <Ring size={width / 3} value={hadCount} maxValue={totalCount}>
+              <Flex justify="center" direction="column">
+                {!mobile && <StyleLabel />}
+                <Text size="sm" ta="center">
+                  {hadCount} / {totalCount}
+                </Text>
+                <Text size="sm" fs="italic" ta="center" mt="3" mb="-5">
+                  Left: {notHadCount}
+                </Text>
+                <Text size="sm" fs="italic" ta="center">
+                  Have: 0
+                </Text>
+              </Flex>
+            </Ring>
+          </Flex>
+          <Flex direction="column">
+            {mobile && <LevelLabel />}
+            <Ring
+              size={width / 3}
+              value={progressToNext}
+              maxValue={checkInsPerLevel}
+            >
+              <Flex justify="center" direction="column">
+                {!mobile && <LevelLabel />}
+                <Text size="sm" ta="center">
+                  {progressToNext} / {checkInsPerLevel}
+                </Text>
+              </Flex>
+            </Ring>
+          </Flex>
         </Flex>
       </Card>
     </>
