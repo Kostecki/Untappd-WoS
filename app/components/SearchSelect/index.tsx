@@ -6,12 +6,14 @@ import {
   Image,
   Loader,
   ScrollArea,
+  Stack,
   Text,
   TextInput,
   useCombobox,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
+import { isMobile } from "~/utils";
 
 interface InputProps {
   apiURL: string;
@@ -38,6 +40,8 @@ export const SearchSelect = ({
   setDetails,
   leftSection = false,
 }: InputProps) => {
+  const mobile = isMobile();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState<[] | null>(null);
   const [empty, setEmpty] = useState(false);
@@ -81,6 +85,38 @@ export const SearchSelect = ({
     }
   }, [debouncedSearch]);
 
+  const VerifiedImageComponent = ({
+    is_verified,
+  }: {
+    is_verified: boolean;
+  }) => {
+    return (
+      <Image
+        src={is_verified ? "verified.svg" : "unverified.svg"}
+        h="16"
+        w="16"
+        style={{ opacity: is_verified ? 1 : 0.3 }}
+        mr="xs"
+      />
+    );
+  };
+
+  const TextComponents = ({
+    venue,
+  }: {
+    venue: { venue_name: string; venue_city: string; venue_country: string };
+  }) => {
+    const { venue_name, venue_city, venue_country } = venue;
+    return (
+      <>
+        <Text size="sm">{venue_name}</Text>
+        <Text size="sm" c="dimmed" fs="italic">
+          ({venue_city}, {venue_country})
+        </Text>
+      </>
+    );
+  };
+
   const options = (data || []).map((input: any) => {
     if (apiURL.includes("/venues")) {
       return (
@@ -88,29 +124,27 @@ export const SearchSelect = ({
           value={input.venue.venue_id.toString()}
           key={input.venue.venue_id}
         >
-          <Flex justify="space-between">
-            <Group gap="6">
-              <Image
-                src={
-                  input.venue.is_verified ? "verified.svg" : "unverified.svg"
-                }
-                h={16}
-                w={16}
-                mt="2px"
-                style={{ opacity: input.venue.is_verified ? 1 : 0.3 }}
-              />
-              {input.venue.venue_name}
+          {mobile ? (
+            <Group gap={0}>
+              <VerifiedImageComponent is_verified={input.venue.is_verified} />
+              <Stack gap={0}>
+                <TextComponents venue={input.venue} />
+              </Stack>
             </Group>
-            <Group>
-              ({input.venue.venue_city}, {input.venue.venue_country})
-            </Group>
-          </Flex>
+          ) : (
+            <Flex align="center">
+              <VerifiedImageComponent is_verified={input.venue.is_verified} />
+              <Flex justify="space-between" w="100%">
+                <TextComponents venue={input.venue} />
+              </Flex>
+            </Flex>
+          )}
         </Combobox.Option>
       );
     } else if (apiURL.includes("/beers")) {
       return (
         <Combobox.Option value={input.beer.bid.toString()} key={input.beer.bid}>
-          <Text>
+          <Text size="sm">
             {input.beer.beer_name}
             <Text c="dimmed" component="span" fs="italic" ml="xs" size="sm">
               ({input.brewery.brewery_name})

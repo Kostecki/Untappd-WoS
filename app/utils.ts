@@ -1,3 +1,5 @@
+import { useViewportSize } from "@mantine/hooks";
+
 enum Settings {
   STOCK_LIST = "stockList",
   TABLE_FILTERS = "tableFilters",
@@ -30,4 +32,9 @@ const setSettings = <T extends Settings>(
   localStorage.setItem("settings", JSON.stringify(parsedSettings));
 };
 
-export { getSettings, setSettings, Settings };
+const isMobile = () => {
+  const { width } = useViewportSize();
+  return width <= 768;
+};
+
+export { getSettings, setSettings, Settings, isMobile };

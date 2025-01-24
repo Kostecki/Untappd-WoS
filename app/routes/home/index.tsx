@@ -88,10 +88,10 @@ export default function Home() {
   return (
     <Container size="1200">
       <Grid mt="lg">
-        <Grid.Col span={6}>
+        <Grid.Col span={{ base: 12, lg: 6 }} order={{ base: 2, lg: 1 }}>
           <StylesTable styles={filteredStyles} />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={{ base: 12, lg: 6 }} order={{ base: 1, lg: 2 }}>
           <Profile
             user={user}
             stats={stylesInfo.stats}
