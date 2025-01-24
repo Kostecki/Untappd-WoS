@@ -67,7 +67,7 @@ export const StylesTable = ({ styles }: InputProps) => {
         stickyHeader
         style={{
           display: "block",
-          overflowY: "auto",
+          overflowY: "scroll",
           maxHeight: windowHeight - 140,
           scrollbarWidth: "thin",
         }}
@@ -129,43 +129,48 @@ export const StylesTable = ({ styles }: InputProps) => {
                   </Flex>
                 </Table.Td>
               </Table.Tr>
-              <Collapse className="balls" in={openRow === style.styleId}>
-                {loading ? (
-                  <Flex justify="center">
-                    <Loader color="untappd" my="lg" />
-                  </Flex>
-                ) : (
-                  <List my="lg">
-                    {relatedBeers.map((beer: FullBeer) => {
-                      const {
-                        beer: { beer_name, bid },
-                        brewery: { brewery_name, country_name },
-                      } = beer;
+              <Table.Tr style={{ border: "none" }}>
+                <Table.Td colSpan={3} p={0}>
+                  <Collapse in={openRow === style.styleId}>
+                    {loading ? (
+                      <Flex justify="center">
+                        <Loader color="untappd" my="lg" />
+                      </Flex>
+                    ) : (
+                      <List my="lg">
+                        {relatedBeers.map((beer: FullBeer) => {
+                          const {
+                            beer: { beer_name, bid },
+                            brewery: { brewery_name, country_name },
+                          } = beer;
 
-                      return (
-                        <Anchor
-                          href={`https://untappd.com/beer/${bid}`}
-                          target="_blank"
-                        >
-                          <List.Item
-                            key={bid}
-                            px="sm"
-                            py="xs"
-                            className="related-beer"
-                          >
-                            <Text component="div" size="sm" c="dark">
-                              {beer_name}
-                            </Text>
-                            <Text component="div" size="sm" c="dimmed">
-                              {brewery_name}, {country_name}
-                            </Text>
-                          </List.Item>
-                        </Anchor>
-                      );
-                    })}
-                  </List>
-                )}
-              </Collapse>
+                          return (
+                            <Anchor
+                              href={`https://untappd.com/beer/${bid}`}
+                              target="_blank"
+                              key={bid}
+                            >
+                              <List.Item
+                                key={bid}
+                                px="sm"
+                                py="xs"
+                                className="related-beer"
+                              >
+                                <Text component="div" size="sm" c="dark">
+                                  {beer_name}
+                                </Text>
+                                <Text component="div" size="sm" c="dimmed">
+                                  {brewery_name}, {country_name}
+                                </Text>
+                              </List.Item>
+                            </Anchor>
+                          );
+                        })}
+                      </List>
+                    )}
+                  </Collapse>
+                </Table.Td>
+              </Table.Tr>
             </Fragment>
           ))}
         </Table.Tbody>
