@@ -1,4 +1,4 @@
-import { Flex, RingProgress, Text } from "@mantine/core";
+import { RingProgress } from "@mantine/core";
 
 interface InputProps {
   value: number;

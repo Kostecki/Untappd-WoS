@@ -16,5 +16,6 @@ export default [
     route("venue/:venueId", "./routes/untappd/venue.ts"),
     route("beers/:searchQuery", "./routes/untappd/beers.ts"),
     route("beer/:beerId", "./routes/untappd/beer.ts"),
+    route("barcode/:barcode", "./routes/untappd/barcode.ts"),
   ]),
 ] satisfies RouteConfig;

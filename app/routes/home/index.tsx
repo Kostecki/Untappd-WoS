@@ -59,7 +59,7 @@ export default function Home() {
         );
         const listDetails = await listDetailsResponse.json();
         const listBeerStyles = listDetails.map(
-          (beer: FullBeer) => beer.beer.beer_style_id
+          (beer: FullBeer) => beer.type_id // TODO: Type
         );
 
         setStockListStyleIds(listBeerStyles);
@@ -69,6 +69,7 @@ export default function Home() {
     fetchListDetails();
   }, [stockList]);
 
+  // TODO: Make sure this doesn't break on users first visit
   const filteredStyles = stylesInfo.styles.filter((style) => {
     if (profileFilters.showHaveHad) {
       // Show all styles, ignoring other filters

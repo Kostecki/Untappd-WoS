@@ -19,7 +19,49 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   const data = await response.json();
-  const beer = data.response.beer;
+  const {
+    beer: {
+      bid,
+      beer_name,
+      beer_label,
+      beer_label_hd,
+      beer_abv,
+      beer_ibu,
+      beer_description,
+      beer_style,
+      is_in_production,
+      beer_slug,
+      is_homebrew,
+      created_at,
+      rating_count,
+      rating_score,
+      stats,
+      brewery,
+    },
+  } = data.response;
 
-  return Response.json(beer);
+  const payload = [
+    {
+      beer: {
+        bid,
+        beer_name,
+        beer_label,
+        beer_label_hd,
+        beer_abv,
+        beer_ibu,
+        beer_description,
+        beer_style,
+        is_in_production,
+        beer_slug,
+        is_homebrew,
+        created_at,
+        rating_count,
+        rating_score,
+        stats,
+      },
+      brewery,
+    },
+  ];
+
+  return Response.json(payload);
 }

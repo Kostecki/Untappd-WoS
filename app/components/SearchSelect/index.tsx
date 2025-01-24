@@ -123,7 +123,9 @@ export const SearchSelect = ({
 
   return (
     <Combobox
-      onOptionSubmit={(option) => optionSelectHandler(option, data, combobox)}
+      onOptionSubmit={(option) =>
+        optionSelectHandler(data, null, option, combobox)
+      }
       store={combobox}
     >
       <Combobox.Target>
