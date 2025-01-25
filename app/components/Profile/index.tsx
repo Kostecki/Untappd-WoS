@@ -52,6 +52,8 @@ export const Profile = ({
     level: { currentLevel, progressToNext, checkInsPerLevel, maxLevel },
   } = stats;
 
+  console.log("stockList", stockList);
+
   const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.currentTarget;
 
@@ -122,7 +124,7 @@ export const Profile = ({
               checked={profileFilters.showHaveHad}
               onChange={handleToggle}
             />
-            {stockList && (
+            {stockList?.listId && (
               <Switch
                 name="showOnlyMissingOnList"
                 label={`Show Only On List: "${stockList.listName}"`}

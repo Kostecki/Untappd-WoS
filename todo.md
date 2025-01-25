@@ -1,6 +1,6 @@
 # TODO
 
-- use enhanced user/unfo endpoints for things?
+- use enhanced user/info endpoints for things?
   - Lists?
 - Barcode scan om mobile
 - No routes matched location "/api/list/"
