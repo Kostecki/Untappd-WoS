@@ -78,18 +78,22 @@ export const SettingsModal = ({
 
         <Flex justify="space-between" align="center" mt="xl">
           {user.isAdmin && (
-            <Tooltip label="Commit message">
-              <Anchor
-                href={`https://github.com/Kostecki/Untappd-WoS/commit/${latestCommit.hash}`}
-                target="_blank"
-                fs="italic"
-                c="dimmed"
-                size="sm"
-              >
-                <Text>Last commit:</Text>
-                <Text>{latestCommit.message}</Text>
-              </Anchor>
-            </Tooltip>
+            <Group gap={0}>
+              <Text size="sm" mr="5">
+                Last commit:
+              </Text>
+              <Tooltip label={latestCommit.message} position="bottom" withArrow>
+                <Anchor
+                  href={`https://github.com/Kostecki/Untappd-WoS/commit/${latestCommit.hash}`}
+                  target="_blank"
+                  fs="italic"
+                  c="dimmed"
+                  size="sm"
+                >
+                  <Text>{latestCommit.hash}</Text>
+                </Anchor>
+              </Tooltip>
+            </Group>
           )}
           <Group ml="lg">
             <Button
