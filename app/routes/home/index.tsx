@@ -33,12 +33,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     message: process.env.LATEST_COMMIT_MESSAGE ?? "No commit message",
   };
 
-  return { user, stylesInfo, userLists, latestCommit };
+  const isProd = import.meta.env.PROD;
+
+  return { user, stylesInfo, userLists, latestCommit, isProd };
 }
 
 export default function Home() {
   const data = useLoaderData<typeof loader>();
-  const { user, stylesInfo, userLists, latestCommit } = data;
+  const { user, stylesInfo, userLists, latestCommit, isProd } = data;
 
   const [profileFilters, setProfileFilters] = useState<Filters>({
     showHaveHad: false,
@@ -56,6 +58,10 @@ export default function Home() {
     } else {
       setStockList(settings.stockList);
       setProfileFilters(settings.tableFilters);
+    }
+
+    if (isProd) {
+      umami.identify({ email: user.email });
     }
   }, []);
 

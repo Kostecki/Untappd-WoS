@@ -1,9 +1,10 @@
 # TODO
 
+- use enhanced user/unfo endpoints for things?
+  - Lists?
 - Barcode scan om mobile
 - No routes matched location "/api/list/"
 - Autofill doesn't automatically login
-- Umami
 - Country badges
 - Cleanup deploy/dockerignore
 

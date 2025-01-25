@@ -16,6 +16,8 @@ export type SessionUser = {
   firstName: string;
   lastName: string;
   userAvatarURL: string;
+  email: string;
+  profileUrl: string;
   wosBadgeId: number;
   accessToken: string;
   isAdmin: boolean;
@@ -28,19 +30,19 @@ invariant(ADMIN_USER_ID, "ADMIN_USER_ID must be set in .env");
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
-    const username = String(form.get("username"));
-    const password = String(form.get("password"));
+    const formUsername = String(form.get("username"));
+    const formPassword = String(form.get("password"));
 
     const formData = new FormData();
-    formData.append("user_name", username);
-    formData.append("user_password", password);
+    formData.append("user_name", formUsername);
+    formData.append("user_password", formPassword);
     formData.append("device_udid", String(DEVICE_UDID));
 
-    const searchParams = new URLSearchParams({
+    const authSearchParams = new URLSearchParams({
       client_id: String(CLIENT_ID),
       client_secret: String(CLIENT_SECRET),
     });
-    const url = `${API_BASE_URL}/xauth?${searchParams}`;
+    const url = `${API_BASE_URL}/xauth?${authSearchParams}`;
     const response = await fetch(url, {
       method: "POST",
       body: formData,
@@ -51,10 +53,14 @@ authenticator.use(
     }
 
     const data = await response.json();
-    const accessToken = data.response.access_token;
+    const { access_token, username } = data.response;
 
+    const userSearchParams = new URLSearchParams({
+      compact: "enhanced",
+      access_token,
+    });
     const userResponse = await fetch(
-      `${API_BASE_URL}/user/info?access_token=${accessToken}`
+      `${API_BASE_URL}/user/info/${username}?${userSearchParams}`
     );
 
     if (!userResponse.ok) {
@@ -62,19 +68,31 @@ authenticator.use(
     }
 
     const userData = await userResponse.json();
-    const { id, user_name, first_name, last_name, user_avatar_hd } =
-      userData.response.user;
+    const {
+      id,
+      user_name,
+      first_name,
+      last_name,
+      user_avatar_hd,
+      untappd_url,
+      settings: { email_address },
+    } = userData.response.user;
 
-    const userSpecificBadgeId = await getUserSpecificWoSBadgeId(0, accessToken);
+    const userSpecificBadgeId = await getUserSpecificWoSBadgeId(
+      0,
+      access_token
+    );
 
     return {
       id,
       userName: user_name,
       firstName: first_name,
       lastName: last_name,
+      email: email_address,
+      profileUrl: untappd_url,
       userAvatarURL: user_avatar_hd,
       wosBadgeId: userSpecificBadgeId,
-      accessToken,
+      accessToken: access_token,
       isAdmin: id === Number(ADMIN_USER_ID),
     };
   }),
