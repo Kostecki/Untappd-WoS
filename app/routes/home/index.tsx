@@ -3,6 +3,7 @@ import { Box, Container, Grid } from "@mantine/core";
 import { useEffect, useLayoutEffect, useState } from "react";
 
 import { userSessionGet } from "~/auth/user.server";
+import { getSettings, setSettings, Settings } from "~/utils";
 
 import { getStylesInfo, getUserLists } from "./loader";
 
@@ -12,7 +13,6 @@ import { CheckBeer } from "~/components/CheckBeer";
 import { StylesTable } from "~/components/StylesTable";
 
 import type { Route } from "./+types/index";
-import { getSettings } from "~/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Wheel of Styles" }];
@@ -45,7 +45,10 @@ export default function Home() {
   useLayoutEffect(() => {
     const settings = getSettings();
 
-    if (settings) {
+    if (Object.keys(settings).length === 0 && settings.constructor === Object) {
+      setSettings(Settings.STOCK_LIST, { listId: "", listName: "" });
+      setSettings(Settings.TABLE_FILTERS, profileFilters);
+    } else {
       setStockList(settings.stockList);
       setProfileFilters(settings.tableFilters);
     }
@@ -69,7 +72,6 @@ export default function Home() {
     fetchListDetails();
   }, [stockList]);
 
-  // TODO: Make sure this doesn't break on users first visit
   const filteredStyles = stylesInfo.styles.filter((style) => {
     if (profileFilters.showHaveHad) {
       // Show all styles, ignoring other filters
