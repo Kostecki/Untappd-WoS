@@ -1,8 +1,12 @@
-import { Box, Flex, Loader, type ComboboxStore } from "@mantine/core";
 import {
-  BarcodeDetector,
-  type BarcodeDetectorOptions,
-} from "barcode-detector/pure";
+  Box,
+  Flex,
+  Loader,
+  type ComboboxStore,
+  ActionIcon,
+} from "@mantine/core";
+import { IconBulb, IconBulbOff } from "@tabler/icons-react";
+import { BarcodeDetector, type BarcodeDetectorOptions } from "barcode-detector";
 import { useEffect, useRef, useState } from "react";
 
 interface InputProps {
@@ -24,55 +28,52 @@ const scannerOptions: BarcodeDetectorOptions = {
 };
 
 export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFlashOn, setIsFlashOn] = useState(false);
+  const [isTorchAvailable, setIsTorchAvailable] = useState(false);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const barcodeDetectorRef = useRef<BarcodeDetector | null>(null);
   const detectionComplete = useRef(false);
+  const videoTrackRef = useRef<MediaStreamTrack | null>(null);
 
   useEffect(() => {
-    const enableStream = async () => {
+    const enableCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia(
           videoCaptureOptions
         );
-        setMediaStream(stream);
+        const videoTrack = stream.getVideoTracks()[0];
+
+        videoTrackRef.current = videoTrack;
+        if (videoRef.current) videoRef.current.srcObject = stream;
+
+        // Check if the torch feature is available
+        const capabilities = (videoTrack.getCapabilities() as any) || {};
+        setIsTorchAvailable(!!capabilities.torch);
+
+        videoRef.current?.play().then(() => {
+          setLoading(false);
+          startBarcodeDetection();
+        });
       } catch (error) {
         console.error("Error accessing camera:", error);
         setLoading(false);
       }
     };
 
-    if (!mediaStream) {
-      enableStream();
-    }
+    enableCamera();
 
     return () => {
-      mediaStream?.getTracks().forEach((track) => track.stop());
+      if (videoTrackRef.current) {
+        // Turn off the torch before stopping the camera
+        videoTrackRef.current
+          .applyConstraints({ advanced: [{ torch: false }] } as any)
+          .catch(console.error);
+        videoTrackRef.current.stop();
+      }
     };
-  }, [mediaStream]);
-
-  useEffect(() => {
-    if (videoRef.current && mediaStream) {
-      videoRef.current.srcObject = mediaStream;
-
-      const playVideo = () => {
-        videoRef.current
-          ?.play()
-          .then(() => {
-            setLoading(false);
-            startBarcodeDetection();
-          })
-          .catch((error) => console.error("Error playing video:", error));
-      };
-
-      videoRef.current.addEventListener("loadedmetadata", playVideo);
-
-      return () => {
-        videoRef.current?.removeEventListener("loadedmetadata", playVideo);
-      };
-    }
-  }, [mediaStream]);
+  }, []);
 
   const startBarcodeDetection = () => {
     if (!("BarcodeDetector" in window)) {
@@ -94,9 +95,7 @@ export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
             videoRef.current
           );
           if (barcodes.length > 0) {
-            const barcodeValue = barcodes[0].rawValue;
-            const barcode = parseInt(barcodeValue);
-            fetchDetailsHandler(undefined, barcode);
+            fetchDetailsHandler(undefined, parseInt(barcodes[0].rawValue));
             detectionComplete.current = true;
           }
         } catch (error) {
@@ -104,12 +103,25 @@ export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
         }
       }
 
-      if (!detectionComplete.current) {
-        requestAnimationFrame(detectBarcodes);
-      }
+      if (!detectionComplete.current) requestAnimationFrame(detectBarcodes);
     };
 
     requestAnimationFrame(detectBarcodes);
+  };
+
+  const toggleFlash = async () => {
+    const videoTrack = videoTrackRef.current;
+    if (videoTrack) {
+      try {
+        await videoTrack.applyConstraints({
+          advanced: [{ torch: !isFlashOn }] as any,
+        });
+
+        setIsFlashOn((prev) => !prev);
+      } catch (error) {
+        console.error("Failed to toggle flash:", error);
+      }
+    }
   };
 
   return (
@@ -126,11 +138,7 @@ export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
           autoPlay
           playsInline
           muted
-          style={{
-            width: "100%",
-            height: "auto",
-            borderRadius: "8px",
-          }}
+          style={{ width: "100%", height: "auto", borderRadius: "8px" }}
         />
 
         <Flex
@@ -140,22 +148,33 @@ export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
           left="50%"
           top="50%"
           w="100%"
-          h="70%"
-          style={{
-            transform: "translate(-50%, -50%)",
-            pointerEvents: "none",
-          }}
+          h="40%"
+          style={{ transform: "translate(-50%, -50%)", pointerEvents: "none" }}
         >
           <img
             src="/focus-border.svg"
             alt="Focus Border"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-            }}
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
           />
         </Flex>
+
+        {isTorchAvailable && (
+          <Flex
+            className="balls-flash"
+            justify="flex-end"
+            pos="absolute"
+            w="100%"
+            bottom="0"
+          >
+            <ActionIcon variant="subtle" onClick={toggleFlash} mb="md" mr="md">
+              {isFlashOn ? (
+                <IconBulbOff size={26} color="white" stroke={1.2} />
+              ) : (
+                <IconBulb size={26} color="white" stroke={1.2} />
+              )}
+            </ActionIcon>
+          </Flex>
+        )}
       </Box>
     </Box>
   );
