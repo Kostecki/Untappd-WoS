@@ -54,11 +54,25 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const UmamiScript = () => {
+    const isProd = import.meta.env.PROD;
+    if (!isProd) return null;
+
+    return (
+      <script
+        defer
+        src="https://umami.israndom.win/script.js"
+        data-website-id="84995db7-3b4e-4c2e-8b0c-7f6c8c88f920"
+      ></script>
+    );
+  };
+
   return (
     <html lang="en" data-mantine-color-scheme="light">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <UmamiScript />
         <Meta />
         <Links />
         <ColorSchemeScript />
