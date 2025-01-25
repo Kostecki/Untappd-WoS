@@ -1,4 +1,4 @@
-import { Box, Flex, Loader } from "@mantine/core";
+import { Box, Flex, Loader, type ComboboxStore } from "@mantine/core";
 import {
   BarcodeDetector,
   type BarcodeDetectorOptions,
@@ -6,7 +6,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 interface InputProps {
-  fetchDetailsHandler: any;
+  fetchDetailsHandler: (
+    beers?: BeerStringSearchResponse[],
+    barcode?: number,
+    optionValue?: string,
+    combobox?: ComboboxStore
+  ) => Promise<void>;
 }
 
 const videoCaptureOptions = {
@@ -91,7 +96,7 @@ export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
           if (barcodes.length > 0) {
             const barcodeValue = barcodes[0].rawValue;
             const barcode = parseInt(barcodeValue);
-            fetchDetailsHandler(null, barcode);
+            fetchDetailsHandler(undefined, barcode);
             detectionComplete.current = true;
           }
         } catch (error) {

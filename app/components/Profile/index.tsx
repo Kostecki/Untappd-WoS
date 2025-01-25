@@ -13,15 +13,16 @@ import { IconLogout } from "@tabler/icons-react";
 import { Link } from "react-router";
 
 import type { SessionUser } from "~/auth/auth.server";
-
-import { Ring } from "../Ring";
 import { SettingsModal } from "../SettingsModal";
 import { isMobile, setSettings, Settings } from "~/utils";
-import { useElementSize, useViewportSize } from "@mantine/hooks";
+
+import { Ring } from "../Ring";
+
+import { useElementSize } from "@mantine/hooks";
 
 interface InputProps {
   user: SessionUser;
-  stats: Stats;
+  stats: UserStats;
   userLists: UserLists[];
   stockList?: StockList;
   setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;

@@ -140,7 +140,7 @@ export const StylesTable = ({ styles }: InputProps) => {
                       </Flex>
                     ) : (
                       <List my="lg">
-                        {relatedBeers.map((beer: FullBeer) => {
+                        {relatedBeers.map((beer: BeerWithBrewery) => {
                           const {
                             beer: { beer_name, bid },
                             brewery: { brewery_name, country_name },

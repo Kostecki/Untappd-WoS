@@ -19,46 +19,52 @@ interface InputProps {
 
 export const VenueStyles = ({ styles }: InputProps) => {
   const [loading, setLoading] = useState(false);
-  const [selectedVenue, setSelectedVenue] = useState<any>(null);
-  const [venueDetails, setVenueDetails] = useState<any>(null);
+  const [selectedVenue, setSelectedVenue] = useState<VenueDetails | undefined>(
+    undefined
+  );
+  const [venueDetails, setVenueDetails] = useState<
+    VenueMenuDetails[] | undefined
+  >(undefined);
 
   const handleVenueSelect = async (
-    venues?: any,
-    barcode?: number,
+    inputDataList?: VenueDetails[] | BeerStringSearchResponse[],
+    _barcode?: number,
     optionValue?: string,
     combobox?: ComboboxStore
   ) => {
     setLoading(true);
 
-    const venue = venues?.find(
-      (venue: any) => venue.venue.venue_id.toString() === optionValue
+    const venue = inputDataList?.find(
+      (item): item is VenueDetails =>
+        "venue_id" in item && String(item.venue_id) === optionValue
     );
-    if (venue) {
-      setSelectedVenue(venue.venue); // TODO: Fix type
 
-      const venueDetails = await fetch(`/api/venue/${venue.venue.venue_id}`);
-      const venueDetailsData = await venueDetails.json();
+    if (venue) {
+      setSelectedVenue(venue);
+
+      const venueDetails = await fetch(`/api/venue/${venue.venue_id}`);
+      const venueDetailsData: VenueMenuDetails[] = await venueDetails.json();
 
       const haveHadStyleIds = styles.map((style) => style.styleId);
+
       // Filter out beers that user has already had
-      // TODO: Super mega type this
-      const filteredMenus = venueDetailsData.map((menuItem) => ({
-        ...menuItem,
-        menu: {
-          ...menuItem.menu,
-          sections: {
-            ...menuItem.menu.sections,
-            items: menuItem.menu.sections.items.map((section) => ({
-              ...section,
-              items: section.items.filter(
-                (beer) => !haveHadStyleIds.includes(beer.beer.beer_style_id)
-              ),
-            })),
-          },
+      const filteredMenus = venueDetailsData.map((menu) => ({
+        ...menu,
+        sections: {
+          ...menu.sections,
+          items: menu.sections.items.map((section) => ({
+            ...section,
+            items: section.items.filter(
+              (item) =>
+                item.beer &&
+                item.beer.beer_style_id !== undefined &&
+                !haveHadStyleIds.includes(item.beer.beer_style_id)
+            ),
+          })),
         },
       }));
 
-      setVenueDetails(venueDetailsData);
+      setVenueDetails(filteredMenus);
     }
 
     setLoading(false);
@@ -82,9 +88,8 @@ export const VenueStyles = ({ styles }: InputProps) => {
         emptyText="No venues found"
         loading={loading}
         setLoading={setLoading}
-        selected={selectedVenue}
-        setSelected={setSelectedVenue}
-        setDetails={setVenueDetails}
+        setSelectedVenue={setSelectedVenue}
+        setVenueDetails={setVenueDetails}
         optionSelectHandler={handleVenueSelect}
         leftSection={true}
       />
@@ -94,11 +99,11 @@ export const VenueStyles = ({ styles }: InputProps) => {
           <Tabs
             color="untappd"
             mt="sm"
-            defaultValue={String(venueDetails[0].menu.menu_id)}
+            defaultValue={String(venueDetails[0].menu_id)}
           >
             <Tabs.List>
-              {venueDetails.map((item: any) => {
-                const { menu_id, menu_name, total_item_count } = item.menu;
+              {venueDetails.map((item) => {
+                const { menu_id, menu_name, total_item_count } = item;
 
                 if (total_item_count === 0) {
                   return null;
@@ -112,9 +117,9 @@ export const VenueStyles = ({ styles }: InputProps) => {
               })}
             </Tabs.List>
 
-            {venueDetails.map((item: any) => {
+            {venueDetails.map((item) => {
               const { menu_id, menu_description, total_item_count, sections } =
-                item.menu;
+                item;
 
               if (total_item_count === 0) {
                 return null;
@@ -128,7 +133,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
                     </Text>
                     <Text c="untappd" size="sm" ta="right">
                       <Anchor
-                        href={selectedVenue.url}
+                        href={selectedVenue?.url}
                         target="_blank"
                         c="untappd"
                         underline="always"
@@ -139,7 +144,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
                     </Text>
                   </Stack>
 
-                  {sections.items.map((section: any) => {
+                  {sections.items.map((section) => {
                     const { section_id, section_name, items, count } = section;
                     if (items.length === 0 && items.length === count) {
                       return false;
@@ -161,7 +166,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
                           </Text>
                         )}
 
-                        {items.map((item: any) => (
+                        {items.map((item) => (
                           <BeerCard key={item.beer.bid} beerItem={item} />
                         ))}
                       </Fragment>

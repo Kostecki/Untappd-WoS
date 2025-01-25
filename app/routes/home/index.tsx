@@ -59,7 +59,7 @@ export default function Home() {
         );
         const listDetails = await listDetailsResponse.json();
         const listBeerStyles = listDetails.map(
-          (beer: FullBeer) => beer.type_id // TODO: Type
+          (styleList: StyleList) => styleList.type_id
         );
 
         setStockListStyleIds(listBeerStyles);
