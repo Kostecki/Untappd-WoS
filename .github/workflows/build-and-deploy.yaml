@@ -15,7 +15,7 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: wheel-of-styles
+      IMAGE_NAME: kostecki/wheel-of-styles
 
     steps:
       - name: Checkout repository
@@ -100,7 +100,7 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ${{ env.REGISTRY }}/{{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
 
