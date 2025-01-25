@@ -52,8 +52,6 @@ export const Profile = ({
     level: { currentLevel, progressToNext, checkInsPerLevel, maxLevel },
   } = stats;
 
-  console.log("stockList", stockList);
-
   const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.currentTarget;
 

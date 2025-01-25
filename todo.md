@@ -4,7 +4,6 @@
 - use enhanced user/info endpoints for things?
   - Lists?
 - Barcode scan om mobile
-- No routes matched location "/api/list/"
 - Autofill doesn't automatically login
 - i18n?
 - Country badges

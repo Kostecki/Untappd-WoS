@@ -67,7 +67,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchListDetails = async () => {
-      if (stockList) {
+      if (stockList?.listId) {
         const listDetailsResponse = await fetch(
           `/api/list/${stockList.listId}`
         );
