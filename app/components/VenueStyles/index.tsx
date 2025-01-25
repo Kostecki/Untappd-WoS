@@ -58,7 +58,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
         },
       }));
 
-      setVenueDetails(filteredMenus);
+      setVenueDetails(venueDetailsData);
     }
 
     setLoading(false);

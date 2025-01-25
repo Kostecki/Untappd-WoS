@@ -13,7 +13,7 @@ const mapValue = (value: number, maxValue: number) => {
 };
 
 export const Ring = ({ size, value, maxValue, children }: InputProps) => {
-  const clampedSize = Math.min(size, 150);
+  const clampedSize = Math.min(Math.max(size, 100), 150);
   const mappedValue = mapValue(value, maxValue);
   const mobile = isMobile();
 

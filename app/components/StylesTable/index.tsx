@@ -21,6 +21,8 @@ import {
 import { Fragment, useState } from "react";
 import { useViewportSize } from "@mantine/hooks";
 
+import countryToEmoji from "~/countries";
+
 import "./styles.css";
 
 interface InputProps {
@@ -160,7 +162,8 @@ export const StylesTable = ({ styles }: InputProps) => {
                                   {beer_name}
                                 </Text>
                                 <Text component="div" size="sm" c="dimmed">
-                                  {brewery_name}, {country_name}
+                                  {brewery_name}, {country_name}{" "}
+                                  {countryToEmoji(country_name)}
                                 </Text>
                               </List.Item>
                             </Anchor>

@@ -12,11 +12,12 @@ import {
   type ComboboxStore,
 } from "@mantine/core";
 import { useState } from "react";
+import { IconBarcode, IconSearch } from "@tabler/icons-react";
+
+import countryToEmoji from "~/countries";
 
 import { SearchSelect } from "../SearchSelect";
 import { Barcode } from "../BarcodeScanner/Scanner";
-
-import { IconBarcode, IconSearch } from "@tabler/icons-react";
 
 import "./style.css";
 
@@ -158,7 +159,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
         <>
           {beerDetails.length > 1 && (
             <Text fs="italic" fw="300">
-              Barcode belongs to multiple beers
+              Barcode belongs to multiple beers ({beerDetails.length})
             </Text>
           )}
 
@@ -177,7 +178,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
                   has_had,
                   stats,
                 },
-                brewery: { brewery_name },
+                brewery: { brewery_name, country_name },
               } = beer;
 
               return (
@@ -191,6 +192,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
                     <Flex justify="space-between" align="center">
                       <Image src={beer_label} alt={beer_name} />
                       <Stack align="center" gap="0" maw="50%">
+                        <Text ta="center">{countryToEmoji(country_name)}</Text>
                         <Text ta="center" c="gray">
                           {brewery_name}
                         </Text>
