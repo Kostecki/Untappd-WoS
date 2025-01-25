@@ -66,15 +66,18 @@ export const SettingsModal = ({
           onChange={(_, option) => handleListSelect(option)}
         />
 
-        <Text mt="xl" mb="xs">
-          Extra features
-        </Text>
-
         {/* TODO: Actually implement this */}
-        <Switch
-          label="Country badges"
-          description='Show progress on each of the "country badges"'
-        />
+        {false && (
+          <>
+            <Text mt="xl" mb="xs">
+              Extra features
+            </Text>
+            <Switch
+              label="Country badges"
+              description='Show progress on each of the "country badges"'
+            />
+          </>
+        )}
 
         <Flex justify="space-between" align="center" mt="xl">
           {user.isAdmin && (
