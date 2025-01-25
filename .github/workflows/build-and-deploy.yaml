@@ -70,7 +70,7 @@ jobs:
             pnpm-${{ runner.os }}-
 
       - name: Install node modules
-        run: pnpm install
+        run: pnpm install -P
 
       - name: Build the application
         run: pnpm run build
