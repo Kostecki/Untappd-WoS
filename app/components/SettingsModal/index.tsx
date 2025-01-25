@@ -1,8 +1,10 @@
 import {
   ActionIcon,
   Anchor,
+  Box,
   Button,
   Flex,
+  Group,
   Modal,
   Select,
   Switch,
@@ -19,6 +21,7 @@ import { setSettings, Settings } from "~/utils";
 interface InputProps {
   user: SessionUser;
   userLists: UserLists[];
+  latestCommit: LatestCommit;
   stockList?: StockList;
   setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
 }
@@ -28,6 +31,7 @@ export const SettingsModal = ({
   userLists,
   stockList,
   setStockList,
+  latestCommit,
 }: InputProps) => {
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -73,28 +77,31 @@ export const SettingsModal = ({
         />
 
         <Flex justify="space-between" align="center" mt="xl">
-          {/* TODO: Actually implement this */}
           {user.isAdmin && (
             <Tooltip label="Commit message">
               <Anchor
-                href={`https://github.com/Kostecki/Untappd-WoS/commit/${123}`}
+                href={`https://github.com/Kostecki/Untappd-WoS/commit/${latestCommit.hash}`}
                 target="_blank"
                 fs="italic"
-                c="untappd"
+                c="dimmed"
                 size="sm"
               >
-                <Text>Last commit: ??</Text>
+                <Text>Last commit:</Text>
+                <Text>{latestCommit.message}</Text>
               </Anchor>
             </Tooltip>
           )}
-          <Button
-            size="compact-sm"
-            variant="transparent"
-            color="untappd"
-            mr="-6px"
-          >
-            Save
-          </Button>
+          <Group ml="lg">
+            <Button
+              size="compact-sm"
+              variant="transparent"
+              color="untappd"
+              mr="-6px"
+              onClick={close}
+            >
+              Save
+            </Button>
+          </Group>
         </Flex>
       </Modal>
 

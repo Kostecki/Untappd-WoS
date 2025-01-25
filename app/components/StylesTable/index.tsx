@@ -59,7 +59,7 @@ export const StylesTable = ({ styles }: InputProps) => {
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <TextInput
-        placeholder="Search for style"
+        placeholder="Search for styles"
         onChange={(event) => setSearchTerm(event.currentTarget.value)}
       />
 

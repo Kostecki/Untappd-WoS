@@ -28,6 +28,7 @@ interface InputProps {
   setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
   setProfileFilters: React.Dispatch<React.SetStateAction<Filters>>;
   profileFilters: Filters;
+  latestCommit: LatestCommit;
 }
 
 export const Profile = ({
@@ -38,6 +39,7 @@ export const Profile = ({
   setStockList,
   setProfileFilters,
   profileFilters,
+  latestCommit,
 }: InputProps) => {
   const { ref, width } = useElementSize();
   const mobile = isMobile();
@@ -94,6 +96,7 @@ export const Profile = ({
               userLists={userLists}
               stockList={stockList}
               setStockList={setStockList}
+              latestCommit={latestCommit}
             />
             <ActionIcon
               component={Link}

@@ -28,12 +28,17 @@ export async function loader({ request }: Route.LoaderArgs) {
   const stylesInfo = await getStylesInfo(user);
   const userLists = await getUserLists(user);
 
-  return { user, stylesInfo, userLists };
+  const latestCommit = {
+    hash: process.env.LATEST_COMMIT_HASH ?? "No commit hash",
+    message: process.env.LATEST_COMMIT_MESSAGE ?? "No commit message",
+  };
+
+  return { user, stylesInfo, userLists, latestCommit };
 }
 
 export default function Home() {
   const data = useLoaderData<typeof loader>();
-  const { user, stylesInfo, userLists } = data;
+  const { user, stylesInfo, userLists, latestCommit } = data;
 
   const [profileFilters, setProfileFilters] = useState<Filters>({
     showHaveHad: false,
@@ -102,6 +107,7 @@ export default function Home() {
             setStockList={setStockList}
             profileFilters={profileFilters}
             setProfileFilters={setProfileFilters}
+            latestCommit={latestCommit}
           />
           <Box my="md">
             <VenueStyles styles={stylesInfo.styles} />
