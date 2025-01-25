@@ -14,8 +14,8 @@ jobs:
       packages: write
 
     env:
-      registry: ghcr.io
-      image_name: wheel-of-styles
+      REGISTRY: ghcr.io
+      IMAGE_NAME: wheel-of-styles
 
     steps:
       - name: Checkout repository
