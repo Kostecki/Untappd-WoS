@@ -1,22 +1,21 @@
-FROM node:20-alpine AS development-dependencies-env
+FROM node:23-slim
+
+ENV NODE_ENV=production
+ENV HOSTNAME="0.0.0.0"
+
+RUN npm install -g pnpm
+
 COPY . /app
+COPY .env /app
 WORKDIR /app
-RUN npm ci
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN npm ci --omit=dev
+RUN addgroup --system --gid 1001 wos
+RUN adduser --system --uid 1001 wos
+RUN chown -R wos:wos /app
+RUN chmod 755 /app
 
-FROM node:20-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
-RUN npm run build
+USER wos
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
-CMD ["npm", "run", "start"]
+EXPOSE 3000
+
+CMD ["pnpm", "run", "start"]
