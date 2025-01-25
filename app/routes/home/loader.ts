@@ -36,17 +36,20 @@ const getStylesHad = async (user: SessionUser) => {
     return [];
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as {
+    response: {
+      badge: Badge;
+    };
+  };
+  const { special_status_list } = data.response.badge;
 
-  const outputData = data.response.badge.special_status_list.items[0].items.map(
-    (item: any) => {
-      return {
-        styleId: item.item_id,
-        styleName: item.item_name,
-        had: true,
-      };
-    }
-  );
+  const outputData = special_status_list.items[0].items.map((item) => {
+    return {
+      styleId: item.item_id,
+      styleName: item.item_name,
+      had: true,
+    };
+  });
 
   return outputData;
 };

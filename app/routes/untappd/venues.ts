@@ -19,29 +19,27 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return Response.json([]);
   }
 
-  const data = await response.json();
-  const venues = data.response.venues.items;
+  const data = (await response.json()) as {
+    response: { venues: { items: VenueSearchAPIResponse[] } };
+  };
+  const { items } = data.response.venues;
 
-  // TODO: Type
-  const sortedVenues = venues
-    .map((venue: any) => {
-      const { venue_id, venue_slug } = venue.venue;
+  const sortedVenues = items
+    .map(({ venue }) => {
+      const { venue_id, venue_slug } = venue;
 
       return {
         ...venue,
-        venue: {
-          ...venue.venue,
-          url: `https://untappd.com/v/${venue_slug}/${venue_id}`,
-        },
+        url: `https://untappd.com/v/${venue_slug}/${venue_id}`,
       };
     })
-    .sort((a: any, b: any) => {
-      return a.venue.venue_country === "Danmark"
+    .sort((a: Venue, b: Venue) => {
+      return a.venue_country === "Danmark"
         ? -1
-        : b.venue.venue_country === "Danmark"
+        : b.venue_country === "Danmark"
         ? 1
         : 0;
-    });
+    }) as VenueDetails[];
 
   return Response.json(sortedVenues);
 }

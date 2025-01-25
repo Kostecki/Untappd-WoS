@@ -19,7 +19,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return Response.json([]);
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as {
+    response: { items: BarcodeAPIResponse[] };
+  };
   const { items } = data.response;
 
   return Response.json(items);

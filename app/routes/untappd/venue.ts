@@ -18,8 +18,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return Response.json([]);
   }
 
-  const data = await response.json();
-  const menus = data.response.items;
+  const data = (await response.json()) as {
+    response: { items: VenueDetailsAPIResponse[] };
+  };
+  const { items } = data.response;
+
+  const menus = items.map(({ menu }) => menu);
 
   return Response.json(menus);
 }

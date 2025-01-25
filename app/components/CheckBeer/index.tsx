@@ -17,7 +17,7 @@ import { IconBarcode, IconSearch } from "@tabler/icons-react";
 import countryToEmoji from "~/countries";
 
 import { SearchSelect } from "../SearchSelect";
-import { Barcode } from "../BarcodeScanner/Scanner";
+import { Barcode } from "../BarcodeScanner";
 
 import "./style.css";
 
@@ -32,13 +32,19 @@ enum searchOptions {
 
 export const CheckBeer = ({ styles }: InputProps) => {
   const [loading, setLoading] = useState(false);
-  const [selectedBeer, setSelectedBeer] = useState<any>(null);
-  const [beerDetails, setBeerDetails] = useState<any>(null);
+  const [selectedBeer, setSelectedBeer] = useState<
+    BeerStringSearchResponse | undefined
+  >(undefined);
+  const [beerDetails, setBeerDetails] = useState<
+    BeerWithStylesHad[] | undefined
+  >(undefined);
   const [activeSearchOptions, setActiveSearchOptions] = useState<searchOptions>(
     searchOptions.TEXT
   );
 
-  const setStylesHadStatus = (beers: any[]) => {
+  const setStylesHadStatus = <T extends BarcodeAPIResponse | BeerInfoResponse>(
+    beers: T[]
+  ): BeerWithStylesHad[] => {
     return beers.map((beer) => {
       const matchedStyle = styles.find(
         (style) => style.styleName === beer.beer.beer_style
@@ -48,14 +54,14 @@ export const CheckBeer = ({ styles }: InputProps) => {
         ...beer,
         beer: {
           ...beer.beer,
-          style_had: matchedStyle?.had ?? false, // Default to false if no match
+          style_had: matchedStyle?.had ?? false,
         },
       };
     });
   };
 
   const fetchDetails = async (
-    beers?: any,
+    inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
     barcode?: number,
     optionValue?: string,
     combobox?: ComboboxStore
@@ -64,22 +70,22 @@ export const CheckBeer = ({ styles }: InputProps) => {
 
     if (barcode) {
       const beerDetails = await fetch(`/api/barcode/${barcode}`);
-      const beerDetailsData = await beerDetails.json();
+      const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
 
       const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
       setBeerDetails(beerDetailsDataWithStyle);
     }
 
     if (optionValue) {
-      const beer = beers?.find(
-        (beer: any) => beer.beer.bid.toString() === optionValue
+      const beer = (inputDataList as BeerStringSearchResponse[])?.find(
+        (beer) => beer.beer.bid.toString() === optionValue
       );
 
       if (beer) {
-        setSelectedBeer(beer.beer);
+        setSelectedBeer(beer);
 
         const beerDetails = await fetch(`/api/beer/${beer.beer.bid}`);
-        const beerDetailsData = await beerDetails.json();
+        const beerDetailsData: BeerInfoResponse[] = await beerDetails.json();
 
         const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
         setBeerDetails(beerDetailsDataWithStyle);
@@ -104,8 +110,8 @@ export const CheckBeer = ({ styles }: InputProps) => {
             }
             aria-label="Search by text"
             onClick={() => {
-              setSelectedBeer(null);
-              setBeerDetails(null);
+              setSelectedBeer(undefined);
+              setBeerDetails(undefined);
               setActiveSearchOptions(searchOptions.TEXT);
             }}
           >
@@ -120,8 +126,8 @@ export const CheckBeer = ({ styles }: InputProps) => {
             }
             aria-label="Search by barcode"
             onClick={() => {
-              setSelectedBeer(null);
-              setBeerDetails(null);
+              setSelectedBeer(undefined);
+              setBeerDetails(undefined);
               setActiveSearchOptions(searchOptions.BARCODE);
             }}
           >
@@ -144,9 +150,9 @@ export const CheckBeer = ({ styles }: InputProps) => {
           emptyText="No beers found"
           loading={loading}
           setLoading={setLoading}
-          selected={selectedBeer}
-          setSelected={setSelectedBeer}
-          setDetails={setBeerDetails}
+          selectedBeer={selectedBeer}
+          setSelectedBeer={setSelectedBeer}
+          setBeerDetails={setBeerDetails}
           optionSelectHandler={fetchDetails}
         />
       )}
@@ -166,7 +172,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
           {beerDetails.length === 0 ? (
             <Text fs="italic">No beers found</Text>
           ) : (
-            beerDetails.map((beer: any) => {
+            beerDetails.map((beer) => {
               const {
                 beer: {
                   bid,
@@ -175,11 +181,21 @@ export const CheckBeer = ({ styles }: InputProps) => {
                   beer_name,
                   beer_style,
                   style_had,
-                  has_had,
-                  stats,
                 },
                 brewery: { brewery_name, country_name },
               } = beer;
+
+              const hadBeer = () => {
+                if ("stats" in beer.beer) {
+                  const stats = beer.beer.stats;
+                  return stats.user_count > 0 ? "Yes" : "No";
+                }
+
+                if ("has_had" in beer.beer) {
+                  const has_had = beer.beer.has_had;
+                  return has_had ? "Yes" : "No";
+                }
+              };
 
               return (
                 <Anchor
@@ -211,7 +227,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
                           Style: {style_had ? "Yes" : "No"}
                         </Text>
                         <Text ta="center" size="sm" c="gray">
-                          Beer: {has_had ?? stats.user_count > 0 ? "Yes" : "No"}
+                          Beer: {hadBeer()}
                         </Text>
                       </Stack>
                     </Flex>

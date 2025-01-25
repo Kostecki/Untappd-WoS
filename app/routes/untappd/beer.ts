@@ -18,7 +18,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return Response.json([]);
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as {
+    response: { beer: BeerInfoBeer & { brewery: Brewery } };
+  };
+
   const {
     beer: {
       bid,
@@ -61,7 +64,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       },
       brewery,
     },
-  ];
+  ] as BeerInfoResponse[];
 
   return Response.json(payload);
 }

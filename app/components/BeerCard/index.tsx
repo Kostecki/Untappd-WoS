@@ -5,7 +5,7 @@ import countryToEmoji from "~/countries";
 
 import "./style.css";
 
-export const BeerCard = ({ beerItem }: { beerItem: any }) => {
+export const BeerCard = ({ beerItem }: { beerItem: BeerWithBrewery }) => {
   const {
     beer: { bid, beer_name, beer_slug, beer_abv, beer_style, rating_score },
     brewery: { brewery_name, country_name },
@@ -33,21 +33,19 @@ export const BeerCard = ({ beerItem }: { beerItem: any }) => {
             <Text size="xs">{brewery_name}</Text>
             <Text size="xs">{countryToEmoji(country_name)}</Text>
             <Text size="xs">•</Text>
-            <Text size="xs">
-              <Group gap={0}>
-                <Rating
-                  value={rating_score}
-                  fractions={10}
-                  size="xs"
-                  mt="-2px"
-                  mr="6"
-                  readOnly
-                  emptySymbol={<IconCircleFilled color="#d8d8d8" size={12} />}
-                  fullSymbol={<IconCircleFilled color="#ffc100" size={12} />}
-                />
-                <Text size="xs">({rating_score.toFixed(2)})</Text>
-              </Group>
-            </Text>
+            <Group gap={0}>
+              <Rating
+                value={rating_score}
+                fractions={10}
+                size="xs"
+                mt="-2px"
+                mr="6"
+                readOnly
+                emptySymbol={<IconCircleFilled color="#d8d8d8" size={12} />}
+                fullSymbol={<IconCircleFilled color="#ffc100" size={12} />}
+              />
+              <Text size="xs">({rating_score.toFixed(2)})</Text>
+            </Group>
           </Group>
         </Stack>
         <Stack gap="0">
