@@ -13,6 +13,8 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
+
+import countryToEmoji from "~/countries";
 import { isMobile } from "~/utils";
 
 interface InputProps {
@@ -118,6 +120,7 @@ export const SearchSelect = ({
   };
 
   const options = (data || []).map((input: any) => {
+    console.log(input);
     if (apiURL.includes("/venues")) {
       return (
         <Combobox.Option
@@ -144,12 +147,15 @@ export const SearchSelect = ({
     } else if (apiURL.includes("/beers")) {
       return (
         <Combobox.Option value={input.beer.bid.toString()} key={input.beer.bid}>
-          <Text size="sm">
-            {input.beer.beer_name}
+          <Flex direction="row" mt="-2px">
+            <Text size="sm" mt="2px" mr="xs">
+              {countryToEmoji(input.brewery.country_name)}
+            </Text>
+            <Text size="sm">{input.beer.beer_name}</Text>
             <Text c="dimmed" component="span" fs="italic" ml="xs" size="sm">
               ({input.brewery.brewery_name})
             </Text>
-          </Text>
+          </Flex>
         </Combobox.Option>
       );
     }
