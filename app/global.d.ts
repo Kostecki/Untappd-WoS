@@ -1,3 +1,3 @@
 declare const umami: {
-  identify: (data: { email?: string }) => void;
+  identify: (data: { userId: number; email: string }) => void;
 };
