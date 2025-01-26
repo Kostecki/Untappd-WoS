@@ -109,6 +109,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
         emptyText="No venues found"
         loading={loading}
         setLoading={setLoading}
+        selectedVenue={selectedVenue}
         setSelectedVenue={setSelectedVenue}
         setVenueDetails={setVenueDetails}
         optionSelectHandler={handleVenueSelect}

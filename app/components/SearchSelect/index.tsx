@@ -259,9 +259,9 @@ export const SearchSelect = ({
 
       <Combobox.Dropdown hidden={data === null}>
         <Combobox.Options>
+          {empty && <Combobox.Empty>{emptyText}</Combobox.Empty>}
           <ScrollArea.Autosize type="scroll" mah={200}>
             {options}
-            {empty && <Combobox.Empty>{emptyText}</Combobox.Empty>}
           </ScrollArea.Autosize>
         </Combobox.Options>
       </Combobox.Dropdown>
