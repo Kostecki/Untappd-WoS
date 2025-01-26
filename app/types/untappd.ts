@@ -122,6 +122,16 @@ interface MenuSection {
   items: SectionItem[];
 }
 
+interface FlattednedMenuData {
+  menu_id: number;
+  menu_name: string;
+  menu_description: string;
+  total_item_count: number;
+  created_at: string;
+  updated_at: string;
+  items: SectionItem[];
+}
+
 interface UserListItemImage {
   count: number;
   items: { beer_label: string }[];

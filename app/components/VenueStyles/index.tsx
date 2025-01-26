@@ -8,14 +8,16 @@ import {
   Text,
   type ComboboxStore,
 } from "@mantine/core";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 
-import { BeerCard } from "../BeerCard";
 import { SearchSelect } from "../SearchSelect";
+import { VenueBeerCard } from "../VenueBeerCard";
 
 interface InputProps {
   styles: { styleId: number; styleName: string; had: boolean }[];
 }
+
+const TEST = false;
 
 export const VenueStyles = ({ styles }: InputProps) => {
   const [loading, setLoading] = useState(false);
@@ -23,7 +25,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
     undefined
   );
   const [venueDetails, setVenueDetails] = useState<
-    VenueMenuDetails[] | undefined
+    FlattednedMenuData[] | undefined
   >(undefined);
 
   const handleVenueSelect = async (
@@ -42,33 +44,52 @@ export const VenueStyles = ({ styles }: InputProps) => {
     if (venue) {
       setSelectedVenue(venue);
 
+      const haveHadStyleIds = TEST ? [] : styles.map((style) => style.styleId);
+
       const venueDetails = await fetch(`/api/venue/${venue.venue_id}`);
       const venueDetailsData: VenueMenuDetails[] = await venueDetails.json();
 
-      const haveHadStyleIds = styles.map((style) => style.styleId);
-
-      // Filter out beers that user has already had
-      const filteredMenus = venueDetailsData.map((menu) => ({
-        ...menu,
-        sections: {
-          ...menu.sections,
-          items: menu.sections.items.map((section) => ({
-            ...section,
-            items: section.items.filter(
+      // Flatten the menu data to have menus with all items from sub-sections and only new styles
+      const flattendMenuData = venueDetailsData.map((menu) => {
+        return {
+          menu_id: menu.menu_id,
+          menu_name: menu.menu_name,
+          menu_description: menu.menu_description,
+          total_item_count: menu.total_item_count,
+          created_at: menu.created_at,
+          updated_at: menu.updated_at,
+          items: menu.sections.items
+            .flatMap((section) => section.items)
+            .filter(
               (item) =>
-                item.beer &&
                 item.beer.beer_style_id !== undefined &&
                 !haveHadStyleIds.includes(item.beer.beer_style_id)
             ),
-          })),
-        },
-      }));
+        };
+      }) as FlattednedMenuData[];
 
-      setVenueDetails(filteredMenus);
+      setVenueDetails(flattendMenuData);
     }
 
     setLoading(false);
     combobox?.closeDropdown();
+  };
+
+  const groupByStyles = (items: FlattednedMenuData["items"]) => {
+    return items
+      .reduce<{ beer_style: string; beers: typeof items }[]>((acc, item) => {
+        const style = item.beer?.beer_style?.trim() ?? "Unknown";
+        let group = acc.find((group) => group.beer_style === style);
+
+        if (!group) {
+          group = { beer_style: style, beers: [] };
+          acc.push(group);
+        }
+
+        group.beers.push(item);
+        return acc;
+      }, [])
+      .sort((a, b) => a.beer_style.localeCompare(b.beer_style));
   };
 
   return (
@@ -118,7 +139,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
             </Tabs.List>
 
             {venueDetails.map((item) => {
-              const { menu_id, menu_description, total_item_count, sections } =
+              const { menu_id, menu_description, total_item_count, items } =
                 item;
 
               if (total_item_count === 0) {
@@ -144,34 +165,26 @@ export const VenueStyles = ({ styles }: InputProps) => {
                     </Text>
                   </Stack>
 
-                  {sections.items.map((section) => {
-                    const { section_id, section_name, items, count } = section;
-                    if (items.length === 0 && items.length === count) {
-                      return false;
-                    }
+                  {items.length === 0 && (
+                    <Text
+                      fs="italic"
+                      c="dimmed"
+                      fw="500"
+                      ta="center"
+                      mt="xl"
+                      mb="xs"
+                    >
+                      No new styles on this menu
+                    </Text>
+                  )}
 
-                    return (
-                      <Fragment key={section_id}>
-                        <Text mt="md" fw="500">
-                          {section_name}
-                        </Text>
-
-                        {items.length === 0 && (
-                          <Text fs="italic" c="dimmed">
-                            No new styles in the
-                            <Text component="span" fw="bold">
-                              {` ${section_name} `}
-                            </Text>
-                            section of the menu
-                          </Text>
-                        )}
-
-                        {items.map((item) => (
-                          <BeerCard key={item.beer.bid} beerItem={item} />
-                        ))}
-                      </Fragment>
-                    );
-                  })}
+                  {groupByStyles(items).map((group, index) => (
+                    <VenueBeerCard
+                      key={group.beer_style}
+                      group={group}
+                      startOpen={index === 0}
+                    />
+                  ))}
                 </Tabs.Panel>
               );
             })}

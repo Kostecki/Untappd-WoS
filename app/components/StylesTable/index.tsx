@@ -24,7 +24,7 @@ import { useViewportSize } from "@mantine/hooks";
 
 import countryToEmoji from "~/countries";
 
-import "./styles.css";
+import "./style.css";
 
 interface InputProps {
   styles: { styleId: number; styleName: string; had: boolean }[];

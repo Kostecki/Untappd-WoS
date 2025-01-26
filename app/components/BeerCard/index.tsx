@@ -16,8 +16,9 @@ export const BeerCard = ({ beerItem }: { beerItem: BeerWithBrewery }) => {
       component="a"
       href={`https://untappd.com/b/${beer_slug}/${bid}`}
       target="_blank"
-      mb="sm"
       className="beer-card"
+      shadow="none"
+      p="xs"
     >
       <Flex justify="space-between">
         <Stack gap="0">
