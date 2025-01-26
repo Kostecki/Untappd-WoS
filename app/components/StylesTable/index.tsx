@@ -6,6 +6,7 @@ import {
   Collapse,
   CopyButton,
   Flex,
+  Group,
   List,
   Loader,
   Table,
@@ -89,14 +90,14 @@ export const StylesTable = ({ styles }: InputProps) => {
                 style={{ cursor: "pointer", userSelect: "none" }}
               >
                 <Table.Td>
-                  <Flex>
+                  <Flex align="center">
                     {openRow === style.styleId ? (
-                      <IconChevronDown size="20" color="gray" stroke={1.5} />
+                      <IconChevronDown size={20} color="gray" stroke={1.5} />
                     ) : (
-                      <IconChevronUp size="20" color="gray" stroke={1.5} />
+                      <IconChevronUp size={20} color="gray" stroke={1.5} />
                     )}
 
-                    <Text fw="bold" size="sm" ml="sm">
+                    <Text fw="500" size="xs" ml="sm">
                       {style.styleName}
                     </Text>
                   </Flex>
