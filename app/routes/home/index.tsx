@@ -47,7 +47,9 @@ export default function Home() {
     showOnlyMissingOnList: false,
   });
   const [stockList, setStockList] = useState<StockList | undefined>(undefined);
-  const [stockListStyleIds, setStockListStyleIds] = useState<number[]>([]);
+  const [stockListDetails, setStockListDetails] = useState<
+    StockListDeatils | undefined
+  >(undefined);
 
   useLayoutEffect(() => {
     const settings = getSettings();
@@ -72,11 +74,19 @@ export default function Home() {
           `/api/list/${stockList.listId}`
         );
         const listDetails = await listDetailsResponse.json();
-        const listBeerStyles = listDetails.map(
+        const { list_name, listItems, styles } = listDetails;
+
+        const listBeerStyles = styles.items.map(
           (styleList: StyleList) => styleList.type_id
         );
 
-        setStockListStyleIds(listBeerStyles);
+        const stockListDetails: StockListDeatils = {
+          listName: list_name,
+          listItems,
+          styles: listBeerStyles,
+        };
+
+        setStockListDetails(stockListDetails);
       }
     };
 
@@ -91,7 +101,7 @@ export default function Home() {
 
     if (profileFilters.showOnlyMissingOnList) {
       // Show only missing styles that are also in the stock list
-      return !style.had && stockListStyleIds.includes(style.styleId);
+      return !style.had && stockListDetails?.styles.includes(style.styleId);
     }
 
     // Default: Show only missing styles
@@ -102,7 +112,10 @@ export default function Home() {
     <Container size="1200">
       <Grid mt="lg">
         <Grid.Col span={{ base: 12, lg: 6 }} order={{ base: 2, lg: 1 }}>
-          <StylesTable styles={filteredStyles} />
+          <StylesTable
+            styles={filteredStyles}
+            stockListDetails={stockListDetails}
+          />
         </Grid.Col>
         <Grid.Col span={{ base: 12, lg: 6 }} order={{ base: 1, lg: 2 }}>
           <Profile
@@ -118,7 +131,10 @@ export default function Home() {
           <Box my="md">
             <VenueStyles styles={stylesInfo.styles} />
           </Box>
-          <CheckBeer styles={stylesInfo.styles} />
+          <CheckBeer
+            styles={stylesInfo.styles}
+            stockListDetails={stockListDetails}
+          />
         </Grid.Col>
       </Grid>
     </Container>

@@ -23,6 +23,7 @@ import "./style.css";
 
 interface InputProps {
   styles: { styleId: number; styleName: string; had: boolean }[];
+  stockListDetails: StockListDeatils | undefined;
 }
 
 enum searchOptions {
@@ -30,7 +31,7 @@ enum searchOptions {
   BARCODE,
 }
 
-export const CheckBeer = ({ styles }: InputProps) => {
+export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
   const [loading, setLoading] = useState(false);
   const [selectedBeer, setSelectedBeer] = useState<
     BeerStringSearchResponse | undefined
@@ -94,6 +95,36 @@ export const CheckBeer = ({ styles }: InputProps) => {
 
     setLoading(false);
     combobox?.closeDropdown();
+  };
+
+  const findBeerByStyle = (styleName: string) => {
+    const beer = stockListDetails?.listItems.some(
+      (beer) => beer.beer.beer_style === styleName
+    );
+
+    return beer;
+  };
+
+  const HaveHadStatus = ({ beer }: { beer: BeerWithStylesHad }) => {
+    const {
+      beer: { beer_style, style_had },
+    } = beer;
+    const haveStyleInStock = findBeerByStyle(beer_style);
+    const haveButNotDrunk = !style_had && haveStyleInStock;
+
+    const text = style_had ? "Yes" : "No";
+
+    return (
+      <Text ta="center" size="sm" c="gray">
+        Style: {text}
+        {haveButNotDrunk && "*"}
+        {haveButNotDrunk && (
+          <Text size="xs" c="dimmed" fs="italic">
+            On list: {stockListDetails?.listName}
+          </Text>
+        )}
+      </Text>
+    );
   };
 
   return (
@@ -174,14 +205,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
           ) : (
             beerDetails.map((beer) => {
               const {
-                beer: {
-                  bid,
-                  beer_slug,
-                  beer_label,
-                  beer_name,
-                  beer_style,
-                  style_had,
-                },
+                beer: { bid, beer_slug, beer_label, beer_name, beer_style },
                 brewery: { brewery_name, country_name },
               } = beer;
 
@@ -204,7 +228,7 @@ export const CheckBeer = ({ styles }: InputProps) => {
                   underline="never"
                   key={bid}
                 >
-                  <Card mt="lg" className="beer-style-card">
+                  <Card mt="lg" className="beer-style-card" p="xs">
                     <Flex justify="space-between" align="center">
                       <Image src={beer_label} alt={beer_name} />
                       <Stack align="center" gap="0" maw="50%">
@@ -221,11 +245,9 @@ export const CheckBeer = ({ styles }: InputProps) => {
                       </Stack>
                       <Stack align="center" gap="0">
                         <Text ta="center" mb="3">
-                          Had?
+                          Status
                         </Text>
-                        <Text ta="center" size="sm" c="gray">
-                          Style: {style_had ? "Yes" : "No"}
-                        </Text>
+                        <HaveHadStatus beer={beer} />
                         <Text ta="center" size="sm" c="gray">
                           Beer: {hadBeer()}
                         </Text>

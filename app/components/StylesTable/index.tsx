@@ -6,9 +6,9 @@ import {
   Collapse,
   CopyButton,
   Flex,
-  Group,
   List,
   Loader,
+  Stack,
   Table,
   Text,
   TextInput,
@@ -28,9 +28,10 @@ import "./style.css";
 
 interface InputProps {
   styles: { styleId: number; styleName: string; had: boolean }[];
+  stockListDetails: StockListDeatils | undefined;
 }
 
-export const StylesTable = ({ styles }: InputProps) => {
+export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [openRow, setOpenRow] = useState<number | undefined>(undefined);
@@ -56,6 +57,12 @@ export const StylesTable = ({ styles }: InputProps) => {
   const filteredStyles = styles.filter((style) =>
     style.styleName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const findBeerByStyle = (styleId: number) => {
+    return stockListDetails?.listItems.find(
+      (beer) => beer.beer.beer_style_id === styleId
+    );
+  };
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -83,100 +90,128 @@ export const StylesTable = ({ styles }: InputProps) => {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {filteredStyles.map((style) => (
-            <Fragment key={style.styleId}>
-              <Table.Tr
-                onClick={() => toggleRow(style.styleId)}
-                style={{ cursor: "pointer", userSelect: "none" }}
-              >
-                <Table.Td>
-                  <Flex align="center">
-                    {openRow === style.styleId ? (
-                      <IconChevronDown size={20} color="gray" stroke={1.5} />
-                    ) : (
-                      <IconChevronUp size={20} color="gray" stroke={1.5} />
-                    )}
+          {filteredStyles.map((style) => {
+            const haveStyleInStock = stockListDetails?.styles.includes(
+              style.styleId
+            );
 
-                    <Text fw="500" size="xs" ml="sm">
-                      {style.styleName}
+            const ShowHaveStyleInStock = () => {
+              if (haveStyleInStock) {
+                const beer = findBeerByStyle(style.styleId);
+
+                if (beer) {
+                  return (
+                    <Text fw="500" size="xs" ml="sm" fs="italic" c="dimmed">
+                      On list: {stockListDetails?.listName}
                     </Text>
-                  </Flex>
-                </Table.Td>
+                  );
+                }
+              }
+            };
 
-                <Table.Td>
-                  <Flex justify="center">
-                    <Checkbox color="untappd" checked={style.had} readOnly />
-                  </Flex>
-                </Table.Td>
-
-                <Table.Td>
-                  <Flex justify="center">
-                    <CopyButton value={style.styleName}>
-                      {({ copied, copy }) => (
-                        <ActionIcon
-                          variant="transparent"
-                          aria-label="Copy"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            copy();
-                          }}
-                        >
-                          {copied ? (
-                            <IconCheck color="gray" stroke={1.5} />
-                          ) : (
-                            <IconCopy color="gray" stroke={1.5} />
-                          )}
-                        </ActionIcon>
+            return (
+              <Fragment key={style.styleId}>
+                <Table.Tr
+                  onClick={() => toggleRow(style.styleId)}
+                  style={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  <Table.Td>
+                    <Flex align="center">
+                      {openRow === style.styleId ? (
+                        <IconChevronDown size={20} color="gray" stroke={1.5} />
+                      ) : (
+                        <IconChevronUp size={20} color="gray" stroke={1.5} />
                       )}
-                    </CopyButton>
-                  </Flex>
-                </Table.Td>
-              </Table.Tr>
-              <Table.Tr style={{ border: "none" }}>
-                <Table.Td colSpan={3} p={0}>
-                  <Collapse in={openRow === style.styleId}>
-                    {loading ? (
-                      <Flex justify="center">
-                        <Loader color="untappd" my="lg" />
-                      </Flex>
-                    ) : (
-                      <List my="lg">
-                        {relatedBeers.map((beer: BeerWithBrewery) => {
-                          const {
-                            beer: { beer_name, bid },
-                            brewery: { brewery_name, country_name },
-                          } = beer;
 
-                          return (
-                            <Anchor
-                              href={`https://untappd.com/beer/${bid}`}
-                              target="_blank"
-                              key={bid}
-                            >
-                              <List.Item
+                      <Stack gap={0}>
+                        <Text fw="500" size="xs" ml="sm">
+                          {style.styleName}
+                        </Text>
+                        <ShowHaveStyleInStock />
+                      </Stack>
+                    </Flex>
+                  </Table.Td>
+
+                  <Table.Td>
+                    <Flex justify="center">
+                      <Checkbox
+                        color="untappd"
+                        checked={style.had}
+                        indeterminate={haveStyleInStock}
+                        readOnly
+                      />
+                    </Flex>
+                  </Table.Td>
+
+                  <Table.Td>
+                    <Flex justify="center">
+                      <CopyButton value={style.styleName}>
+                        {({ copied, copy }) => (
+                          <ActionIcon
+                            variant="transparent"
+                            aria-label="Copy"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              copy();
+                            }}
+                          >
+                            {copied ? (
+                              <IconCheck color="gray" stroke={1.5} />
+                            ) : (
+                              <IconCopy color="gray" stroke={1.5} />
+                            )}
+                          </ActionIcon>
+                        )}
+                      </CopyButton>
+                    </Flex>
+                  </Table.Td>
+                </Table.Tr>
+                <Table.Tr style={{ border: "none" }}>
+                  <Table.Td colSpan={3} p={0}>
+                    <Collapse in={openRow === style.styleId}>
+                      {loading ? (
+                        <Flex justify="center">
+                          <Loader color="untappd" my="lg" />
+                        </Flex>
+                      ) : (
+                        <List my="lg">
+                          {relatedBeers.map((beer: BeerWithBrewery) => {
+                            const {
+                              beer: { beer_name, bid },
+                              brewery: { brewery_name, country_name },
+                            } = beer;
+
+                            return (
+                              <Anchor
+                                href={`https://untappd.com/beer/${bid}`}
+                                target="_blank"
                                 key={bid}
-                                px="sm"
-                                py="xs"
-                                className="related-beer"
                               >
-                                <Text component="div" size="sm" c="dark">
-                                  {beer_name}
-                                </Text>
-                                <Text component="div" size="sm" c="dimmed">
-                                  {brewery_name}, {country_name}{" "}
-                                  {countryToEmoji(country_name)}
-                                </Text>
-                              </List.Item>
-                            </Anchor>
-                          );
-                        })}
-                      </List>
-                    )}
-                  </Collapse>
-                </Table.Td>
-              </Table.Tr>
-            </Fragment>
-          ))}
+                                <List.Item
+                                  key={bid}
+                                  px="sm"
+                                  py="xs"
+                                  className="related-beer"
+                                >
+                                  <Text component="div" size="sm" c="dark">
+                                    {beer_name}
+                                  </Text>
+                                  <Text component="div" size="sm" c="dimmed">
+                                    {brewery_name}, {country_name}{" "}
+                                    {countryToEmoji(country_name)}
+                                  </Text>
+                                </List.Item>
+                              </Anchor>
+                            );
+                          })}
+                        </List>
+                      )}
+                    </Collapse>
+                  </Table.Td>
+                </Table.Tr>
+              </Fragment>
+            );
+          })}
         </Table.Tbody>
       </Table>
     </Card>

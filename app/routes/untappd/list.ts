@@ -20,7 +20,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   const data = await response.json();
-  const details = data.response.styles.items;
 
-  return Response.json(details);
+  const {
+    items,
+    styles,
+    list: { list_name },
+  } = data.response;
+
+  const stockListDeatils = {
+    list_name,
+    listItems: items,
+    styles,
+  };
+
+  return Response.json(stockListDeatils);
 }
