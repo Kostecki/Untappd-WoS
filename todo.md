@@ -7,7 +7,6 @@
 - Cleanup deploy/dockerignore
 - Autofill doesn't automatically login
 - Update readme screenshot
-- Hover style table beer
 
 ### Maybe
 - Zustand

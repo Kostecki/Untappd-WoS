@@ -73,7 +73,6 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 
       <Table
         mt="lg"
-        highlightOnHover
         stickyHeader
         style={{
           display: "block",
