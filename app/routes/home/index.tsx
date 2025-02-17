@@ -63,7 +63,11 @@ export default function Home() {
     }
 
     if (isProd) {
-      umami.identify({ userId: user.id, email: user.email });
+      umami.identify({
+        userId: user.id,
+        email: user.email,
+        username: user.userName,
+      });
     }
   }, []);
 
