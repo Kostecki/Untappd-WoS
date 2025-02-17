@@ -107,7 +107,7 @@ jobs:
       - name: Ping Portainer
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.PORTAINER_URL }}
-          method: POST
+          url: ${{ secrets.PORTAINER_WEBHOOK }}
+          method: "POST"
           timeout: 15000
           retry: 3
