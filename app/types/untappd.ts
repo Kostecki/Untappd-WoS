@@ -22,10 +22,10 @@ interface Venue {
 }
 
 interface VenueDetails extends Venue {
-  has_beer: boolean;
-  has_food: boolean;
-  has_wine: boolean;
-  has_spirits: boolean;
+  has_beer: number;
+  has_food: number;
+  has_wine: number;
+  has_spirits: number;
   url: string;
 }
 
