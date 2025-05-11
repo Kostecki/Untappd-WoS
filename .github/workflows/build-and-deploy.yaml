@@ -103,17 +103,3 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-
-      # - name: Bypass Cloudflare for GitHub Action
-      #   uses: xiaotianxt/bypass-cloudflare-for-github-action@v1.1.1
-      #   with:
-      #     cf_zone_id: ${{ secrets.CF_ZONE_ID }}
-      #     cf_api_token: ${{ secrets.CF_API_TOKEN }}
-
-      # - name: Ping Portainer
-      #   uses: fjogeleit/http-request-action@v1
-      #   with:
-      #     url: ${{ secrets.PORTAINER_WEBHOOK }}
-      #     method: "POST"
-      #     timeout: 15000
-      #     retry: 3
