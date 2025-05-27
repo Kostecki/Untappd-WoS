@@ -93,10 +93,9 @@ export const SearchSelect = ({
       try {
         const response = await fetch(`${apiURL}/${query}`);
         const data: VenueDetails[] = await response.json();
-        const hasBeerData = data.filter((item) => item.has_beer === 1);
 
-        setData(hasBeerData);
-        setEmpty(hasBeerData.length === 0);
+        setData(data);
+        setEmpty(data.length === 0);
       } catch (error) {
         console.error("Failed to get data", apiURL, error);
       }

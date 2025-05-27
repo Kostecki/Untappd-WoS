@@ -1,12 +1,13 @@
 import {
   ActionIcon,
   Anchor,
+  Box,
   Card,
   Divider,
   Flex,
+  Grid,
   Group,
   Image,
-  Stack,
   Text,
   Tooltip,
   type ComboboxStore,
@@ -69,6 +70,8 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
   ) => {
     setLoading(true);
 
+    console.log("fetchDetails called");
+
     if (barcode) {
       const beerDetails = await fetch(`/api/barcode/${barcode}`);
       const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
@@ -90,6 +93,8 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 
         const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
         setBeerDetails(beerDetailsDataWithStyle);
+
+        console.log("Beer details fetched:", beerDetails);
       }
     }
 
@@ -115,15 +120,22 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
     const text = style_had ? "Yes" : "No";
 
     return (
-      <Text ta="center" size="sm" c="gray">
-        Style: {text}
-        {haveButNotDrunk && "*"}
-        {haveButNotDrunk && (
-          <Text size="xs" c="dimmed" fs="italic">
-            On list: {stockListDetails?.listName}
-          </Text>
-        )}
-      </Text>
+      <>
+        <Text size="sm" c="dimmed">
+          Had style: {text}
+          {haveButNotDrunk && (
+            <Box component="span">
+              <Text component="span" size="sm" c="dimmed">
+                , But on list:{" "}
+                <Text fs="italic" component="span">
+                  "{stockListDetails?.listName}"
+                </Text>
+              </Text>
+              <Divider orientation="vertical" />
+            </Box>
+          )}
+        </Text>
+      </>
     );
   };
 
@@ -229,9 +241,11 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
                   key={bid}
                 >
                   <Card mt="lg" className="beer-style-card" p="xs">
-                    <Flex justify="space-between" align="center">
-                      <Image src={beer_label} alt={beer_name} />
-                      <Stack align="center" gap="0" maw="50%">
+                    <Grid align="center" justify="space-between">
+                      <Grid.Col span={3}>
+                        <Image src={beer_label} alt={beer_name} />
+                      </Grid.Col>
+                      <Grid.Col span={9}>
                         <Text ta="center">{countryToEmoji(country_name)}</Text>
                         <Text ta="center" c="gray">
                           {brewery_name}
@@ -242,17 +256,16 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
                         <Text ta="center" fw="500" size="sm">
                           {beer_style}
                         </Text>
-                      </Stack>
-                      <Stack align="center" gap="0">
-                        <Text ta="center" mb="3">
-                          Status
-                        </Text>
-                        <HaveHadStatus beer={beer} />
-                        <Text ta="center" size="sm" c="gray">
-                          Beer: {hadBeer()}
-                        </Text>
-                      </Stack>
-                    </Flex>
+                      </Grid.Col>
+                    </Grid>
+                    <Divider my="xs" opacity={0.5} />
+                    <Group>
+                      <HaveHadStatus beer={beer} />
+                      <Divider orientation="vertical" />
+                      <Text ta="center" size="sm" c="dimmed">
+                        Had beer: {hadBeer()}
+                      </Text>
+                    </Group>
                   </Card>
                 </Anchor>
               );
