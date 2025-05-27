@@ -49,7 +49,9 @@ authenticator.use(
     });
 
     if (!response.ok) {
-      console.error("Failed to authenticate", response);
+      // console.error("Failed to authenticate", response);
+
+      throw new Error("INVALID_PASSWORD");
     }
 
     const data = await response.json();
@@ -65,6 +67,8 @@ authenticator.use(
 
     if (!userResponse.ok) {
       console.error("Failed to get user info", userResponse);
+
+      throw new Error("Failed to retrieve user information");
     }
 
     const userData = await userResponse.json();

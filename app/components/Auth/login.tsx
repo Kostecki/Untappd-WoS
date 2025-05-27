@@ -29,6 +29,7 @@ export default function Login() {
         <Text fs="italic" my="lg" c="dimmed" fw="500">
           Use your Untappd account to log in
         </Text>
+
         <Form method="post">
           <Stack>
             <TextInput name="username" placeholder="Username" required />

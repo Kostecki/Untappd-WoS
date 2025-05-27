@@ -1,10 +1,13 @@
 import {
+  data,
   isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  type LoaderFunctionArgs,
 } from "react-router";
 import {
   Box,
@@ -16,11 +19,15 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-
-import stylesheet from "./app.css?url";
-import "@mantine/core/styles.css";
+import { Notifications, notifications } from "@mantine/notifications";
+import { getToast } from "remix-toast";
 
 import type { Route } from "./+types/root";
+import { useEffect } from "react";
+
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
+import stylesheet from "./app.css?url";
 
 const theme = createTheme({
   colors: {
@@ -39,6 +46,12 @@ const theme = createTheme({
   },
 });
 
+enum NotificationTypes {
+  success = "green",
+  warning = "yellow",
+  error = "red",
+}
+
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -53,7 +66,16 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { toast, headers } = await getToast(request);
+
+  return data({ toast }, { headers });
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const loaderData = useLoaderData<typeof loader>();
+  const { toast } = loaderData;
+
   const UmamiScript = () => {
     const isProd = import.meta.env.PROD;
     if (!isProd) return null;
@@ -67,6 +89,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
   };
 
+  useEffect(() => {
+    if (toast) {
+      const { type, message } = toast;
+
+      const title = type === "error" ? "Something went wrong" : "Success";
+
+      if (type && message) {
+        notifications.show({
+          title: title,
+          message: message,
+          color: NotificationTypes[type as keyof typeof NotificationTypes],
+          withBorder: true,
+          autoClose: 4000,
+        });
+      }
+    }
+  }, [toast]);
+
   return (
     <html lang="en" data-mantine-color-scheme="light">
       <head>
@@ -78,7 +118,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          {children}
+
+          <Notifications />
+        </MantineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

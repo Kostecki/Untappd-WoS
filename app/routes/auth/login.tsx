@@ -7,6 +7,8 @@ import { userSessionGet } from "~/auth/user.server";
 import Login from "~/components/Auth/login";
 
 import type { Route } from "./+types/login";
+import { notifications } from "@mantine/notifications";
+import { dataWithError, dataWithToast } from "remix-toast";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Log in | Wheel of Styles" }];
@@ -20,14 +22,32 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export async function action({ request }: Route.ActionArgs) {
-  const user = await authenticator.authenticate("form", request);
+  try {
+    const user = await authenticator.authenticate("form", request);
 
-  const session = await getSession(request.headers.get("cookie"));
-  session.set("user", user);
+    const session = await getSession(request.headers.get("cookie"));
+    session.set("user", user);
 
-  throw redirect("/", {
-    headers: { "Set-Cookie": await commitSession(session) },
-  });
+    throw redirect("/", {
+      headers: { "Set-Cookie": await commitSession(session) },
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+      console.error("Login error:", errorMessage);
+
+      if (errorMessage === "INVALID_PASSWORD") {
+        return dataWithError(null, "Invalid username or password.");
+      } else {
+        return dataWithError(
+          "Error",
+          errorMessage || "Something went wrong. Please try again."
+        );
+      }
+    }
+
+    throw error;
+  }
 }
 
 export default function LoginView() {
