@@ -204,6 +204,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
                                   px="sm"
                                   py="xs"
                                   className="related-beer"
+                                  icon={<></>}
                                 >
                                   <Text component="div" size="sm" c="dark">
                                     {beer_name}
