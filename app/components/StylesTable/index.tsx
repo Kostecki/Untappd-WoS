@@ -31,13 +31,27 @@ interface InputProps {
   stockListDetails: StockListDeatils | undefined;
 }
 
+const rowInfoCache = new Map<number, RelatedBeersResponse[]>();
+
 export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [openRow, setOpenRow] = useState<number | undefined>(undefined);
-  const [relatedBeers, setRelatedBeers] = useState([]);
+  const [relatedBeers, setRelatedBeers] = useState<RelatedBeersResponse[]>([]);
 
   const { height: windowHeight } = useViewportSize();
+
+  const getRelatedBeers = async (styleId: number) => {
+    if (rowInfoCache.has(styleId)) {
+      return rowInfoCache.get(styleId) || [];
+    }
+
+    const response = await fetch(`/api/related/${styleId}`);
+    const relatedBeers = (await response.json()) as RelatedBeersResponse[];
+    rowInfoCache.set(styleId, relatedBeers);
+
+    return relatedBeers;
+  };
 
   const toggleRow = async (styleId: number) => {
     if (openRow === styleId) {
@@ -46,10 +60,9 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
       setLoading(true);
       setOpenRow(styleId);
 
-      const response = await fetch(`/api/related/${styleId}`);
-      const relatedBeers = await response.json();
-      setRelatedBeers(relatedBeers);
+      const relatedBeers = await getRelatedBeers(styleId);
 
+      setRelatedBeers(relatedBeers);
       setLoading(false);
     }
   };

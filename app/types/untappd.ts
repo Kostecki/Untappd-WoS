@@ -226,3 +226,13 @@ interface Badge {
   badge_status: BadgeStatus;
   special_status_list: BadgeSpecialStatusList;
 }
+
+interface RelatedBeersResponse {
+  beer: Beer;
+  brewery: Brewery;
+  distance: number;
+  distinct_users: number;
+  recent_created_at: string;
+  venue: Venue | null;
+  your_count: number;
+}
