@@ -236,3 +236,12 @@ interface RelatedBeersResponse {
   venue: Venue | null;
   your_count: number;
 }
+
+interface StylesInfo {
+  styles: {
+    styleId: number;
+    styleName: string;
+    had: boolean;
+  }[];
+  stats: UserStats;
+}

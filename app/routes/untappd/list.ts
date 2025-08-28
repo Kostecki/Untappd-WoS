@@ -1,7 +1,6 @@
-import { API_BASE_URL } from "./config";
 import { userSessionGet } from "~/auth/user.server";
-
 import type { Route } from "./+types/list";
+import { API_BASE_URL } from "./config";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const user = await userSessionGet(request);
@@ -27,11 +26,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     list: { list_name },
   } = data.response;
 
-  const stockListDeatils = {
+  const stockListDetails = {
     list_name,
     listItems: items,
     styles,
   };
 
-  return Response.json(stockListDeatils);
+  return Response.json(stockListDetails);
 }

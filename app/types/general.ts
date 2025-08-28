@@ -3,7 +3,7 @@ interface StockList {
   listName: string;
 }
 
-interface StockListDeatils {
+interface StockListDetails {
   listName: string;
   listItems: BeerWithBrewery[];
   styles: number[];
