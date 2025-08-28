@@ -60,12 +60,6 @@ export const Profile = ({
 		missingStyles.includes(style),
 	).length;
 
-	console.log(
-		stockListDetails?.styles.filter((style) => missingStyles.includes(style)),
-	);
-
-	console.log(stylesInfo);
-
 	const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, checked } = event.currentTarget;
 

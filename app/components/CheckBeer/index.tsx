@@ -69,8 +69,6 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 	) => {
 		setLoading(true);
 
-		console.log("fetchDetails called");
-
 		if (barcode) {
 			const beerDetails = await fetch(`/api/barcode/${barcode}`);
 			const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
@@ -92,8 +90,6 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 
 				const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
 				setBeerDetails(beerDetailsDataWithStyle);
-
-				console.log("Beer details fetched:", beerDetails);
 			}
 		}
 
