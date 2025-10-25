@@ -59,13 +59,13 @@ export default function Home() {
 			setProfileFilters(settings.tableFilters);
 		}
 
-		if (isProd) {
-			umami.identify({
-				userId: user.id,
-				email: user.email,
-				username: user.userName,
-			});
-		}
+		// if (isProd) {
+		// 	umami.identify({
+		// 		userId: user.id,
+		// 		email: user.email,
+		// 		username: user.userName,
+		// 	});
+		// }
 	}, []);
 
 	useEffect(() => {
