@@ -28,6 +28,12 @@ import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import stylesheet from "./app.css?url";
 
+enum NotificationTypes {
+	success = "green",
+	warning = "yellow",
+	error = "red",
+}
+
 const theme = createTheme({
 	colors: {
 		untappd: [
@@ -45,11 +51,10 @@ const theme = createTheme({
 	},
 });
 
-enum NotificationTypes {
-	success = "green",
-	warning = "yellow",
-	error = "red",
-}
+const umami = {
+	src: "https://umami.israndom.win/script.js",
+	websiteId: "84995db7-3b4e-4c2e-8b0c-7f6c8c88f920",
+};
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -80,11 +85,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 		if (!isProd) return null;
 
 		return (
-			<script
-				defer
-				src="https://umami.israndom.win/script.js"
-				data-website-id="84995db7-3b4e-4c2e-8b0c-7f6c8c88f920"
-			></script>
+			<script defer src={umami.src} data-website-id={umami.websiteId}></script>
 		);
 	};
 
