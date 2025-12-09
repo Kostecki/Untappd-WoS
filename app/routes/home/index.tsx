@@ -67,7 +67,7 @@ export default function Home() {
 				username,
 			});
 		}
-	}, [isProd, profileFilters, user]);
+	}, []);
 
 	useEffect(() => {
 		const fetchListDetails = async () => {
