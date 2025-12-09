@@ -75,18 +75,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	const loaderData = useLoaderData<typeof loader>();
 	const { toast } = loaderData;
 
-	// const UmamiScript = () => {
-	// 	const isProd = import.meta.env.PROD;
-	// 	if (!isProd) return null;
+	const UmamiScript = () => {
+		const isProd = import.meta.env.PROD;
+		if (!isProd) return null;
 
-	// 	return (
-	// 		<script
-	// 			defer
-	// 			src="https://umami.israndom.win/script.js"
-	// 			data-website-id="84995db7-3b4e-4c2e-8b0c-7f6c8c88f920"
-	// 		></script>
-	// 	);
-	// };
+		return (
+			<script
+				defer
+				src="https://umami.israndom.win/script.js"
+				data-website-id="84995db7-3b4e-4c2e-8b0c-7f6c8c88f920"
+			></script>
+		);
+	};
 
 	useEffect(() => {
 		if (toast) {
@@ -111,7 +111,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				{/* <UmamiScript /> */}
+				<UmamiScript />
 				<Meta />
 				<Links />
 				<ColorSchemeScript />

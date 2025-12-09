@@ -50,6 +50,7 @@ export default function Home() {
 
 	useLayoutEffect(() => {
 		const settings = getSettings();
+		const { id: userId, email, userName: username } = user;
 
 		if (Object.keys(settings).length === 0 && settings.constructor === Object) {
 			setSettings(Settings.STOCK_LIST, { listId: "", listName: "" });
@@ -59,14 +60,14 @@ export default function Home() {
 			setProfileFilters(settings.tableFilters);
 		}
 
-		// if (isProd) {
-		// 	umami.identify({
-		// 		userId: user.id,
-		// 		email: user.email,
-		// 		username: user.userName,
-		// 	});
-		// }
-	}, []);
+		if (isProd) {
+			umami.identify({
+				userId,
+				email,
+				username,
+			});
+		}
+	}, [isProd, profileFilters, user]);
 
 	useEffect(() => {
 		const fetchListDetails = async () => {
