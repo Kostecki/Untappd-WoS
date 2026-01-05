@@ -7,6 +7,7 @@ import { CheckBeer } from "~/components/CheckBeer";
 import { Profile } from "~/components/Profile";
 import { StylesTable } from "~/components/StylesTable";
 import { VenueStyles } from "~/components/VenueStyles";
+import { useUmamiIdentify } from "~/hooks/umami";
 import { getSettings, Settings, setSettings } from "~/utils";
 import type { Route } from "./+types/index";
 import { getStylesInfo, getUserLists } from "./loader";
@@ -37,7 +38,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Home() {
 	const data = useLoaderData<typeof loader>();
-	const { user, stylesInfo, userLists, latestCommit, isProd } = data;
+	const { user, stylesInfo, userLists, latestCommit } = data;
 
 	const [profileFilters, setProfileFilters] = useState<Filters>({
 		showHaveHad: false,
@@ -48,9 +49,11 @@ export default function Home() {
 		StockListDetails | undefined
 	>(undefined);
 
+	const { id: userId, email, userName: username } = user;
+	useUmamiIdentify(userId, email, username);
+
 	useLayoutEffect(() => {
 		const settings = getSettings();
-		const { id: userId, email, userName: username } = user;
 
 		if (Object.keys(settings).length === 0 && settings.constructor === Object) {
 			setSettings(Settings.STOCK_LIST, { listId: "", listName: "" });
@@ -58,14 +61,6 @@ export default function Home() {
 		} else {
 			setStockList(settings.stockList);
 			setProfileFilters(settings.tableFilters);
-		}
-
-		if (isProd) {
-			umami.identify({
-				userId,
-				email,
-				username,
-			});
 		}
 	}, []);
 
