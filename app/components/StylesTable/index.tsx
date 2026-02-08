@@ -96,7 +96,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 			>
 				<Table.Thead>
 					<Table.Tr>
-						<Table.Th w="360px">Style</Table.Th>
+						<Table.Th w="360px">{`Styles (${filteredStyles.length})`}</Table.Th>
 						<Table.Th ta="center">Have Had</Table.Th>
 						<Table.Th ta="center">Copy</Table.Th>
 					</Table.Tr>

@@ -1,5 +1,6 @@
 interface Filters {
   showHaveHad: boolean;
+  showOnlyMissing: boolean;
   showOnlyMissingOnList: boolean;
 }
 

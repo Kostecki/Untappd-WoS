@@ -42,6 +42,7 @@ export default function Home() {
 
 	const [profileFilters, setProfileFilters] = useState<Filters>({
 		showHaveHad: false,
+		showOnlyMissing: false,
 		showOnlyMissingOnList: false,
 	});
 	const [stockList, setStockList] = useState<StockList | undefined>(undefined);
@@ -94,6 +95,11 @@ export default function Home() {
 		if (profileFilters.showHaveHad) {
 			// Show all styles, ignoring other filters
 			return true;
+		}
+
+		if (profileFilters.showOnlyMissing) {
+			// Show only missing styles, ignoring stock list filter
+			return !style.had && !stockListDetails?.styles.includes(style.styleId);
 		}
 
 		if (profileFilters.showOnlyMissingOnList) {

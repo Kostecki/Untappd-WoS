@@ -67,6 +67,7 @@ export const Profile = ({
 			...profileFilters,
 			[name]: checked,
 			showHaveHad: name === "showHaveHad" ? checked : false,
+			showOnlyMissing: name === "showOnlyMissing" ? checked : false,
 			showOnlyMissingOnList: name === "showOnlyMissingOnList" ? checked : false,
 		};
 
@@ -127,6 +128,14 @@ export const Profile = ({
 						description="Also show styles already checked in"
 						color="untappd"
 						checked={profileFilters.showHaveHad}
+						onChange={handleToggle}
+					/>
+					<Switch
+						name="showOnlyMissing"
+						label="Show Only Missing"
+						description="Only show styles you haven't checked in yet (and don't own)"
+						color="untappd"
+						checked={profileFilters.showOnlyMissing}
 						onChange={handleToggle}
 					/>
 					{stockList?.listId && (

@@ -9,6 +9,7 @@ interface SettingsTypes {
   [Settings.STOCK_LIST]: { listId: string; listName: string };
   [Settings.TABLE_FILTERS]: {
     showHaveHad: boolean;
+    showOnlyMissing: boolean;
     showOnlyMissingOnList: boolean;
   };
 }
@@ -22,7 +23,7 @@ const getSettings = (identifier?: Settings) => {
 
 const setSettings = <T extends Settings>(
   identifier: T,
-  inputValue: SettingsTypes[T]
+  inputValue: SettingsTypes[T],
 ) => {
   const settings = localStorage.getItem("settings");
   const parsedSettings = settings ? JSON.parse(settings) : {};
