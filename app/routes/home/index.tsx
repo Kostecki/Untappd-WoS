@@ -42,7 +42,7 @@ export default function Home() {
 
 	const [profileFilters, setProfileFilters] = useState<Filters>({
 		showHaveHad: false,
-		showOnlyMissing: false,
+		showOnlyMissing: true,
 		showOnlyMissingOnList: false,
 	});
 	const [stockList, setStockList] = useState<StockList | undefined>(undefined);
