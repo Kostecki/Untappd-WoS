@@ -17,8 +17,6 @@ interface InputProps {
   styles: { styleId: number; styleName: string; had: boolean }[];
 }
 
-const TEST = false;
-
 export const VenueStyles = ({ styles }: InputProps) => {
   const [loading, setLoading] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState<VenueDetails | undefined>(
@@ -44,7 +42,12 @@ export const VenueStyles = ({ styles }: InputProps) => {
     if (venue) {
       setSelectedVenue(venue);
 
-      const haveHadStyleIds = TEST ? [] : styles.map((style) => style.styleId);
+      const haveHadStyleIds = styles
+				.filter((style) => style.styleId && style.had)
+				.map((style) => style.styleId);
+
+      // Add 0 to filter out items without a style ("other" as style)
+      haveHadStyleIds.push(0);
 
       const venueDetails = await fetch(`/api/venue/${venue.venue_id}`);
       const venueDetailsData: VenueMenuDetails[] = await venueDetails.json();
