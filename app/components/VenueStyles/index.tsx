@@ -25,7 +25,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
     undefined
   );
   const [venueDetails, setVenueDetails] = useState<
-    FlattednedMenuData[] | undefined
+    FlattenedMenuData[] | undefined
   >(undefined);
 
   const handleVenueSelect = async (
@@ -50,7 +50,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
       const venueDetailsData: VenueMenuDetails[] = await venueDetails.json();
 
       // Flatten the menu data to have menus with all items from sub-sections and only new styles
-      const flattendMenuData = venueDetailsData.map((menu) => {
+      const flattenedMenuData = venueDetailsData.map((menu) => {
         return {
           menu_id: menu.menu_id,
           menu_name: menu.menu_name,
@@ -66,16 +66,16 @@ export const VenueStyles = ({ styles }: InputProps) => {
                 !haveHadStyleIds.includes(item.beer.beer_style_id)
             ),
         };
-      }) as FlattednedMenuData[];
+      }) as FlattenedMenuData[];
 
-      setVenueDetails(flattendMenuData);
+      setVenueDetails(flattenedMenuData);
     }
 
     setLoading(false);
     combobox?.closeDropdown();
   };
 
-  const groupByStyles = (items: FlattednedMenuData["items"]) => {
+  const groupByStyles = (items: FlattenedMenuData["items"]) => {
     return items
       .reduce<{ beer_style: string; beers: typeof items }[]>((acc, item) => {
         const style = item.beer?.beer_style?.trim() ?? "Unknown";

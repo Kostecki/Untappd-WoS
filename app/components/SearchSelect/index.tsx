@@ -42,7 +42,7 @@ interface InputProps {
     React.SetStateAction<VenueDetails | undefined>
   >;
   setVenueDetails?: React.Dispatch<
-    React.SetStateAction<FlattednedMenuData[] | undefined>
+    React.SetStateAction<FlattenedMenuData[] | undefined>
   >;
   leftSection?: boolean;
 }

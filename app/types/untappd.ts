@@ -122,7 +122,7 @@ interface MenuSection {
   items: SectionItem[];
 }
 
-interface FlattednedMenuData {
+interface FlattenedMenuData {
   menu_id: number;
   menu_name: string;
   menu_description: string;
