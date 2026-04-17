@@ -52,7 +52,7 @@ const theme = createTheme({
 });
 
 const umami = {
-	src: "https://umami.israndom.win/script.js",
+	src: "https://umami.kostecki.dk/script.js",
 	websiteId: "84995db7-3b4e-4c2e-8b0c-7f6c8c88f920",
 };
 
