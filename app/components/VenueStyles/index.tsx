@@ -15,6 +15,7 @@ import { VenueBeerCard } from "../VenueBeerCard";
 
 interface InputProps {
 	styles: { styleId: number; styleName: string; had: boolean }[];
+	mbccEnabled: boolean;
 }
 
 type FlattenedVenueMenuData = FlattenedMenuData & {
@@ -25,7 +26,7 @@ const getMBCCSessionURL = (session: MBCCSession) => {
 	return `https://mbcc.jonpacker.com/#session[{%22colour%22:%22${session}%22}]`;
 };
 
-export const VenueStyles = ({ styles }: InputProps) => {
+export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 	const [loading, setLoading] = useState(false);
 	const [selectedVenue, setSelectedVenue] = useState<VenueDetails | undefined>(
 		undefined,
@@ -35,7 +36,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
 		FlattenedVenueMenuData[] | undefined
 	>(undefined);
 
-	const isMBCCRelevant = import.meta.env.VITE_MBCC_ENABLED !== "0";
+	const isMBCCRelevant = mbccEnabled;
 
 	useEffect(() => {
 		const fetchMBCCVenues = async () => {
@@ -54,7 +55,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
 		};
 
 		fetchMBCCVenues();
-	}, []);
+	}, [isMBCCRelevant]);
 
 	const isMBCCVenue = (venue: VenueDetails): venue is MBCCVenueDetails => {
 		return "mbcc_event" in venue && venue.mbcc_event === true;
