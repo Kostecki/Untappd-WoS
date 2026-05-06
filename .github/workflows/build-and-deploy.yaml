@@ -41,23 +41,6 @@ jobs:
         with:
           version: 9.15.4
 
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v2
-        with:
-          # Commit Info
-          envkey_LATEST_COMMIT_HASH: ${{ env.LATEST_COMMIT_HASH }}
-          envkey_LATEST_COMMIT_MESSAGE: ${{ env.LATEST_COMMIT_MESSAGE }}
-
-          # App
-          envkey_SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          envkey_ADMIN_USER_ID: ${{ vars.ADMIN_USER_ID }}
-
-          # Untappd
-          envkey_UNTAPPD_API_URL: ${{ vars. UNTAPPD_API_URL }}
-          envkey_UNTAPPD_DEVICE_UDID: ${{ vars.UNTAPPD_DEVICE_UDID }}
-          envkey_UNTAPPD_CLIENT_ID: ${{ vars.UNTAPPD_CLIENT_ID }}
-          envkey_UNTAPPD_CLIENT_SECRET: ${{ secrets.UNTAPPD_CLIENT_SECRET }}
-
       - name: Set pnpm store path
         run: echo "PNPM_STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
 
@@ -98,6 +81,9 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            LATEST_COMMIT_HASH=${{ env.LATEST_COMMIT_HASH }}
+            LATEST_COMMIT_MESSAGE=${{ env.LATEST_COMMIT_MESSAGE }}
           tags: |
             ${{ steps.meta.outputs.tags }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
