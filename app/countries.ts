@@ -315,6 +315,15 @@ const isoToEmoji = (countryCode: string) => {
 
 const countryToEmoji = (countryName: string) => {
 	const countryNameTrimmed = countryName.trim().toLowerCase();
+	const countryCodeCandidate = countryName.trim().toUpperCase();
+
+	if (/^[A-Z]{2}$/.test(countryCodeCandidate)) {
+		return isoToEmoji(countryCodeCandidate);
+	}
+
+	if (/^[A-Z]{2}-[A-Z]{3}$/.test(countryCodeCandidate)) {
+		return isoToEmoji(countryCodeCandidate);
+	}
 
 	if (countryMapping[countryNameTrimmed]) {
 		const alpha2 = countryMapping[countryNameTrimmed];

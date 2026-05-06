@@ -24,6 +24,7 @@ interface InputProps {
 	emptyText: string;
 	loading: boolean;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+	prependVenues?: VenueDetails[];
 	optionSelectHandler: (
 		inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
 		barcode?: number,
@@ -53,6 +54,7 @@ export const SearchSelect = ({
 	emptyText,
 	loading,
 	setLoading,
+	prependVenues,
 	optionSelectHandler,
 	selectedBeer,
 	setSelectedBeer,
@@ -92,10 +94,23 @@ export const SearchSelect = ({
 			setLoading(true);
 			try {
 				const response = await fetch(`${apiURL}/${query}`);
-				const data: VenueDetails[] = await response.json();
+				const responseData: VenueDetails[] = await response.json();
 
-				setData(data);
-				setEmpty(data.length === 0);
+				if (apiURL.includes("/venues") && prependVenues?.length) {
+					const merged = [...prependVenues, ...responseData].filter(
+						(venue, index, allVenues) =>
+							allVenues.findIndex(
+								(item) => item.venue_id === venue.venue_id,
+							) === index,
+					);
+
+					setData(merged);
+					setEmpty(merged.length === 0);
+					return;
+				}
+
+				setData(responseData);
+				setEmpty(responseData.length === 0);
 			} catch (error) {
 				console.error("Failed to get data", apiURL, error);
 			}
@@ -108,7 +123,7 @@ export const SearchSelect = ({
 			setData(undefined);
 			setEmpty(false);
 		}
-	}, [debouncedSearch, apiURL, setLoading]);
+	}, [debouncedSearch, apiURL, prependVenues, setLoading]);
 
 	const VerifiedImageComponent = ({
 		is_verified,

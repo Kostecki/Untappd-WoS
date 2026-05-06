@@ -30,6 +30,12 @@ declare global {
 		url: string;
 	}
 
+	type MBCCSession = "yellow" | "blue" | "red" | "green";
+
+	interface MBCCVenueDetails extends VenueDetails {
+		mbcc_event: true;
+	}
+
 	interface VenueMenuDetails {
 		menu_id: number;
 		menu_name: string;
@@ -45,6 +51,23 @@ declare global {
 
 	interface VenueDetailsAPIResponse {
 		menu: VenueMenuDetails;
+	}
+
+	interface MBCCVenueMenuDetails extends VenueMenuDetails {
+		mbcc_event: true;
+		mbcc_session: MBCCSession;
+	}
+
+	interface MBCCCompiledData {
+		event_id: "mbcc-2026";
+		generated_at: string;
+		venues: MBCCVenueDetails[];
+		menus: Record<MBCCSession, MBCCVenueMenuDetails[]>;
+		diagnostics: {
+			source_version: string;
+			resolved_beers: number;
+			unresolved_beers: number;
+		};
 	}
 
 	// Beer and Brewery
