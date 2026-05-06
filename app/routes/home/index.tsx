@@ -36,15 +36,19 @@ export async function loader({ request }: Route.LoaderArgs) {
 	return { user, stylesInfo, userLists, latestCommit, isProd };
 }
 
+const defaultProfileFilters: Filters = {
+	showHaveHad: false,
+	showOnlyMissing: true,
+	showOnlyMissingOnList: false,
+};
+
 export default function Home() {
 	const data = useLoaderData<typeof loader>();
 	const { user, stylesInfo, userLists, latestCommit } = data;
 
-	const [profileFilters, setProfileFilters] = useState<Filters>({
-		showHaveHad: false,
-		showOnlyMissing: true,
-		showOnlyMissingOnList: false,
-	});
+	const [profileFilters, setProfileFilters] = useState<Filters>(
+		defaultProfileFilters,
+	);
 	const [stockList, setStockList] = useState<StockList | undefined>(undefined);
 	const [stockListDetails, setStockListDetails] = useState<
 		StockListDetails | undefined
@@ -58,7 +62,7 @@ export default function Home() {
 
 		if (Object.keys(settings).length === 0 && settings.constructor === Object) {
 			setSettings(Settings.STOCK_LIST, { listId: "", listName: "" });
-			setSettings(Settings.TABLE_FILTERS, profileFilters);
+			setSettings(Settings.TABLE_FILTERS, defaultProfileFilters);
 		} else {
 			setStockList(settings.stockList);
 			setProfileFilters(settings.tableFilters);

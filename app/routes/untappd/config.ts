@@ -9,4 +9,4 @@ invariant(DEVICE_UDID, "DEVICE_UDID must be set in .env");
 invariant(CLIENT_ID, "CLIENT_ID must be set in .env");
 invariant(CLIENT_SECRET, "CLIENT_SECRET must be set in .env");
 
-export { API_BASE_URL, DEVICE_UDID, CLIENT_ID, CLIENT_SECRET };
+export { API_BASE_URL, CLIENT_ID, CLIENT_SECRET, DEVICE_UDID };

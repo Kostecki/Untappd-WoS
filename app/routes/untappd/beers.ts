@@ -1,28 +1,27 @@
-import { API_BASE_URL } from "./config";
 import { userSessionGet } from "~/auth/user.server";
-
 import type { Route } from "./+types/beers";
+import { API_BASE_URL } from "./config";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const user = await userSessionGet(request);
-  const query = params.searchQuery;
+	const user = await userSessionGet(request);
+	const query = params.searchQuery;
 
-  const searchParams = new URLSearchParams({
-    q: query,
-    access_token: user.accessToken,
-  });
-  const url = `${API_BASE_URL}/search/beer?${searchParams}`;
-  const response = await fetch(url);
+	const searchParams = new URLSearchParams({
+		q: query,
+		access_token: user.accessToken,
+	});
+	const url = `${API_BASE_URL}/search/beer?${searchParams}`;
+	const response = await fetch(url);
 
-  if (!response.ok) {
-    console.error("Failed to get beers", response);
-    return Response.json([]);
-  }
+	if (!response.ok) {
+		console.error("Failed to get beers", response);
+		return Response.json([]);
+	}
 
-  const data = (await response.json()) as {
-    response: { beers: { items: BeerStringSearchResponse[] } };
-  };
-  const beers = data.response.beers.items;
+	const data = (await response.json()) as {
+		response: { beers: { items: BeerStringSearchResponse[] } };
+	};
+	const beers = data.response.beers.items;
 
-  return Response.json(beers);
+	return Response.json(beers);
 }

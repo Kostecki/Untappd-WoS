@@ -180,7 +180,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 								</Table.Tr>
 								<Table.Tr style={{ border: "none" }}>
 									<Table.Td colSpan={3} p={0}>
-										<Collapse in={openRow === style.styleId}>
+										<Collapse expanded={openRow === style.styleId}>
 											{loading ? (
 												<Flex justify="center">
 													<Loader color="untappd" my="lg" />

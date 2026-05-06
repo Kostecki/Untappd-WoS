@@ -3,34 +3,34 @@ import type { Route } from "./+types/list";
 import { API_BASE_URL } from "./config";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const user = await userSessionGet(request);
-  const listId = params.listId;
+	const user = await userSessionGet(request);
+	const listId = params.listId;
 
-  const searchParams = new URLSearchParams({
-    styles: "true",
-    access_token: user.accessToken,
-  });
-  const url = `${API_BASE_URL}/custom_lists/view/${listId}?${searchParams}`;
-  const response = await fetch(url);
+	const searchParams = new URLSearchParams({
+		styles: "true",
+		access_token: user.accessToken,
+	});
+	const url = `${API_BASE_URL}/custom_lists/view/${listId}?${searchParams}`;
+	const response = await fetch(url);
 
-  if (!response.ok) {
-    console.error("Failed to get list details", response);
-    return [];
-  }
+	if (!response.ok) {
+		console.error("Failed to get list details", response);
+		return [];
+	}
 
-  const data = await response.json();
+	const data = await response.json();
 
-  const {
-    items,
-    styles,
-    list: { list_name },
-  } = data.response;
+	const {
+		items,
+		styles,
+		list: { list_name },
+	} = data.response;
 
-  const stockListDetails = {
-    list_name,
-    listItems: items,
-    styles,
-  };
+	const stockListDetails = {
+		list_name,
+		listItems: items,
+		styles,
+	};
 
-  return Response.json(stockListDetails);
+	return Response.json(stockListDetails);
 }
