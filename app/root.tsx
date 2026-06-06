@@ -78,7 +78,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	const loaderData = useLoaderData<typeof loader>();
-	const { toast } = loaderData;
+	const toast = loaderData?.toast;
 
 	const UmamiScript = () => {
 		const isProd = import.meta.env.PROD;
