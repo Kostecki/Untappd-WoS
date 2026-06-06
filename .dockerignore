@@ -2,3 +2,5 @@
 .react-router
 README.md
 todo.md
+node_modules
+.pnpm-store

@@ -7,11 +7,16 @@ ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
 ENV LATEST_COMMIT_HASH=$LATEST_COMMIT_HASH
 ENV LATEST_COMMIT_MESSAGE=$LATEST_COMMIT_MESSAGE
+ENV CI=true
 
 RUN npm install -g pnpm
 
-COPY . /app
 WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
+RUN pnpm install --frozen-lockfile --prod
+
+COPY . /app
 
 RUN addgroup --system --gid 1001 wos
 RUN adduser --system --uid 1001 wos
@@ -22,4 +27,4 @@ USER wos
 
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start"]
+CMD ["./node_modules/.bin/react-router-serve", "./build/server/index.js"]
