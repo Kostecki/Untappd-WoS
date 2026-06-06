@@ -41,13 +41,16 @@ jobs:
         with:
           version: 9.15.4
 
-      - name: Set pnpm store path
-        run: echo "PNPM_STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+      - name: Detect pnpm store path
+        id: pnpm_store_path
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
 
       - name: Cache pnpm modules
         uses: actions/cache@v5
         with:
-          path: ${{ env.PNPM_STORE_PATH }}
+          path: |
+            ${{ steps.pnpm_store_path.outputs.path }}
+            ~/.pnpm-store
           key: pnpm-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             pnpm-${{ runner.os }}-
