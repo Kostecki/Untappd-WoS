@@ -27,9 +27,9 @@ jobs:
         id: git_info
         run: |
           LATEST_COMMIT_HASH=$(git log -1 --pretty=format:"%h")
-          LATEST_COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "LATEST_COMMIT_HASH=\"$LATEST_COMMIT_HASH\"" >> $GITHUB_ENV
-          echo "LATEST_COMMIT_MESSAGE=\"$LATEST_COMMIT_MESSAGE\"" >> $GITHUB_ENV
+          LATEST_COMMIT_MESSAGE=$(git log -1 --pretty=%s)
+          echo "LATEST_COMMIT_HASH=$LATEST_COMMIT_HASH" >> "$GITHUB_ENV"
+          echo "LATEST_COMMIT_MESSAGE=$LATEST_COMMIT_MESSAGE" >> "$GITHUB_ENV"
 
       - name: Use Node.js
         uses: actions/setup-node@v6
