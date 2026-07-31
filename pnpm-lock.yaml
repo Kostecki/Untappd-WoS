@@ -26,22 +26,22 @@ importers:
     dependencies:
       '@mantine/core':
         specifier: ^9.1.1
-        version: 9.1.1(@mantine/hooks@9.1.1(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 9.1.1(@mantine/hooks@9.1.1(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       '@mantine/hooks':
         specifier: ^9.1.1
-        version: 9.1.1(react@19.2.5)
+        version: 9.1.1(react@19.2.8)
       '@mantine/notifications':
         specifier: ^9.1.1
-        version: 9.1.1(@mantine/core@9.1.1(@mantine/hooks@9.1.1(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@mantine/hooks@9.1.1(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 9.1.1(@mantine/core@9.1.1(@mantine/hooks@9.1.1(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.1.1(react@19.2.8))(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       '@react-router/node':
         specifier: ^7.15.0
-        version: 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
+        version: 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       '@react-router/serve':
         specifier: ^7.15.0
-        version: 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
+        version: 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       '@tabler/icons-react':
         specifier: ^3.42.0
-        version: 3.42.0(react@19.2.5)
+        version: 3.42.0(react@19.2.8)
       barcode-detector:
         specifier: ^3.1.3
         version: 3.1.3(@types/emscripten@1.40.0)
@@ -56,16 +56,16 @@ importers:
         version: 5.1.40
       react:
         specifier: ^19.2.5
-        version: 19.2.5
+        version: 19.2.8
       react-dom:
         specifier: ^19.2.5
-        version: 19.2.5(react@19.2.5)
+        version: 19.2.5(react@19.2.8)
       react-router:
         specifier: ^7.15.0
-        version: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       recharts:
         specifier: ^3.8.1
-        version: 3.8.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-is@18.3.1)(react@19.2.5)(redux@5.0.1)
+        version: 3.8.1(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react-is@18.3.1)(react@19.2.8)(redux@5.0.1)
       remix-auth:
         specifier: ^4.2.0
         version: 4.2.0
@@ -74,23 +74,23 @@ importers:
         version: 3.0.0(remix-auth@4.2.0)
       remix-toast:
         specifier: ^4.0.0
-        version: 4.0.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))
+        version: 4.0.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))
       tiny-invariant:
         specifier: ^1.3.3
         version: 1.3.3
     devDependencies:
       '@react-router/dev':
         specifier: ^7.15.0
-        version: 7.15.0(@react-router/serve@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3))(@types/node@25.6.0)(jiti@1.21.7)(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(sugarss@5.0.1(postcss@8.5.24))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.24)))
+        version: 7.15.0(@react-router/serve@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3))(@types/node@25.6.0)(jiti@1.21.7)(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(sugarss@5.0.1(postcss@8.5.24))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.24)))
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
       '@types/react':
         specifier: ^19.2.14
-        version: 19.2.14
+        version: 19.2.17
       '@types/react-dom':
         specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.14)
+        version: 19.2.3(@types/react@19.2.17)
       autoprefixer:
         specifier: ^10.5.0
         version: 10.5.4(postcss@8.5.24)
@@ -572,8 +572,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.2.0
 
-  '@types/react@19.2.14':
-    resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
+  '@types/react@19.2.17':
+    resolution: {integrity: sha512-MXfmqaVPEVgkBT/aY0aGCkRWWtByiYQXo3xdQ8r5RzuFrPiRn8Gar2tQdXSUQ2GKV3bkXckek89V8wQBY2Q/Aw==}
 
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
@@ -1399,8 +1399,8 @@ packages:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
 
-  react@19.2.5:
-    resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
+  react@19.2.8:
+    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
     engines: {node: '>=0.10.0'}
 
   readdirp@4.1.2:
@@ -1934,18 +1934,18 @@ snapshots:
       '@floating-ui/core': 1.7.5
       '@floating-ui/utils': 0.2.11
 
-  '@floating-ui/react-dom@2.1.8(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@floating-ui/react-dom@2.1.8(react-dom@19.2.5(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@floating-ui/dom': 1.7.6
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
 
-  '@floating-ui/react@0.27.19(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@floating-ui/react@0.27.19(react-dom@19.2.5(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@floating-ui/react-dom': 2.1.8(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@floating-ui/react-dom': 2.1.8(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       '@floating-ui/utils': 0.2.11
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
       tabbable: 6.2.0
 
   '@floating-ui/utils@0.2.11': {}
@@ -1982,35 +1982,35 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@mantine/core@9.1.1(@mantine/hooks@9.1.1(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@mantine/core@9.1.1(@mantine/hooks@9.1.1(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@floating-ui/react': 0.27.19(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@mantine/hooks': 9.1.1(react@19.2.5)
+      '@floating-ui/react': 0.27.19(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
+      '@mantine/hooks': 9.1.1(react@19.2.8)
       clsx: 2.1.1
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-      react-number-format: 5.4.5(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      react-remove-scroll: 2.7.2(@types/react@19.2.14)(react@19.2.5)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
+      react-number-format: 5.4.5(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
+      react-remove-scroll: 2.7.2(@types/react@19.2.17)(react@19.2.8)
       type-fest: 5.6.0
     transitivePeerDependencies:
       - '@types/react'
 
-  '@mantine/hooks@9.1.1(react@19.2.5)':
+  '@mantine/hooks@9.1.1(react@19.2.8)':
     dependencies:
-      react: 19.2.5
+      react: 19.2.8
 
-  '@mantine/notifications@9.1.1(@mantine/core@9.1.1(@mantine/hooks@9.1.1(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@mantine/hooks@9.1.1(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@mantine/notifications@9.1.1(@mantine/core@9.1.1(@mantine/hooks@9.1.1(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.1.1(react@19.2.8))(react-dom@19.2.5(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@mantine/core': 9.1.1(@mantine/hooks@9.1.1(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@mantine/hooks': 9.1.1(react@19.2.5)
-      '@mantine/store': 9.1.1(react@19.2.5)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-      react-transition-group: 4.4.5(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@mantine/core': 9.1.1(@mantine/hooks@9.1.1(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
+      '@mantine/hooks': 9.1.1(react@19.2.8)
+      '@mantine/store': 9.1.1(react@19.2.8)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
+      react-transition-group: 4.4.5(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
 
-  '@mantine/store@9.1.1(react@19.2.5)':
+  '@mantine/store@9.1.1(react@19.2.8)':
     dependencies:
-      react: 19.2.5
+      react: 19.2.8
 
   '@mjackson/node-fetch-server@0.2.0': {}
 
@@ -2023,7 +2023,7 @@ snapshots:
 
   '@oxc-project/types@0.127.0': {}
 
-  '@react-router/dev@7.15.0(@react-router/serve@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3))(@types/node@25.6.0)(jiti@1.21.7)(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(sugarss@5.0.1(postcss@8.5.24))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.24)))':
+  '@react-router/dev@7.15.0(@react-router/serve@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3))(@types/node@25.6.0)(jiti@1.21.7)(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(sugarss@5.0.1(postcss@8.5.24))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.24)))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/generator': 7.29.1
@@ -2032,7 +2032,7 @@ snapshots:
       '@babel/preset-typescript': 7.27.1(@babel/core@7.29.0)
       '@babel/traverse': 7.29.0
       '@babel/types': 7.29.0
-      '@react-router/node': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
+      '@react-router/node': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       '@remix-run/node-fetch-server': 0.13.1
       arg: 5.0.2
       babel-dead-code-elimination: 1.0.10
@@ -2049,14 +2049,14 @@ snapshots:
       pkg-types: 2.3.1
       prettier: 3.8.3
       react-refresh: 0.14.2
-      react-router: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react-router: 7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       semver: 7.7.2
       tinyglobby: 0.2.14
       valibot: 1.4.0(typescript@6.0.3)
       vite: 8.0.10(@types/node@25.6.0)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.24))
       vite-node: 3.2.4(@types/node@25.6.0)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.24))
     optionalDependencies:
-      '@react-router/serve': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
+      '@react-router/serve': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@types/node'
@@ -2074,37 +2074,37 @@ snapshots:
       - tsx
       - yaml
 
-  '@react-router/express@7.15.0(express@4.21.2)(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)':
+  '@react-router/express@7.15.0(express@4.21.2)(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)':
     dependencies:
-      '@react-router/node': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
+      '@react-router/node': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       express: 4.21.2
-      react-router: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react-router: 7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
     optionalDependencies:
       typescript: 6.0.3
 
-  '@react-router/node@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)':
+  '@react-router/node@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)':
     dependencies:
       '@mjackson/node-fetch-server': 0.2.0
-      react-router: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react-router: 7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
     optionalDependencies:
       typescript: 6.0.3
 
-  '@react-router/serve@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)':
+  '@react-router/serve@7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)':
     dependencies:
       '@mjackson/node-fetch-server': 0.2.0
-      '@react-router/express': 7.15.0(express@4.21.2)(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
-      '@react-router/node': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)
+      '@react-router/express': 7.15.0(express@4.21.2)(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
+      '@react-router/node': 7.15.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       compression: 1.8.1
       express: 4.21.2
       get-port: 5.1.1
       morgan: 1.10.1
-      react-router: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react-router: 7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       source-map-support: 0.5.21
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)':
+  '@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.17)(react@19.2.8)(redux@5.0.1))(react@19.2.8)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@standard-schema/utils': 0.3.0
@@ -2113,8 +2113,8 @@ snapshots:
       redux-thunk: 3.1.0(redux@5.0.1)
       reselect: 5.1.1
     optionalDependencies:
-      react: 19.2.5
-      react-redux: 9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1)
+      react: 19.2.8
+      react-redux: 9.2.0(@types/react@19.2.17)(react@19.2.8)(redux@5.0.1)
 
   '@remix-run/node-fetch-server@0.13.1': {}
 
@@ -2173,10 +2173,10 @@ snapshots:
 
   '@standard-schema/utils@0.3.0': {}
 
-  '@tabler/icons-react@3.42.0(react@19.2.5)':
+  '@tabler/icons-react@3.42.0(react@19.2.8)':
     dependencies:
       '@tabler/icons': 3.42.0
-      react: 19.2.5
+      react: 19.2.8
 
   '@tabler/icons@3.42.0': {}
 
@@ -2215,11 +2215,11 @@ snapshots:
     dependencies:
       undici-types: 7.19.2
 
-  '@types/react-dom@19.2.3(@types/react@19.2.14)':
+  '@types/react-dom@19.2.3(@types/react@19.2.17)':
     dependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
 
-  '@types/react@19.2.14':
+  '@types/react@19.2.17':
     dependencies:
       csstype: 3.2.3
 
@@ -2907,94 +2907,94 @@ snapshots:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
 
-  react-dom@19.2.5(react@19.2.5):
+  react-dom@19.2.5(react@19.2.8):
     dependencies:
-      react: 19.2.5
+      react: 19.2.8
       scheduler: 0.27.0
 
   react-is@16.13.1: {}
 
   react-is@18.3.1: {}
 
-  react-number-format@5.4.5(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  react-number-format@5.4.5(react-dom@19.2.5(react@19.2.8))(react@19.2.8):
     dependencies:
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
 
-  react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1):
+  react-redux@9.2.0(@types/react@19.2.17)(react@19.2.8)(redux@5.0.1):
     dependencies:
       '@types/use-sync-external-store': 0.0.6
-      react: 19.2.5
-      use-sync-external-store: 1.6.0(react@19.2.5)
+      react: 19.2.8
+      use-sync-external-store: 1.6.0(react@19.2.8)
     optionalDependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
       redux: 5.0.1
 
   react-refresh@0.14.2: {}
 
-  react-remove-scroll-bar@2.3.8(@types/react@19.2.14)(react@19.2.5):
+  react-remove-scroll-bar@2.3.8(@types/react@19.2.17)(react@19.2.8):
     dependencies:
-      react: 19.2.5
-      react-style-singleton: 2.2.3(@types/react@19.2.14)(react@19.2.5)
+      react: 19.2.8
+      react-style-singleton: 2.2.3(@types/react@19.2.17)(react@19.2.8)
       tslib: 2.8.1
     optionalDependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
 
-  react-remove-scroll@2.7.2(@types/react@19.2.14)(react@19.2.5):
+  react-remove-scroll@2.7.2(@types/react@19.2.17)(react@19.2.8):
     dependencies:
-      react: 19.2.5
-      react-remove-scroll-bar: 2.3.8(@types/react@19.2.14)(react@19.2.5)
-      react-style-singleton: 2.2.3(@types/react@19.2.14)(react@19.2.5)
+      react: 19.2.8
+      react-remove-scroll-bar: 2.3.8(@types/react@19.2.17)(react@19.2.8)
+      react-style-singleton: 2.2.3(@types/react@19.2.17)(react@19.2.8)
       tslib: 2.8.1
-      use-callback-ref: 1.3.3(@types/react@19.2.14)(react@19.2.5)
-      use-sidecar: 1.1.3(@types/react@19.2.14)(react@19.2.5)
+      use-callback-ref: 1.3.3(@types/react@19.2.17)(react@19.2.8)
+      use-sidecar: 1.1.3(@types/react@19.2.17)(react@19.2.8)
     optionalDependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
 
-  react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8):
     dependencies:
       cookie: 1.0.2
-      react: 19.2.5
+      react: 19.2.8
       set-cookie-parser: 2.7.1
     optionalDependencies:
-      react-dom: 19.2.5(react@19.2.5)
+      react-dom: 19.2.5(react@19.2.8)
 
-  react-style-singleton@2.2.3(@types/react@19.2.14)(react@19.2.5):
+  react-style-singleton@2.2.3(@types/react@19.2.17)(react@19.2.8):
     dependencies:
       get-nonce: 1.0.1
-      react: 19.2.5
+      react: 19.2.8
       tslib: 2.8.1
     optionalDependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
 
-  react-transition-group@4.4.5(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  react-transition-group@4.4.5(react-dom@19.2.5(react@19.2.8))(react@19.2.8):
     dependencies:
       '@babel/runtime': 7.29.2
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
 
-  react@19.2.5: {}
+  react@19.2.8: {}
 
   readdirp@4.1.2: {}
 
-  recharts@3.8.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-is@18.3.1)(react@19.2.5)(redux@5.0.1):
+  recharts@3.8.1(@types/react@19.2.17)(react-dom@19.2.5(react@19.2.8))(react-is@18.3.1)(react@19.2.8)(redux@5.0.1):
     dependencies:
-      '@reduxjs/toolkit': 2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
+      '@reduxjs/toolkit': 2.11.2(react-redux@9.2.0(@types/react@19.2.17)(react@19.2.8)(redux@5.0.1))(react@19.2.8)
       clsx: 2.1.1
       decimal.js-light: 2.5.1
       es-toolkit: 1.46.1
       eventemitter3: 5.0.4
       immer: 10.2.0
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
+      react: 19.2.8
+      react-dom: 19.2.5(react@19.2.8)
       react-is: 18.3.1
-      react-redux: 9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1)
+      react-redux: 9.2.0(@types/react@19.2.17)(react@19.2.8)(redux@5.0.1)
       reselect: 5.1.1
       tiny-invariant: 1.3.3
-      use-sync-external-store: 1.6.0(react@19.2.5)
+      use-sync-external-store: 1.6.0(react@19.2.8)
       victory-vendor: 37.3.6
     transitivePeerDependencies:
       - '@types/react'
@@ -3012,9 +3012,9 @@ snapshots:
 
   remix-auth@4.2.0: {}
 
-  remix-toast@4.0.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)):
+  remix-toast@4.0.0(react-router@7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)):
     dependencies:
-      react-router: 7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      react-router: 7.15.0(react-dom@19.2.5(react@19.2.8))(react@19.2.8)
       zod: 4.4.3
 
   reselect@5.1.1: {}
@@ -3175,24 +3175,24 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
-  use-callback-ref@1.3.3(@types/react@19.2.14)(react@19.2.5):
+  use-callback-ref@1.3.3(@types/react@19.2.17)(react@19.2.8):
     dependencies:
-      react: 19.2.5
+      react: 19.2.8
       tslib: 2.8.1
     optionalDependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
 
-  use-sidecar@1.1.3(@types/react@19.2.14)(react@19.2.5):
+  use-sidecar@1.1.3(@types/react@19.2.17)(react@19.2.8):
     dependencies:
       detect-node-es: 1.1.0
-      react: 19.2.5
+      react: 19.2.8
       tslib: 2.8.1
     optionalDependencies:
-      '@types/react': 19.2.14
+      '@types/react': 19.2.17
 
-  use-sync-external-store@1.6.0(react@19.2.5):
+  use-sync-external-store@1.6.0(react@19.2.8):
     dependencies:
-      react: 19.2.5
+      react: 19.2.8
 
   util-deprecate@1.0.2: {}
 
