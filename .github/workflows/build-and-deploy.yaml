@@ -38,8 +38,6 @@ jobs:
 
       - name: Use pnpm
         uses: pnpm/action-setup@v6
-        with:
-          version: 11.5.1
 
       - name: Detect pnpm store path
         id: pnpm_store_path
