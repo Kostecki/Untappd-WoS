@@ -30,6 +30,10 @@ declare global {
 		url: string;
 	}
 
+	interface VenueSearchAPIResponse {
+		venue: Venue;
+	}
+
 	type MBCCSession = "yellow" | "blue" | "red" | "green";
 
 	interface MBCCVenueDetails extends VenueDetails {
