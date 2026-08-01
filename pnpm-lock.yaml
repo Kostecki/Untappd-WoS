@@ -35,7 +35,7 @@ importers:
         version: 9.5.0(@mantine/core@9.5.0(@mantine/hooks@9.5.0(react@19.2.8))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@mantine/hooks@9.5.0(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@react-router/node':
         specifier: ^7.15.0
-        version: 7.15.0(react-router@7.15.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
+        version: 7.18.2(react-router@7.15.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
       '@react-router/serve':
         specifier: ^7.15.0
         version: 7.15.0(react-router@7.15.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(typescript@6.0.3)
