@@ -17,7 +17,7 @@
     "@mantine/notifications": "9.6.2",
     "@react-router/node": "8.4.0",
     "@react-router/serve": "8.4.0",
-    "@tabler/icons-react": "3.47.0",
+    "@tabler/icons-react": "3.48.0",
     "barcode-detector": "3.2.2",
     "cheerio": "1.2.0",
     "dotenv-cli": "11.0.0",
