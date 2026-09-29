@@ -1,7 +1,7 @@
 {
   "name": "untappd-wos",
   "private": true,
-  "packageManager": "pnpm@11.27.1",
+  "packageManager": "pnpm@11.28.0",
   "type": "module",
   "scripts": {
     "build": "react-router build",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@react-router/dev": "8.4.0",
-    "@types/node": "26.6.2",
+    "@types/node": "26.6.3",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "autoprefixer": "10.6.1",
