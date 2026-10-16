@@ -1,9 +1,7 @@
 import {
-	ActionIcon,
 	Card,
 	Checkbox,
 	Collapse,
-	CopyButton,
 	Flex,
 	Loader,
 	Stack,
@@ -12,12 +10,7 @@ import {
 	TextInput,
 } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-import {
-	IconCheck,
-	IconChevronDown,
-	IconChevronUp,
-	IconCopy,
-} from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
 import { getLocationQuery } from "~/hooks/location";
@@ -105,7 +98,6 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 					<Table.Tr>
 						<Table.Th w="360px">{`Styles (${filteredStyles.length})`}</Table.Th>
 						<Table.Th ta="center">Have Had</Table.Th>
-						<Table.Th ta="center">Copy</Table.Th>
 					</Table.Tr>
 				</Table.Thead>
 				<Table.Tbody>
@@ -162,31 +154,9 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 										</Flex>
 									</Table.Td>
 
-									<Table.Td>
-										<Flex justify="center">
-											<CopyButton value={style.styleName}>
-												{({ copied, copy }) => (
-													<ActionIcon
-														variant="transparent"
-														aria-label="Copy"
-														onClick={(event) => {
-															event.stopPropagation();
-															copy();
-														}}
-													>
-														{copied ? (
-															<IconCheck color="gray" stroke={1.5} />
-														) : (
-															<IconCopy color="gray" stroke={1.5} />
-														)}
-													</ActionIcon>
-												)}
-											</CopyButton>
-										</Flex>
-									</Table.Td>
 								</Table.Tr>
 								<Table.Tr style={{ border: "none" }}>
-									<Table.Td colSpan={3} p={0}>
+									<Table.Td colSpan={2} p={0}>
 										<Collapse expanded={openRow === style.styleId}>
 											{loading ? (
 												<Flex justify="center">
