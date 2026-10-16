@@ -419,37 +419,6 @@ declare global {
 		nearby: RelatedBeersResponse[];
 	}
 
-	// /beer/find/{bid}
-	interface BeerFindResponse {
-		verified: {
-			count: number;
-			/** created_at = when it was added to the menu */
-			items: { created_at: string; distance: number; venue: NearbyVenue }[];
-		};
-		unverified: {
-			count: number;
-			/** created_at = most recent check-in */
-			items: {
-				created_at: string;
-				distance: number;
-				total_users: number;
-				venue: NearbyVenue;
-			}[];
-		};
-	}
-
-	// Payload of /api/beer/:beerId/find
-	interface BeerFindPlace {
-		venueId: number;
-		venueName: string;
-		venueSlug: string;
-		distance: number;
-		isShop: boolean;
-		/** "menu" = on a verified venue's menu, "checkin" = recently checked in */
-		source: "menu" | "checkin";
-		date: string;
-	}
-
 	// User (subset of /user/info?compact=enhanced)
 	interface UntappdUser {
 		id: number;

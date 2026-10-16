@@ -1,6 +1,7 @@
 import { userSessionGet } from "~/auth/user.server";
 import { getTopRatedBeers, getTrendingBeers } from "~/untappd/api.server";
 import { withFallback } from "~/untappd/client.server";
+import { isEuropean } from "~/untappd/europe.server";
 import { getLocationParams } from "~/untappd/location.server";
 import type { Route } from "./+types/style-beers";
 
@@ -29,8 +30,15 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 				all.findIndex((other) => other.beer.bid === item.beer.bid) === index,
 		);
 
+	// European breweries first (easier to buy here), keeping Untappd's rating
+	// order within each group; the global top 50 is all the API returns
+	const europeanFirst = [
+		...topRated.filter((item) => isEuropean(item.brewery.country_name)),
+		...topRated.filter((item) => !isEuropean(item.brewery.country_name)),
+	];
+
 	const payload: StyleBeersPayload = {
-		topRated: topRated.slice(0, topRatedLimit),
+		topRated: europeanFirst.slice(0, topRatedLimit),
 		nearby,
 	};
 

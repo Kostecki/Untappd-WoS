@@ -110,20 +110,6 @@ const getTopRatedBeers = (accessToken: string, typeId: number | string) =>
 		params: { type_id: typeId, in_production: 1 },
 	}).then((response) => response.beers.items);
 
-/**
- * Where a beer can be found nearby: `verified` = on a verified venue's menu,
- * `unverified` = recently checked in at a venue
- */
-const findBeer = (
-	accessToken: string,
-	beerId: number | string,
-	{ lat, lng, radius }: NearbyOptions,
-) =>
-	untappd<BeerFindResponse>(`/beer/find/${beerId}`, {
-		accessToken,
-		params: { lat, lng, radius, dis_pref: "km", mode: "enhanced" },
-	});
-
 // Venues
 
 const searchVenues = (accessToken: string, query: string) =>
@@ -158,7 +144,6 @@ const getVenueMenus = (accessToken: string, venueId: string | number) =>
 
 export {
 	checkBarcode,
-	findBeer,
 	getBadge,
 	getBeerInfo,
 	getListView,
