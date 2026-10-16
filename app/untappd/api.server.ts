@@ -49,11 +49,34 @@ const getBadge = (accessToken: string, userBadgeId: number) =>
 
 // Lists
 
-const getListView = (accessToken: string, listId: string | number) =>
-	untappd<ListViewResponse>(`/custom_lists/view/${listId}`, {
-		accessToken,
-		params: { styles: true },
-	});
+// /custom_lists/view returns 25 items per page
+const listPageSize = 25;
+const maxListPages = 20;
+
+/** A list with all of its items; the `styles` summary always covers the whole list */
+const getListView = async (accessToken: string, listId: string | number) => {
+	const firstPage = await untappd<ListViewResponse>(
+		`/custom_lists/view/${listId}`,
+		{ accessToken, params: { styles: true } },
+	);
+	const items = [...firstPage.items];
+
+	for (
+		let page = 1;
+		page < maxListPages &&
+		items.length === page * listPageSize &&
+		firstPage.pagination?.next_url;
+		page++
+	) {
+		const { items: pageItems } = await untappd<ListViewResponse>(
+			`/custom_lists/view/${listId}`,
+			{ accessToken, params: { offset: page * listPageSize } },
+		);
+		items.push(...pageItems);
+	}
+
+	return { ...firstPage, items };
+};
 
 // Beer
 

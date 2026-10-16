@@ -472,6 +472,7 @@ declare global {
 		list: UserLists;
 		items: BeerWithBrewery[];
 		styles: { count?: number; items: StyleList[] };
+		pagination?: { next_url: string; offset?: number };
 	}
 
 	// Payload of the /api/list/:listId route
