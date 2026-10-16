@@ -106,14 +106,13 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 							<Table.Th ta="center" w={1} style={{ whiteSpace: "nowrap" }}>
 								<Tooltip
 									multiline
-									w={220}
+									w={340}
 									withArrow
 									label={
 										<Stack gap={4}>
 											<Text size="xs">✓ Had this style</Text>
 											<Text size="xs">
-												– Not had, but a beer in this style is on your stock
-												list
+												– Not had, but a beer in this style is on your stock list
 											</Text>
 											<Text size="xs">☐ Not had yet</Text>
 										</Stack>
