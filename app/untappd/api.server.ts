@@ -103,6 +103,25 @@ const searchVenues = (accessToken: string, query: string) =>
 		params: { q: query },
 	}).then((response) => response.venues.items);
 
+/**
+ * Beer menus of a venue via the menus API the 5.0 app uses. Must be sent
+ * form-encoded (a JSON body is rejected with response_code 403). Items include
+ * per-user `has_had` and `on_list`.
+ */
+const getVenueMenuSections = (accessToken: string, venueId: string | number) =>
+	untappd<MenuSectionsResponse>("/menus/sections", {
+		accessToken,
+		method: "POST",
+		body: {
+			venue_id: venueId,
+			flatten_when_filtering: true,
+			// Default page size is 10 per section; 100 returns whole sections
+			limit: 100,
+			"types[]": "Items::Beer",
+		},
+	}).then((response) => response.sections);
+
+/** Legacy menus endpoint, no longer used by the official app */
 const getVenueMenus = (accessToken: string, venueId: string | number) =>
 	untappd<{ items: VenueDetailsAPIResponse[] }>(`/inventory/view/${venueId}`, {
 		accessToken,
@@ -118,6 +137,7 @@ export {
 	getUserBadges,
 	getUserInfo,
 	getUserLists,
+	getVenueMenuSections,
 	getVenueMenus,
 	login,
 	searchBeers,

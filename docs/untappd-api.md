@@ -169,7 +169,17 @@ The 5.0.0 app no longer uses `/inventory/view/{vid}`. Venue menus go through:
 | GET | `/inventory/viewspecialmenu/{id}` | | `{ venue, updated_at, total_count, menu_name, section_name, items }` |
 | POST | `/helpers/track_menu` | | |
 
-`/menus/sections` body (`flatten_when_filtering` is always sent):
+`/menus/sections` body (`flatten_when_filtering` is always sent).
+
+> **Verified against the live API (2026-10-16):** the body must be sent
+> **form-encoded**; a JSON body returns HTTP 200 with
+> `response.response_code: 403`. Sections are paged at 10 items by default;
+> `limit=100` returns whole sections. `types[]=Items::Beer` drops spirits/wine.
+> Each item carries per-user `has_had` and `on_list`. `name`/`style` are the
+> venue's display values (e.g. `"1. Darkness (Nitro)"`); use
+> `original_name`/`original_style` for Untappd values. `/inventory/view` and
+> `/search/venue` still work, and `Authorization: Bearer` is accepted.
+
 
 ```ts
 {

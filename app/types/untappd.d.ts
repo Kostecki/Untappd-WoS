@@ -131,14 +131,94 @@ declare global {
 	// Menu and User
 	interface SectionItem {
 		created_at: string;
-		price: {
+		price?: {
 			value: string;
 			currency: string;
 			currency_symbol: string;
 		};
 		serving_type: string;
 		beer: Beer;
-		brewery: Brewery;
+		brewery: Pick<
+			Brewery,
+			| "brewery_id"
+			| "brewery_name"
+			| "brewery_slug"
+			| "brewery_page_url"
+			| "brewery_label"
+			| "country_name"
+		> &
+			Partial<Brewery>;
+		// Only from /menus/sections, per logged-in user
+		has_had?: boolean;
+		on_list?: boolean;
+		tap_number?: string;
+	}
+
+	// POST /menus/sections (form-encoded), see docs/untappd-api.md
+	interface MenuSectionContainer {
+		id: number;
+		name: string;
+		price: string;
+		currency: string;
+		currency_symbol: string;
+		container_size: { id: number; name: string; ounces: string };
+	}
+
+	interface MenuSectionItem {
+		id: number;
+		name: string;
+		original_name: string;
+		style: string;
+		original_style: string;
+		short_style: string;
+		type: string;
+		abv: string;
+		ibu: string;
+		rating: string;
+		rating_count: number;
+		description: string;
+		label_image: string;
+		label_image_hd: string;
+		in_production: boolean;
+		is_non_alcoholic: boolean;
+		nitro: boolean;
+		cask: boolean;
+		tap_number: string;
+		created_at: string;
+		updated_at: string;
+		untappd_id: number;
+		untappd_beer_slug: string;
+		brewery: string;
+		brewery_country: string;
+		brewery_location: string;
+		untappd_brewery_id: number;
+		untappd_brewery_slug: string;
+		untappd_brewery_page_url: string;
+		containers: MenuSectionContainer[];
+		has_had: boolean;
+		on_list: boolean;
+	}
+
+	interface MenuSectionsSection {
+		menu_id: number;
+		menu_name: string;
+		menu_description: string;
+		section_id: number;
+		section_name: string;
+		section_description: string;
+		section_position: number;
+		filtered: boolean;
+		total_count: number;
+		total_pages: number;
+		current_page: number;
+		next_page: number | null;
+		items: MenuSectionItem[];
+	}
+
+	interface MenuSectionsResponse {
+		sections: MenuSectionsSection[];
+		item_counts: Record<string, number>;
+		tier: string;
 	}
 
 	interface MenuSection {

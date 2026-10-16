@@ -1,14 +1,23 @@
-import { Card, Flex, Group, Rating, Stack, Text } from "@mantine/core";
+import { Badge, Card, Flex, Group, Rating, Stack, Text } from "@mantine/core";
 import { IconCircleFilled, IconExternalLink } from "@tabler/icons-react";
 
 import countryToEmoji from "~/countries";
 
 import "./style.css";
 
-export const BeerCard = ({ beerItem }: { beerItem: BeerWithBrewery }) => {
+interface BeerCardItem {
+	beer: Beer;
+	brewery: Pick<Brewery, "brewery_name" | "country_name">;
+	has_had?: boolean;
+	on_list?: boolean;
+}
+
+export const BeerCard = ({ beerItem }: { beerItem: BeerCardItem }) => {
 	const {
 		beer: { bid, beer_name, beer_slug, beer_abv, beer_style, rating_score },
 		brewery: { brewery_name, country_name },
+		has_had,
+		on_list,
 	} = beerItem;
 
 	return (
@@ -23,7 +32,19 @@ export const BeerCard = ({ beerItem }: { beerItem: BeerWithBrewery }) => {
 			<Flex justify="space-between">
 				<Stack gap="0">
 					<Stack gap={0} mb="xs">
-						<Text mr="xs">{beer_name}</Text>
+						<Group gap="xs">
+							<Text>{beer_name}</Text>
+							{has_had && (
+								<Badge size="xs" variant="light" color="gray">
+									Had
+								</Badge>
+							)}
+							{on_list && (
+								<Badge size="xs" variant="light" color="untappd">
+									On your list
+								</Badge>
+							)}
+						</Group>
 						<Text size="sm" fs="italic" c="gray">
 							{beer_style}
 						</Text>

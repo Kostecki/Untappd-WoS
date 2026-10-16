@@ -105,7 +105,20 @@ const untappd = async <T>(
 		);
 	}
 
-	const data = (await response.json()) as { response: T };
+	const data = (await response.json()) as {
+		response: T & { response_code?: number };
+	};
+
+	// Some endpoints (e.g. /menus/sections) report errors inside a 200 envelope
+	const responseCode = data.response?.response_code;
+	if (responseCode && responseCode >= 400) {
+		throw new UntappdError(
+			`Untappd ${method} ${path} failed: response_code ${responseCode}`,
+			responseCode,
+			path,
+		);
+	}
+
 	return data.response;
 };
 
