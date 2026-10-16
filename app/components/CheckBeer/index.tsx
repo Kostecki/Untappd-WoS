@@ -44,13 +44,17 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		searchOptions.TEXT,
 	);
 
+	// Prefer the style id (stable); names change when Untappd renames a style
+	const findStyle = ({ beer_style, beer_style_id }: Beer) =>
+		beer_style_id
+			? styles.find((style) => style.styleId === beer_style_id)
+			: styles.find((style) => style.styleName === beer_style);
+
 	const setStylesHadStatus = <T extends BarcodeAPIResponse | BeerInfoResponse>(
 		beers: T[],
 	): BeerWithStylesHad[] => {
 		return beers.map((beer) => {
-			const matchedStyle = styles.find(
-				(style) => style.styleName === beer.beer.beer_style,
-			);
+			const matchedStyle = findStyle(beer.beer);
 
 			return {
 				...beer,
@@ -98,19 +102,17 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		combobox?.closeDropdown();
 	};
 
-	const findBeerByStyle = (styleName: string) => {
-		const beer = stockListDetails?.listItems.some(
-			(beer) => beer.beer.beer_style === styleName,
-		);
-
-		return beer;
-	};
+	// Same source as the styles table: the style ids of the whole stock list
+	const isStyleOnList = ({ beer_style, beer_style_id }: Beer) =>
+		beer_style_id
+			? stockListDetails?.styles.includes(beer_style_id)
+			: stockListDetails?.listItems.some(
+					(item) => item.beer.beer_style === beer_style,
+				);
 
 	const HaveHadStatus = ({ beer }: { beer: BeerWithStylesHad }) => {
-		const {
-			beer: { beer_style, style_had },
-		} = beer;
-		const haveStyleInStock = findBeerByStyle(beer_style);
+		const { style_had } = beer.beer;
+		const haveStyleInStock = isStyleOnList(beer.beer);
 		const haveButNotDrunk = !style_had && haveStyleInStock;
 
 		const text = style_had ? "Yes" : "No";
