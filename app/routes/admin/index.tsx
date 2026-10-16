@@ -326,18 +326,6 @@ const VenueRow = ({
 				</Table.Td>
 				<Table.Td>
 					<fetcher.Form method="post">
-						<input type="hidden" name="intent" value="toggle" />
-						<input type="hidden" name="id" value={venue.id} />
-						<Switch
-							color="untappd"
-							checked={venue.active}
-							onChange={(event) => fetcher.submit(event.currentTarget.form)}
-							aria-label="Active"
-						/>
-					</fetcher.Form>
-				</Table.Td>
-				<Table.Td>
-					<fetcher.Form method="post">
 						<input type="hidden" name="intent" value="set-end-date" />
 						<input type="hidden" name="id" value={venue.id} />
 						<TextInput
@@ -350,6 +338,18 @@ const VenueRow = ({
 							// Active but hidden: the last day has passed
 							error={venue.active && !venue.visible ? "Ended" : undefined}
 							styles={{ error: { color: "var(--mantine-color-orange-7)" } }}
+						/>
+					</fetcher.Form>
+				</Table.Td>
+				<Table.Td>
+					<fetcher.Form method="post">
+						<input type="hidden" name="intent" value="toggle" />
+						<input type="hidden" name="id" value={venue.id} />
+						<Switch
+							color="untappd"
+							checked={venue.active}
+							onChange={(event) => fetcher.submit(event.currentTarget.form)}
+							aria-label="Active"
 						/>
 					</fetcher.Form>
 				</Table.Td>
@@ -623,8 +623,8 @@ export default function Admin({
 					<Table.Thead>
 						<Table.Tr>
 							<Table.Th>Venue</Table.Th>
-							<Table.Th>Active</Table.Th>
 							<Table.Th>Last day</Table.Th>
+							<Table.Th>Active</Table.Th>
 							<Table.Th />
 						</Table.Tr>
 					</Table.Thead>
