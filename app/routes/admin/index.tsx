@@ -345,12 +345,14 @@ const VenueRow = ({
 					<fetcher.Form method="post">
 						<input type="hidden" name="intent" value="toggle" />
 						<input type="hidden" name="id" value={venue.id} />
-						<Switch
-							color="untappd"
-							checked={venue.active}
-							onChange={(event) => fetcher.submit(event.currentTarget.form)}
-							aria-label="Active"
-						/>
+						<Group justify="center">
+							<Switch
+								color="untappd"
+								checked={venue.active}
+								onChange={(event) => fetcher.submit(event.currentTarget.form)}
+								aria-label="Active"
+							/>
+						</Group>
 					</fetcher.Form>
 				</Table.Td>
 				<Table.Td>
@@ -624,7 +626,7 @@ export default function Admin({
 						<Table.Tr>
 							<Table.Th>Venue</Table.Th>
 							<Table.Th>Last day</Table.Th>
-							<Table.Th>Active</Table.Th>
+							<Table.Th ta="center">Active</Table.Th>
 							<Table.Th />
 						</Table.Tr>
 					</Table.Thead>
