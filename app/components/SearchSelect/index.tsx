@@ -296,7 +296,8 @@ export const SearchSelect = ({
 				/>
 			</Combobox.Target>
 
-			<Combobox.Dropdown hidden={data === null}>
+			{/* Hidden when there's nothing to show, e.g. before searching */}
+			<Combobox.Dropdown hidden={!options.some(Boolean) && !empty}>
 				<Combobox.Options>
 					{empty && <Combobox.Empty>{emptyText}</Combobox.Empty>}
 					<ScrollArea.Autosize type="scroll" mah={200}>
