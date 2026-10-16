@@ -76,10 +76,17 @@ const deleteTemporaryVenue = (id: number) =>
 		(await getVenues()).delete(id);
 	});
 
-/** Active, and not past its end date (inclusive) */
+/** Today as yyyy-mm-dd in the server's time zone (mount /etc/localtime in Docker) */
+const localDate = (now: Date) =>
+	[
+		now.getFullYear(),
+		String(now.getMonth() + 1).padStart(2, "0"),
+		String(now.getDate()).padStart(2, "0"),
+	].join("-");
+
+/** Active, and not past its last day (inclusive, in local time) */
 const isVisible = (venue: TemporaryVenue, now = new Date()) =>
-	venue.active &&
-	(!venue.endsOn || now.toISOString().slice(0, 10) <= venue.endsOn);
+	venue.active && (!venue.endsOn || localDate(now) <= venue.endsOn);
 
 const listVisibleTemporaryVenues = async () =>
 	(await listTemporaryVenues()).filter((venue) => isVisible(venue));
