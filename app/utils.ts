@@ -15,23 +15,38 @@ interface SettingsTypes {
   };
 }
 
-const getSettings = (identifier?: Settings) => {
-  const settings = localStorage.getItem("settings");
-  const parsedSettings = settings ? JSON.parse(settings) : {};
+type StoredSettings = { [K in Settings]?: SettingsTypes[K] };
 
-  return identifier ? parsedSettings[identifier] ?? {} : parsedSettings;
+// localStorage can be missing, blocked (private mode) or hold invalid JSON
+const readSettings = (): StoredSettings => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("settings") ?? "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
 };
+
+function getSettings(): StoredSettings;
+function getSettings<T extends Settings>(identifier: T): SettingsTypes[T] | undefined;
+function getSettings(identifier?: Settings) {
+  const parsedSettings = readSettings();
+
+  return identifier ? parsedSettings[identifier] : parsedSettings;
+}
 
 const setSettings = <T extends Settings>(
   identifier: T,
   inputValue: SettingsTypes[T],
 ) => {
-  const settings = localStorage.getItem("settings");
-  const parsedSettings = settings ? JSON.parse(settings) : {};
-
+  const parsedSettings = readSettings();
   parsedSettings[identifier] = inputValue;
 
-  localStorage.setItem("settings", JSON.stringify(parsedSettings));
+  try {
+    localStorage.setItem("settings", JSON.stringify(parsedSettings));
+  } catch {
+    // Not persisted; the app still works with the in-memory state
+  }
 };
 
 // Hook: must only be called from components or other hooks
