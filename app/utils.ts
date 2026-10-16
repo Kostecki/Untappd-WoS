@@ -33,9 +33,10 @@ const setSettings = <T extends Settings>(
   localStorage.setItem("settings", JSON.stringify(parsedSettings));
 };
 
-const isMobile = () => {
+// Hook: must only be called from components or other hooks
+const useIsMobile = () => {
   const { width } = useViewportSize();
   return width <= 768;
 };
 
-export { getSettings, setSettings, Settings, isMobile };
+export { getSettings, setSettings, Settings, useIsMobile };

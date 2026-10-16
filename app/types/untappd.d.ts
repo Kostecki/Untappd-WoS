@@ -264,6 +264,45 @@ declare global {
 		your_count: number;
 	}
 
+	// User (subset of /user/info?compact=enhanced)
+	interface UntappdUser {
+		id: number;
+		uid?: number;
+		user_name: string;
+		first_name: string;
+		last_name: string;
+		user_avatar: string;
+		user_avatar_hd: string;
+		untappd_url: string;
+		is_private: number;
+		settings: { email_address: string };
+	}
+
+	// Item from /user/badges
+	interface UserBadge {
+		user_badge_id: number;
+		badge_id: number;
+		badge_name: string;
+		badge_description: string;
+		is_local_badge?: boolean;
+		is_level_badge?: boolean;
+		badge_image?: { sm: string; md: string; lg: string };
+	}
+
+	// /custom_lists/view/{id}?styles=true
+	interface ListViewResponse {
+		list: UserLists;
+		items: BeerWithBrewery[];
+		styles: { count?: number; items: StyleList[] };
+	}
+
+	// Payload of the /api/list/:listId route
+	interface ListDetailsPayload {
+		list_name: string;
+		listItems: BeerWithBrewery[];
+		styleIds: number[];
+	}
+
 	interface StylesInfo {
 		styles: {
 			styleId: number;

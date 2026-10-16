@@ -1,44 +1,28 @@
 import { userSessionGet } from "~/auth/user.server";
+import { searchVenues } from "~/untappd/api.server";
+import { withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/venues";
-import { API_BASE_URL } from "./config";
+
+const preferredCountry = "Danmark";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const user = await userSessionGet(request);
-	const query = params.searchQuery;
+	const items = await withFallback(
+		searchVenues(user.accessToken, params.searchQuery),
+		[],
+	);
 
-	const searchParams = new URLSearchParams({
-		q: query,
-		access_token: user.accessToken,
-	});
-	const url = `${API_BASE_URL}/search/venue?${searchParams}`;
-	const response = await fetch(url);
+	const venues: VenueDetails[] = items
+		.map(({ venue }) => ({
+			...venue,
+			url: `https://untappd.com/v/${venue.venue_slug}/${venue.venue_id}`,
+		}))
+		// Stable sort: venues in the preferred country first, otherwise keep API order
+		.sort(
+			(a, b) =>
+				Number(b.venue_country === preferredCountry) -
+				Number(a.venue_country === preferredCountry),
+		) as VenueDetails[];
 
-	if (!response.ok) {
-		console.error("Failed to get venues", response);
-		return Response.json([]);
-	}
-
-	const data = (await response.json()) as {
-		response: { venues: { items: VenueSearchAPIResponse[] } };
-	};
-	const { items } = data.response.venues;
-
-	const sortedVenues = items
-		.map(({ venue }) => {
-			const { venue_id, venue_slug } = venue;
-
-			return {
-				...venue,
-				url: `https://untappd.com/v/${venue_slug}/${venue_id}`,
-			};
-		})
-		.sort((a: Venue, b: Venue) => {
-			return a.venue_country === "Danmark"
-				? -1
-				: b.venue_country === "Danmark"
-					? 1
-					: 0;
-		}) as VenueDetails[];
-
-	return Response.json(sortedVenues);
+	return Response.json(venues);
 }

@@ -1,27 +1,14 @@
 import { userSessionGet } from "~/auth/user.server";
+import { searchBeers } from "~/untappd/api.server";
+import { withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/beers";
-import { API_BASE_URL } from "./config";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const user = await userSessionGet(request);
-	const query = params.searchQuery;
-
-	const searchParams = new URLSearchParams({
-		q: query,
-		access_token: user.accessToken,
-	});
-	const url = `${API_BASE_URL}/search/beer?${searchParams}`;
-	const response = await fetch(url);
-
-	if (!response.ok) {
-		console.error("Failed to get beers", response);
-		return Response.json([]);
-	}
-
-	const data = (await response.json()) as {
-		response: { beers: { items: BeerStringSearchResponse[] } };
-	};
-	const beers = data.response.beers.items;
+	const beers = await withFallback(
+		searchBeers(user.accessToken, params.searchQuery),
+		[],
+	);
 
 	return Response.json(beers);
 }

@@ -13,7 +13,7 @@ import { useElementSize } from "@mantine/hooks";
 import { IconLogout } from "@tabler/icons-react";
 import { Link } from "react-router";
 import type { SessionUser } from "~/auth/auth.server";
-import { isMobile, Settings, setSettings } from "~/utils";
+import { useIsMobile, Settings, setSettings } from "~/utils";
 
 import { Ring } from "../Ring";
 import { SettingsModal } from "../SettingsModal";
@@ -42,7 +42,7 @@ export const Profile = ({
 	latestCommit,
 }: InputProps) => {
 	const { ref, width } = useElementSize();
-	const mobile = isMobile();
+	const mobile = useIsMobile();
 
 	const fullName = `${user.firstName} ${user.lastName}`;
 	const {

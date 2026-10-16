@@ -13,10 +13,10 @@ import {
 	useCombobox,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import countryToEmoji from "~/countries";
-import { isMobile } from "~/utils";
+import { useIsMobile } from "~/utils";
 
 interface InputProps {
 	apiURL: string;
@@ -64,15 +64,13 @@ export const SearchSelect = ({
 	setVenueDetails,
 	leftSection = false,
 }: InputProps) => {
-	const mobile = isMobile();
+	const mobile = useIsMobile();
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [data, setData] = useState<
 		BeerStringSearchResponse[] | VenueDetails[] | undefined
 	>(undefined);
 	const [empty, setEmpty] = useState(false);
-
-	const abortController = useRef<AbortController | null>(null);
 
 	const [debouncedSearch] = useDebouncedValue(searchQuery, 300);
 
@@ -81,48 +79,48 @@ export const SearchSelect = ({
 	});
 
 	useEffect(() => {
-		const fetchData = async (query: string) => {
-			abortController.current?.abort();
-			abortController.current = new AbortController();
+		const query = debouncedSearch.trim();
 
-			if (!query) {
-				setData(undefined);
-				setLoading(false);
-				return;
-			}
+		if (!query) {
+			setData(undefined);
+			setEmpty(false);
+			setLoading(false);
+			return;
+		}
 
+		const controller = new AbortController();
+
+		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const response = await fetch(`${apiURL}/${query}`);
+				const response = await fetch(
+					`${apiURL}/${encodeURIComponent(query)}`,
+					{ signal: controller.signal },
+				);
 				const responseData: VenueDetails[] = await response.json();
 
-				if (apiURL.includes("/venues") && prependVenues?.length) {
-					const merged = [...prependVenues, ...responseData].filter(
-						(venue, index, allVenues) =>
-							allVenues.findIndex(
-								(item) => item.venue_id === venue.venue_id,
-							) === index,
-					);
+				const results =
+					apiURL.includes("/venues") && prependVenues?.length
+						? [...prependVenues, ...responseData].filter(
+								(venue, index, allVenues) =>
+									allVenues.findIndex(
+										(item) => item.venue_id === venue.venue_id,
+									) === index,
+							)
+						: responseData;
 
-					setData(merged);
-					setEmpty(merged.length === 0);
-					return;
-				}
-
-				setData(responseData);
-				setEmpty(responseData.length === 0);
+				setData(results);
+				setEmpty(results.length === 0);
 			} catch (error) {
+				if (controller.signal.aborted) return;
 				console.error("Failed to get data", apiURL, error);
 			}
 			setLoading(false);
 		};
 
-		if (debouncedSearch.trim()) {
-			fetchData(debouncedSearch);
-		} else {
-			setData(undefined);
-			setEmpty(false);
-		}
+		fetchData();
+
+		return () => controller.abort();
 	}, [debouncedSearch, apiURL, prependVenues, setLoading]);
 
 	const VerifiedImageComponent = ({

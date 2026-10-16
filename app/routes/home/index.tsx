@@ -23,8 +23,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 		throw redirect("/login");
 	}
 
-	const stylesInfo = await getStylesInfo(user);
-	const userLists = await getUserLists(user);
+	const [stylesInfo, userLists] = await Promise.all([
+		getStylesInfo(user),
+		getUserLists(user),
+	]);
 
 	const latestCommit = {
 		hash: process.env.LATEST_COMMIT_HASH ?? "No commit hash",
@@ -76,25 +78,35 @@ export default function Home() {
 			if (stockList?.listId) {
 				const listDetailsResponse = await fetch(
 					`/api/list/${stockList.listId}`,
-				);
-				const listDetails = await listDetailsResponse.json();
-				const { list_name, listItems, styles } = listDetails;
-
-				const listBeerStyles = styles.items.map(
-					(styleList: StyleList) => styleList.type_id,
+					{ signal: controller.signal },
 				);
 
-				const stockListDetails: StockListDetails = {
+				if (!listDetailsResponse.ok) {
+					setStockListDetails(undefined);
+					return;
+				}
+
+				const { list_name, listItems, styleIds }: ListDetailsPayload =
+					await listDetailsResponse.json();
+
+				setStockListDetails({
 					listName: list_name,
 					listItems,
-					styles: listBeerStyles,
-				};
-
-				setStockListDetails(stockListDetails);
+					styles: styleIds,
+				});
+			} else {
+				setStockListDetails(undefined);
 			}
 		};
 
-		fetchListDetails();
+		const controller = new AbortController();
+		fetchListDetails().catch((error) => {
+			if (!controller.signal.aborted) {
+				console.error("Failed to load list details", error);
+			}
+		});
+
+		return () => controller.abort();
 	}, [stockList]);
 
 	const filteredStyles = stylesInfo.styles.filter((style) => {

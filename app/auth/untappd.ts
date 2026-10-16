@@ -1,36 +1,24 @@
-import { API_BASE_URL } from "~/routes/untappd/config";
+import { getUserBadges } from "~/untappd/api.server";
 
-const wosTypeId = 5115;
+// Badge id of "Wheel of Styles"
+const wosBadgeId = 5115;
+const pageSize = 50;
 
-const getUserSpecificWoSBadgeId = async (offset = 0, accessToken: string) => {
-	const searchParams = new URLSearchParams({
-		offset: String(offset),
-		access_token: accessToken,
-	});
-	const url = `${API_BASE_URL}/user/badges?${searchParams}`;
-	const response = await fetch(url);
+/** Pages through the user's badges to find their own Wheel of Styles badge instance */
+const getUserSpecificWoSBadgeId = async (
+	accessToken: string,
+): Promise<number | null> => {
+	for (let offset = 0; ; offset += pageSize) {
+		const { items } = await getUserBadges(accessToken, offset);
+		const userBadge = items.find((badge) => badge.badge_id === wosBadgeId);
 
-	if (!response.ok) {
-		console.error("Failed to get user badges", response);
-		return null;
-	}
-
-	const data = await response.json();
-	const badges = data.response.items;
-	const userBadge = badges.find(
-		(e: { badge_id: number; user_badge_id: number }) =>
-			e.badge_id === wosTypeId,
-	);
-
-	if (userBadge) {
-		return userBadge.user_badge_id;
-	} else {
-		if (badges.length === 0) {
-			console.error("Failed to user badge id");
-			return null;
+		if (userBadge) {
+			return userBadge.user_badge_id;
 		}
 
-		return getUserSpecificWoSBadgeId(offset + 50, accessToken);
+		if (items.length < pageSize) {
+			return null;
+		}
 	}
 };
 

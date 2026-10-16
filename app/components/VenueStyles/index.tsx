@@ -180,9 +180,16 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 			{venueDetails && (
 				<Box mt="lg">
 					<Tabs
+						// Remount per venue so the default tab follows the new menus
+						key={selectedVenue?.venue_id}
 						color="untappd"
 						mt="sm"
-						defaultValue={String(venueDetails[0].menu_id)}
+						defaultValue={String(
+							(
+								venueDetails.find((menu) => menu.total_item_count > 0) ??
+								venueDetails[0]
+							)?.menu_id,
+						)}
 					>
 						<Tabs.List>
 							{venueDetails.map((item) => {
