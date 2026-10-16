@@ -470,9 +470,12 @@ declare global {
 	// /custom_lists/view/{id}?styles=true
 	interface ListViewResponse {
 		list: UserLists;
-		items: BeerWithBrewery[];
+		/** Number of beers currently on the list */
+		total_count: number;
+		items: (BeerWithBrewery & {
+			beer: { on_list?: boolean; has_had?: boolean };
+		})[];
 		styles: { count?: number; items: StyleList[] };
-		pagination?: { next_url: string; offset?: number };
 	}
 
 	// Payload of the /api/list/:listId route

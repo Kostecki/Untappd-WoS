@@ -53,26 +53,33 @@ const getBadge = (accessToken: string, userBadgeId: number) =>
 const listPageSize = 25;
 const maxListPages = 20;
 
+// Lists that remove beers on check-in (like the wish list) keep returning
+// those beers with on_list: false
+const isOnList = (item: ListViewResponse["items"][number]) =>
+	item.beer.on_list !== false;
+
 /** A list with all of its items; the `styles` summary always covers the whole list */
 const getListView = async (accessToken: string, listId: string | number) => {
 	const firstPage = await untappd<ListViewResponse>(
 		`/custom_lists/view/${listId}`,
 		{ accessToken, params: { styles: true } },
 	);
-	const items = [...firstPage.items];
+	const items = firstPage.items.filter(isOnList);
+	let fetched = firstPage.items.length;
 
 	for (
 		let page = 1;
 		page < maxListPages &&
-		items.length === page * listPageSize &&
-		firstPage.pagination?.next_url;
+		fetched === page * listPageSize &&
+		items.length < firstPage.total_count;
 		page++
 	) {
 		const { items: pageItems } = await untappd<ListViewResponse>(
 			`/custom_lists/view/${listId}`,
 			{ accessToken, params: { offset: page * listPageSize } },
 		);
-		items.push(...pageItems);
+		fetched += pageItems.length;
+		items.push(...pageItems.filter(isOnList));
 	}
 
 	return { ...firstPage, items };
