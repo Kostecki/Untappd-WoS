@@ -28,7 +28,7 @@ interface InputProps {
 	prependVenues?: VenueDetails[];
 	optionSelectHandler: (
 		inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
-		barcode?: number,
+		barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => Promise<void>;

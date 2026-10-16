@@ -65,7 +65,7 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 
 	const handleVenueSelect = async (
 		inputDataList?: VenueDetails[] | BeerStringSearchResponse[],
-		_barcode?: number,
+		_barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => {

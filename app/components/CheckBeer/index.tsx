@@ -68,14 +68,14 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 
 	const fetchDetails = async (
 		inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
-		barcode?: number,
+		barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => {
 		setLoading(true);
 
 		if (barcode) {
-			const beerDetails = await apiFetch(`/api/barcode/${barcode}`);
+			const beerDetails = await apiFetch(`/api/barcode/${encodeURIComponent(barcode)}`);
 			const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
 
 			const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
