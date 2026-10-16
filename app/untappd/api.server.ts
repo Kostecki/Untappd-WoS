@@ -64,7 +64,7 @@ const searchBeers = (accessToken: string, query: string) =>
 	}).then((response) => response.beers.items);
 
 const getBeerInfo = (accessToken: string, beerId: string | number) =>
-	untappd<{ beer: Beer & { stats: Stats; brewery: Brewery } }>(
+	untappd<{ beer: BeerInfo & { brewery: Brewery } }>(
 		`/beer/info/${beerId}`,
 		{
 			accessToken,

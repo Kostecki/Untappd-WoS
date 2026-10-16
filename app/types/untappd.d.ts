@@ -112,15 +112,38 @@ declare global {
 
 	interface BarcodeAPIResponse extends BeerWithBrewery {}
 
-	interface BeerInfoResponse extends BeerWithBrewery {
-		beer: Beer & { stats: Stats };
+	// /beer/info/{bid}?compact=enhanced (subset)
+	interface BeerInfo extends Beer {
+		stats: Stats;
+		auth_rating: number;
+		wish_list: boolean;
+		parent_style_id: number;
+		parent_style_name: string;
+		is_non_alcoholic: boolean;
+		friends_ratings: { rating_score: number; rating_count: number };
 	}
 
+	interface BeerInfoResponse extends BeerWithBrewery {
+		beer: BeerInfo;
+	}
+
+	// Item from /search/beer: lighter beer object than /beer/info
 	interface BeerStringSearchResponse {
 		checkin_count: number;
 		have_had: boolean;
 		your_count: number;
-		beer: Beer;
+		beer: Pick<
+			Beer,
+			| "bid"
+			| "beer_name"
+			| "beer_label"
+			| "beer_abv"
+			| "beer_ibu"
+			| "beer_slug"
+			| "beer_description"
+			| "beer_style"
+			| "created_at"
+		> & { in_production: number; is_non_alcoholic: boolean };
 		brewery: Brewery;
 	}
 
@@ -329,7 +352,19 @@ declare global {
 		badge_hint: string;
 	}
 
+	// /badges/view/{user_badge_id} (subset)
 	interface Badge {
+		user_badge_id: number;
+		badge_id: number;
+		badge_name: string;
+		badge_description: string;
+		badge_created_at: string;
+		is_level_badge: boolean;
+		media: {
+			badge_image_sm: string;
+			badge_image_md: string;
+			badge_image_lg: string;
+		};
 		badge_status: BadgeStatus;
 		special_status_list: BadgeSpecialStatusList;
 	}
@@ -347,15 +382,29 @@ declare global {
 	// User (subset of /user/info?compact=enhanced)
 	interface UntappdUser {
 		id: number;
-		uid?: number;
+		uid: number;
 		user_name: string;
 		first_name: string;
 		last_name: string;
 		user_avatar: string;
 		user_avatar_hd: string;
+		user_cover_photo: string;
 		untappd_url: string;
+		location: string;
+		bio: string;
 		is_private: number;
-		settings: { email_address: string };
+		is_supporter: number;
+		date_joined: string;
+		stats: {
+			total_badges: number;
+			total_friends: number;
+			total_checkins: number;
+			total_beers: number;
+			total_created_beers: number;
+			total_followings: number;
+			total_photos: number;
+		};
+		settings: { email_address: string; is_email_verified: number };
 	}
 
 	// Item from /user/badges
