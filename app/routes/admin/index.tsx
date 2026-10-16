@@ -31,7 +31,14 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Form, Link, useFetcher, useNavigation, useSubmit } from "react-router";
+import {
+	Form,
+	Link,
+	redirect,
+	useFetcher,
+	useNavigation,
+	useSubmit,
+} from "react-router";
 import { dataWithError, dataWithSuccess } from "remix-toast";
 
 import { requireAdmin } from "~/auth/user.server";
@@ -46,6 +53,7 @@ import {
 } from "~/temporary-venues/store.server";
 import { getBeerTypes } from "~/untappd/api.server";
 import { cached } from "~/untappd/cache.server";
+import { isInvalidToken } from "~/untappd/client.server";
 import type { Route } from "./+types/index";
 
 const maxUploadBytes = 2 * 1024 * 1024;
@@ -109,16 +117,30 @@ const importUpload = async (
 		styles.map((style) => [style.type_name.toLowerCase(), style.type_id]),
 	);
 
-	return importFile(file, styleIdsByName);
+	try {
+		return await importFile(file, styleIdsByName, accessToken);
+	} catch (error) {
+		if (isInvalidToken(error)) throw redirect("/logout");
+		throw error;
+	}
 };
 
-const summary = (menus: TemporaryVenueMenu[], unknownStyles: string[]) => {
+const summary = ({
+	menus,
+	unknownStyles,
+	lookedUp,
+}: {
+	menus: TemporaryVenueMenu[];
+	unknownStyles: string[];
+	lookedUp: number;
+}) => {
 	const beers = menus.reduce((sum, menu) => sum + menu.items.length, 0);
+	const fetched = lookedUp > 0 ? ` ${lookedUp} filled in from Untappd.` : "";
 	const unknown =
 		unknownStyles.length > 0
 			? ` ${unknownStyles.length} unknown style name(s).`
 			: "";
-	return `${beers} beers in ${menus.length} menu(s).${unknown}`;
+	return `${beers} beers in ${menus.length} menu(s).${fetched}${unknown}`;
 };
 
 export async function action({ request }: Route.ActionArgs) {
@@ -160,7 +182,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 		return dataWithSuccess<ActionData>(
 			null,
-			`Created "${name}": ${summary(result.menus, result.unknownStyles)}`,
+			`Created "${name}": ${summary(result)}`,
 		);
 	}
 
@@ -202,7 +224,7 @@ export async function action({ request }: Route.ActionArgs) {
 			});
 			return dataWithSuccess<ActionData>(
 				null,
-				`Replaced beers for "${venue.name}": ${summary(result.menus, result.unknownStyles)}`,
+				`Replaced beers for "${venue.name}": ${summary(result)}`,
 			);
 		}
 
@@ -233,11 +255,12 @@ const uploadHelp = (
 		<Anchor href="/admin/template.xlsx" size="sm" download>
 			template
 		</Anchor>
-		, or a CSV. One row per beer with a header row. Required: <Code>bid</Code>,{" "}
-		<Code>name</Code>, <Code>brewery</Code>, <Code>style</Code> (the Untappd
-		style name). Optional: <Code>menu</Code> (groups beers into menus),{" "}
-		<Code>abv</Code>, <Code>country</Code>, <Code>rating</Code>. For CSV, comma
-		or semicolon separated.
+		, or a CSV. One row per beer with a header row. Only <Code>bid</Code> (the
+		Untappd beer id) is required; <Code>name</Code>, <Code>brewery</Code>,{" "}
+		<Code>style</Code>, <Code>abv</Code>, <Code>country</Code> and{" "}
+		<Code>rating</Code> are filled in from Untappd when left empty.{" "}
+		<Code>menu</Code> groups beers into menus. For CSV, comma or semicolon
+		separated.
 	</Text>
 );
 

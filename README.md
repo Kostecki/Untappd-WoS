@@ -16,9 +16,10 @@ they're suggested as soon as the venue search is focused and listed at the top
 of every search, matching ones first.
 
 Uploads are an Excel file or a CSV with one beer per row and a header row.
-Required columns: `bid` (Untappd beer id), `name`, `brewery`, `style` (the
-Untappd style name). Optional: `menu` (groups beers into menus), `abv`,
-`country`, `rating`. The admin page has a template (`/admin/template.xlsx`)
+Only `bid` (the Untappd beer id) is required. `name`, `brewery`, `style`, `abv`,
+`country` and `rating` are looked up on Untappd when empty (values in the file
+win; at most 250 lookups per upload, cached in `DATA_DIR` for 30 days). `menu`
+groups beers into menus. The admin page has a template (`/admin/template.xlsx`)
 with a dropdown of all Untappd styles.
 
 Venues are stored as JSON files in `DATA_DIR` (`/app/data` in the Docker image,

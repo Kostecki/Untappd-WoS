@@ -124,6 +124,20 @@ const getBeerInfo = (accessToken: string, beerId: string | number) =>
 		params: { compact: "enhanced", include_checkins: false },
 	}).then((response) => response.beer);
 
+/** The basics of a beer (small response; no style id) */
+const getBeerSummary = (accessToken: string, beerId: number) =>
+	untappd<{ beer: Beer & { brewery: Brewery } }>(`/beer/info/${beerId}`, {
+		accessToken,
+		params: { compact: true },
+	}).then(({ beer }) => ({
+		name: beer.beer_name,
+		brewery: beer.brewery.brewery_name,
+		style: beer.beer_style,
+		abv: beer.beer_abv,
+		country: beer.brewery.country_name,
+		rating: beer.rating_score,
+	}));
+
 const checkBarcode = (accessToken: string, upc: string) =>
 	untappd<{ items: BarcodeAPIResponse[] }>("/beer/checkbarcodemultiple", {
 		accessToken,
@@ -198,6 +212,7 @@ export {
 	checkBarcode,
 	getBadge,
 	getBeerInfo,
+	getBeerSummary,
 	getBeerTypes,
 	getListView,
 	getStylesNotHad,

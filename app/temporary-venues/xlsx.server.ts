@@ -61,20 +61,36 @@ const columns: {
 		width: 12,
 		note: "Required. The Untappd beer id: the number at the end of the beer's Untappd link.",
 	},
-	{ key: "name", width: 32, note: "Required. Beer name." },
-	{ key: "brewery", width: 26, note: "Required. Brewery name." },
+	{
+		key: "name",
+		width: 32,
+		note: "Optional. Beer name; looked up on Untappd when empty.",
+	},
+	{
+		key: "brewery",
+		width: 26,
+		note: "Optional. Brewery name; looked up on Untappd when empty.",
+	},
 	{
 		key: "style",
 		width: 36,
-		note: "Required. Pick the Untappd style from the list.",
+		note: "Optional. Pick the Untappd style from the list; looked up on Untappd when empty.",
 	},
-	{ key: "abv", width: 8, note: "Optional. Alcohol %, e.g. 6.5" },
+	{
+		key: "abv",
+		width: 8,
+		note: "Optional. Alcohol %, e.g. 6.5; looked up on Untappd when empty.",
+	},
 	{
 		key: "country",
 		width: 14,
-		note: "Optional. Brewery country, as a name or 2-letter code.",
+		note: "Optional. Brewery country, as a name or 2-letter code; looked up on Untappd when empty.",
 	},
-	{ key: "rating", width: 8, note: "Optional. Untappd rating, e.g. 3.85" },
+	{
+		key: "rating",
+		width: 8,
+		note: "Optional. Untappd rating, e.g. 3.85; looked up on Untappd when empty.",
+	},
 ];
 
 /** An .xlsx to fill in: headers, notes and a dropdown of all Untappd styles */
@@ -131,8 +147,9 @@ const createTemplate = async (styleNames: string[]) => {
 	help.getColumn(1).width = 100;
 	[
 		"Fill in one beer per row on the Beers sheet, then upload the file on /admin.",
-		"Required: bid, name, brewery and style. Hover a column header for details.",
-		"The style column only accepts Untappd style names; pick them from the dropdown.",
+		"Only bid (the Untappd beer id) is required. Empty name, brewery, style, abv,",
+		"country and rating are filled in from Untappd. Hover a column header for details.",
+		"If you fill in style, pick it from the dropdown (Untappd style names only).",
 		"Keep the header row as it is. Extra columns are ignored.",
 		"",
 		"Example row: Yellow session | 6413361 | Fear the Feathers | Fermenterarna | IPA - New England / Hazy | 6.5 | Sweden | 3.93",
