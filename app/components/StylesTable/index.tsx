@@ -15,6 +15,7 @@ import { useViewportSize } from "@mantine/hooks";
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
+import { apiFetch } from "~/api.client";
 import { getLocationQuery } from "~/hooks/location";
 import { StyleBeers } from "./StyleBeers";
 
@@ -46,7 +47,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 			return cached;
 		}
 
-		const response = await fetch(
+		const response = await apiFetch(
 			`/api/style/${styleId}/beers${await getLocationQuery()}`,
 		);
 		const styleBeers: StyleBeersPayload = response.ok

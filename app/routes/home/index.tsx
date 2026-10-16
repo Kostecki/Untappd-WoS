@@ -2,6 +2,7 @@ import { Box, Container, Grid } from "@mantine/core";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useLoaderData } from "react-router";
 
+import { apiFetch } from "~/api.client";
 import { requireUser } from "~/auth/user.server";
 import { CheckBeer } from "~/components/CheckBeer";
 import { Profile } from "~/components/Profile";
@@ -72,7 +73,7 @@ export default function Home() {
 	useEffect(() => {
 		const fetchListDetails = async () => {
 			if (stockList?.listId) {
-				const listDetailsResponse = await fetch(
+				const listDetailsResponse = await apiFetch(
 					`/api/list/${stockList.listId}`,
 					{ signal: controller.signal },
 				);

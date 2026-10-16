@@ -1,6 +1,8 @@
+import { redirect } from "react-router";
+
 import { requireUser } from "~/auth/user.server";
 import { getVenueMenuSections, getVenueMenus } from "~/untappd/api.server";
-import { withFallback } from "~/untappd/client.server";
+import { isInvalidToken, withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/venue";
 
 const toSectionItem = (item: MenuSectionItem): SectionItem => {
@@ -84,6 +86,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		const sections = await getVenueMenuSections(user.accessToken, venueId);
 		return Response.json(toMenus(sections));
 	} catch (error) {
+		if (isInvalidToken(error)) {
+			throw redirect("/logout");
+		}
+
 		// Fall back to the legacy endpoint, which still works for now
 		console.error(error instanceof Error ? error.message : error);
 		const menus = await withFallback(

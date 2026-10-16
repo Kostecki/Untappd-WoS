@@ -10,6 +10,8 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 
+import { apiFetch } from "~/api.client";
+
 import { SearchSelect } from "../SearchSelect";
 import { VenueBeerCard } from "../VenueBeerCard";
 
@@ -46,7 +48,7 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 			}
 
 			try {
-				const response = await fetch("/api/mbcc/venues");
+				const response = await apiFetch("/api/mbcc/venues");
 				const data = (await response.json()) as MBCCVenueDetails[];
 				setMbccVenues(data);
 			} catch (error) {
@@ -92,8 +94,8 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 			haveHadStyleIds.push(0);
 
 			const venueDetails = isMBCCVenue(venue)
-				? await fetch("/api/mbcc/venue")
-				: await fetch(`/api/venue/${venue.venue_id}`);
+				? await apiFetch("/api/mbcc/venue")
+				: await apiFetch(`/api/venue/${venue.venue_id}`);
 			const venueDetailsData: (VenueMenuDetails | MBCCVenueMenuDetails)[] =
 				await venueDetails.json();
 

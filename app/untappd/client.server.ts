@@ -1,3 +1,5 @@
+import { redirect } from "react-router";
+
 import {
 	API_HOST,
 	APP_VERSION,
@@ -122,7 +124,15 @@ const untappd = async <T>(
 	return data.response;
 };
 
-/** Runs an API call and logs + returns `fallback` if it fails */
+/** Untappd answers 401 (invalid_token) when a token is expired or revoked */
+const isInvalidToken = (error: unknown) =>
+	error instanceof UntappdError && error.status === 401;
+
+/**
+ * Runs an API call and logs + returns `fallback` if it fails. An invalid
+ * token logs the user out instead, since nothing will work until they log
+ * in again.
+ */
 const withFallback = async <T>(
 	request: Promise<T>,
 	fallback: T,
@@ -130,10 +140,13 @@ const withFallback = async <T>(
 	try {
 		return await request;
 	} catch (error) {
+		if (isInvalidToken(error)) {
+			throw redirect("/logout");
+		}
 		console.error(error instanceof Error ? error.message : error);
 		return fallback;
 	}
 };
 
-export { UntappdError, untappd, withFallback };
+export { isInvalidToken, UntappdError, untappd, withFallback };
 export type { Query, RequestOptions };

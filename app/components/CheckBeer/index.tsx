@@ -15,6 +15,7 @@ import {
 import { IconBarcode, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 
+import { apiFetch } from "~/api.client";
 import countryToEmoji from "~/countries";
 import { Barcode } from "../BarcodeScanner";
 import { SearchSelect } from "../SearchSelect";
@@ -70,7 +71,7 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		setLoading(true);
 
 		if (barcode) {
-			const beerDetails = await fetch(`/api/barcode/${barcode}`);
+			const beerDetails = await apiFetch(`/api/barcode/${barcode}`);
 			const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
 
 			const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
@@ -85,7 +86,7 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 			if (beer) {
 				setSelectedBeer(beer);
 
-				const beerDetails = await fetch(`/api/beer/${beer.beer.bid}`);
+				const beerDetails = await apiFetch(`/api/beer/${beer.beer.bid}`);
 				const beerDetailsData: BeerInfoResponse[] = await beerDetails.json();
 
 				const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);

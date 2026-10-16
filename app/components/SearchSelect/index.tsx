@@ -15,6 +15,7 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 
+import { apiFetch } from "~/api.client";
 import countryToEmoji from "~/countries";
 import { useIsMobile } from "~/utils";
 
@@ -93,7 +94,7 @@ export const SearchSelect = ({
 		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const response = await fetch(
+				const response = await apiFetch(
 					`${apiURL}/${encodeURIComponent(query)}`,
 					{ signal: controller.signal },
 				);
