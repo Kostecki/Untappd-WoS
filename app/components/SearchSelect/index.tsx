@@ -1,4 +1,5 @@
 import {
+	Box,
 	CloseButton,
 	Combobox,
 	type ComboboxStore,
@@ -13,6 +14,7 @@ import {
 	useCombobox,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { IconConfettiFilled } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 import { apiFetch } from "~/api.client";
@@ -132,6 +134,16 @@ export const SearchSelect = ({
 		);
 	};
 
+	// Same yellow and size as the verified badge
+	const TemporaryVenueIcon = () => (
+		<IconConfettiFilled
+			size={16}
+			color="#FFCC00"
+			stroke={2}
+			style={{ flexShrink: 0 }}
+		/>
+	);
+
 	const TextComponents = ({
 		venue,
 	}: {
@@ -156,18 +168,23 @@ export const SearchSelect = ({
 						value={input.venue_id.toString()}
 						key={input.venue_id}
 					>
-						{/* Same layout as Untappd venues, minus the verified icon */}
-						<Flex
-							direction={mobile ? "column" : "row"}
-							justify="space-between"
-							w="100%"
-						>
-							<Text size="sm">{input.venue_name}</Text>
-							{input.venue_address && (
-								<Text size="sm" c="dimmed" fs="italic">
-									({input.venue_address})
-								</Text>
-							)}
+						{/* Same layout as Untappd venues, with a confetti icon */}
+						<Flex align="center">
+							<Box mr="xs" display="flex">
+								<TemporaryVenueIcon />
+							</Box>
+							<Flex
+								direction={mobile ? "column" : "row"}
+								justify="space-between"
+								w="100%"
+							>
+								<Text size="sm">{input.venue_name}</Text>
+								{input.venue_address && (
+									<Text size="sm" c="dimmed" fs="italic">
+										({input.venue_address})
+									</Text>
+								)}
+							</Flex>
 						</Flex>
 					</Combobox.Option>
 				);
@@ -268,7 +285,11 @@ export const SearchSelect = ({
 					onBlur={() => combobox.closeDropdown()}
 					leftSection={
 						leftSection &&
-						(selected ? (
+						(selected && "temporary" in selected && selected.temporary ? (
+							<Box mt="2px" display="flex">
+								<TemporaryVenueIcon />
+							</Box>
+						) : selected ? (
 							<Image
 								src={isVerified ? "verified.svg" : "unverified.svg"}
 								h={16}

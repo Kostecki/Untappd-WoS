@@ -8,7 +8,6 @@ import {
 	Stack,
 	Switch,
 	Text,
-	Tooltip,
 } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
 import { IconLogout, IconTool } from "@tabler/icons-react";
@@ -101,17 +100,15 @@ export const Profile = ({
 				</Group>
 				<Group>
 					{user.isAdmin && (
-						<Tooltip label="Temporary venues" withArrow>
-							<ActionIcon
-								component={Link}
-								variant="transparent"
-								aria-label="Admin"
-								color="dark"
-								to="/admin"
-							>
-								<IconTool stroke={1} />
-							</ActionIcon>
-						</Tooltip>
+						<ActionIcon
+							component={Link}
+							variant="transparent"
+							aria-label="Admin"
+							color="dark"
+							to="/admin"
+						>
+							<IconTool stroke={1} />
+						</ActionIcon>
 					)}
 					<SettingsModal
 						user={user}
