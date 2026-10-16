@@ -39,9 +39,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 
 	const { height: windowHeight } = useViewportSize();
 
-	const getStyleBeers = async (
-		styleId: number,
-	): Promise<StyleBeersPayload> => {
+	const getStyleBeers = async (styleId: number): Promise<StyleBeersPayload> => {
 		const cached = rowInfoCache.get(styleId);
 		if (cached) {
 			return cached;
@@ -109,7 +107,8 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 										<Stack gap={4}>
 											<Text size="xs">✓ Had this style</Text>
 											<Text size="xs">
-												– Not had, but a beer in this style is on your stock list
+												– Not had, but a beer in this style is on your stock
+												list
 											</Text>
 											<Text size="xs">☐ Not had yet</Text>
 										</Stack>
@@ -151,7 +150,11 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 										<Table.Td>
 											<Flex align="center">
 												{openRow === style.styleId ? (
-													<IconChevronDown size={20} color="gray" stroke={1.5} />
+													<IconChevronDown
+														size={20}
+														color="gray"
+														stroke={1.5}
+													/>
 												) : (
 													<IconChevronUp size={20} color="gray" stroke={1.5} />
 												)}
@@ -176,7 +179,6 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 												/>
 											</Flex>
 										</Table.Td>
-
 									</Table.Tr>
 									<Table.Tr style={{ border: "none" }}>
 										<Table.Td colSpan={2} p={0}>

@@ -1,5 +1,5 @@
-import { DEVICE_UDID } from "./config.server";
 import { untappd } from "./client.server";
+import { DEVICE_UDID } from "./config.server";
 
 // Endpoints and params mirror the official Android app 5.0.0, see docs/untappd-api.md
 
@@ -94,13 +94,10 @@ const searchBeers = (accessToken: string, query: string) =>
 	}).then((response) => response.beers.items);
 
 const getBeerInfo = (accessToken: string, beerId: string | number) =>
-	untappd<{ beer: BeerInfo & { brewery: Brewery } }>(
-		`/beer/info/${beerId}`,
-		{
-			accessToken,
-			params: { compact: "enhanced", include_checkins: false },
-		},
-	).then((response) => response.beer);
+	untappd<{ beer: BeerInfo & { brewery: Brewery } }>(`/beer/info/${beerId}`, {
+		accessToken,
+		params: { compact: "enhanced", include_checkins: false },
+	}).then((response) => response.beer);
 
 const checkBarcode = (accessToken: string, upc: string) =>
 	untappd<{ items: BarcodeAPIResponse[] }>("/beer/checkbarcodemultiple", {

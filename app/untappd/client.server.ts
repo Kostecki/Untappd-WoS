@@ -148,5 +148,5 @@ const withFallback = async <T>(
 	}
 };
 
-export { isInvalidToken, UntappdError, untappd, withFallback };
 export type { Query, RequestOptions };
+export { isInvalidToken, UntappdError, untappd, withFallback };

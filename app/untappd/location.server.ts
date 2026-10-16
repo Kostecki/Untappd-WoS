@@ -17,8 +17,7 @@ const getLocationParams = (request: Request) => {
 
 	return {
 		...(hasLocation ? { lat, lng } : fallbackLocation),
-		radius:
-			radius > 0 && radius <= maxRadiusKm ? radius : defaultRadiusKm,
+		radius: radius > 0 && radius <= maxRadiusKm ? radius : defaultRadiusKm,
 	};
 };
 

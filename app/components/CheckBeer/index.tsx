@@ -75,7 +75,9 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		setLoading(true);
 
 		if (barcode) {
-			const beerDetails = await apiFetch(`/api/barcode/${encodeURIComponent(barcode)}`);
+			const beerDetails = await apiFetch(
+				`/api/barcode/${encodeURIComponent(barcode)}`,
+			);
 			const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
 
 			const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);

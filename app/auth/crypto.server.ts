@@ -1,4 +1,9 @@
-import { createCipheriv, createDecipheriv, hkdfSync, randomBytes } from "node:crypto";
+import {
+	createCipheriv,
+	createDecipheriv,
+	hkdfSync,
+	randomBytes,
+} from "node:crypto";
 import invariant from "tiny-invariant";
 
 const SESSION_SECRET = process.env.SESSION_SECRET;

@@ -1,4 +1,5 @@
 html,
 body {
-  background: #fbfbfb !important;
+	/* biome-ignore lint/complexity/noImportantStyles: overrides Mantine's body background */
+	background: #fbfbfb !important;
 }

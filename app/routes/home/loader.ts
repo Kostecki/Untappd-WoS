@@ -1,9 +1,9 @@
 import type { SessionUser } from "~/auth/auth.server";
 import {
-	getBadge,
-	getListView,
 	getStylesNotHad as fetchStylesNotHad,
 	getUserLists as fetchUserLists,
+	getBadge,
+	getListView,
 } from "~/untappd/api.server";
 import { cached } from "~/untappd/cache.server";
 import { withFallback } from "~/untappd/client.server";
@@ -13,8 +13,11 @@ const checkInsPerLevel = 5;
 // Reloads within this window reuse the previous Untappd responses
 const cacheTtlMs = 60 * 1000;
 
-const cachedForUser = <T>(user: SessionUser, key: string, load: () => Promise<T>) =>
-	cached(`${user.id}:${key}`, cacheTtlMs, load);
+const cachedForUser = <T>(
+	user: SessionUser,
+	key: string,
+	load: () => Promise<T>,
+) => cached(`${user.id}:${key}`, cacheTtlMs, load);
 
 type StyleEntry = StylesInfo["styles"][number];
 
