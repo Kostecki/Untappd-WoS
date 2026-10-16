@@ -1,22 +1,33 @@
-import { redirect } from "react-router";
+import { redirect, type Session } from "react-router";
 import type { SessionUser } from "./auth.server";
+import { decrypt, encrypt } from "./crypto.server";
 import { getSession } from "./session.server";
 
-export const userSessionGet = async (
-	request: Request,
-): Promise<SessionUser> => {
-	const session = await getSession(request.headers.get("cookie"));
-	const user = session.get("user");
+// The user (incl. the Untappd access token) is stored encrypted, not just
+// signed, so the cookie value can't be read if it leaks
+const sessionKey = "user";
 
-	return user;
+const setSessionUser = (session: Session, user: SessionUser) => {
+	session.set(sessionKey, encrypt(user));
 };
 
-export const userRequire = async (request: Request) => {
-	const user = await userSessionGet(request);
+/** The logged in user, or null (also for sessions from before encryption) */
+const getSessionUser = async (
+	request: Request,
+): Promise<SessionUser | null> => {
+	const session = await getSession(request.headers.get("cookie"));
+	return decrypt<SessionUser>(session.get(sessionKey));
+};
+
+/** The logged in user; redirects to the login page otherwise */
+const requireUser = async (request: Request): Promise<SessionUser> => {
+	const user = await getSessionUser(request);
 
 	if (!user) {
 		throw redirect("/login");
 	}
 
-	return null;
+	return user;
 };
+
+export { getSessionUser, requireUser, setSessionUser };

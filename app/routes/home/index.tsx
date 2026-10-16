@@ -1,8 +1,8 @@
 import { Box, Container, Grid } from "@mantine/core";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { redirect, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
 import { CheckBeer } from "~/components/CheckBeer";
 import { Profile } from "~/components/Profile";
 import { StylesTable } from "~/components/StylesTable";
@@ -17,11 +17,7 @@ export function meta(_: Route.MetaArgs) {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
-
-	if (!user) {
-		throw redirect("/login");
-	}
+	const user = await requireUser(request);
 
 	const [stylesInfo, userLists] = await Promise.all([
 		getStylesInfo(user),

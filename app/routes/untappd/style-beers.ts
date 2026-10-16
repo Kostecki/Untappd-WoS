@@ -1,4 +1,4 @@
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
 import { getTopRatedBeers, getTrendingBeers } from "~/untappd/api.server";
 import { withFallback } from "~/untappd/client.server";
 import { isEuropean } from "~/untappd/europe.server";
@@ -8,7 +8,7 @@ import type { Route } from "./+types/style-beers";
 const topRatedLimit = 15;
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
+	const user = await requireUser(request);
 	const { styleId } = params;
 
 	const [topRated, trending] = await Promise.all([

@@ -2,7 +2,7 @@ import { type LoaderFunction, type MetaFunction, redirect } from "react-router";
 import { dataWithError } from "remix-toast";
 import { authenticator } from "~/auth/auth.server";
 import { commitSession, getSession } from "~/auth/session.server";
-import { userSessionGet } from "~/auth/user.server";
+import { getSessionUser, setSessionUser } from "~/auth/user.server";
 import Login from "~/components/Auth/login";
 import type { Route } from "./+types/login";
 
@@ -11,7 +11,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-	const user = await userSessionGet(request);
+	const user = await getSessionUser(request);
 	if (user) {
 		throw redirect("/");
 	}
@@ -22,7 +22,7 @@ export async function action({ request }: Route.ActionArgs) {
 		const user = await authenticator.authenticate("form", request);
 
 		const session = await getSession(request.headers.get("cookie"));
-		session.set("user", user);
+		setSessionUser(session, user);
 
 		throw redirect("/", {
 			headers: { "Set-Cookie": await commitSession(session) },

@@ -1,4 +1,4 @@
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
 import { searchVenues } from "~/untappd/api.server";
 import { withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/venues";
@@ -6,7 +6,7 @@ import type { Route } from "./+types/venues";
 const preferredCountry = "Danmark";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
+	const user = await requireUser(request);
 	const items = await withFallback(
 		searchVenues(user.accessToken, params.searchQuery),
 		[],

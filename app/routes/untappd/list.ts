@@ -1,10 +1,10 @@
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
 import { getListView } from "~/untappd/api.server";
 import { withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/list";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
+	const user = await requireUser(request);
 	const list = await withFallback(
 		getListView(user.accessToken, params.listId),
 		null,
