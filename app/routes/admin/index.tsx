@@ -355,7 +355,7 @@ const VenueRow = ({
 						</Group>
 					</fetcher.Form>
 				</Table.Td>
-				<Table.Td>
+				<Table.Td style={{ verticalAlign: "middle" }}>
 					{/* Picked from the menu below; submits as soon as a file is chosen */}
 					<Form method="post" encType="multipart/form-data" ref={replaceForm}>
 						<input type="hidden" name="intent" value="replace" />
@@ -368,39 +368,41 @@ const VenueRow = ({
 							onChange={() => replaceForm.current?.requestSubmit()}
 						/>
 					</Form>
-					<Menu position="bottom-end" withArrow>
-						<Menu.Target>
-							<ActionIcon variant="subtle" color="gray" aria-label="Actions">
-								<IconDots size={18} stroke={1.5} />
-							</ActionIcon>
-						</Menu.Target>
-						<Menu.Dropdown>
-							<Menu.Item
-								leftSection={<IconUpload size={14} />}
-								onClick={() =>
-									replaceForm.current
-										?.querySelector<HTMLInputElement>("input[type=file]")
-										?.click()
-								}
-							>
-								Replace beers
-							</Menu.Item>
-							<Menu.Item
-								color="red"
-								leftSection={<IconTrash size={14} />}
-								onClick={() => {
-									if (confirm(`Delete "${venue.name}"?`)) {
-										fetcher.submit(
-											{ intent: "delete", id: venue.id },
-											{ method: "post" },
-										);
+					<Group justify="center">
+						<Menu position="bottom-end" withArrow>
+							<Menu.Target>
+								<ActionIcon variant="subtle" color="gray" aria-label="Actions">
+									<IconDots size={18} stroke={1.5} />
+								</ActionIcon>
+							</Menu.Target>
+							<Menu.Dropdown>
+								<Menu.Item
+									leftSection={<IconUpload size={14} />}
+									onClick={() =>
+										replaceForm.current
+											?.querySelector<HTMLInputElement>("input[type=file]")
+											?.click()
 									}
-								}}
-							>
-								Delete
-							</Menu.Item>
-						</Menu.Dropdown>
-					</Menu>
+								>
+									Replace beers
+								</Menu.Item>
+								<Menu.Item
+									color="red"
+									leftSection={<IconTrash size={14} />}
+									onClick={() => {
+										if (confirm(`Delete "${venue.name}"?`)) {
+											fetcher.submit(
+												{ intent: "delete", id: venue.id },
+												{ method: "post" },
+											);
+										}
+									}}
+								>
+									Delete
+								</Menu.Item>
+							</Menu.Dropdown>
+						</Menu>
+					</Group>
 				</Table.Td>
 			</Table.Tr>
 			{showBeers && (
