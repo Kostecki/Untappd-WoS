@@ -276,22 +276,21 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 											</Grid.Col>
 										</Grid>
 										<Divider my="xs" opacity={0.5} />
-										<Group>
-											<HaveHadStatus beer={beer} />
-											<Divider orientation="vertical" />
-											<Text ta="center" size="sm" c="dimmed">
-												Had beer: {hadBeer()}
-											</Text>
+										<Group justify="space-between">
+											<Group>
+												<HaveHadStatus beer={beer} />
+												<Divider orientation="vertical" />
+												<Text ta="center" size="sm" c="dimmed">
+													Had beer: {hadBeer()}
+												</Text>
+											</Group>
 											{onLists && (
-												<>
-													<Divider orientation="vertical" />
-													<Text size="sm" c="dimmed">
-														On list:{" "}
-														<Text fs="italic" component="span">
-															{onLists}
-														</Text>
+												<Text size="sm" c="dimmed">
+													On list:{" "}
+													<Text fs="italic" component="span">
+														{onLists}
 													</Text>
-												</>
+												</Text>
 											)}
 										</Group>
 									</Card>
