@@ -21,7 +21,7 @@ import {
 import { Fragment, useState } from "react";
 
 import { getLocationQuery } from "~/hooks/location";
-import { NearbyStyleBeers } from "./NearbyStyleBeers";
+import { StyleBeers } from "./StyleBeers";
 
 import "./style.css";
 
@@ -30,37 +30,36 @@ interface InputProps {
 	stockListDetails: StockListDetails | undefined;
 }
 
-const rowInfoCache = new Map<number, RelatedBeersResponse[]>();
+const rowInfoCache = new Map<number, StyleBeersPayload>();
 
 export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [openRow, setOpenRow] = useState<number | undefined>(undefined);
-	const [relatedBeers, setRelatedBeers] = useState<RelatedBeersResponse[]>([]);
+	const [styleBeers, setStyleBeers] = useState<StyleBeersPayload>({
+		topRated: [],
+		nearby: [],
+	});
 
 	const { height: windowHeight } = useViewportSize();
 
-	const getRelatedBeers = async (styleId: number) => {
-		if (rowInfoCache.has(styleId)) {
-			return rowInfoCache.get(styleId) || [];
+	const getStyleBeers = async (
+		styleId: number,
+	): Promise<StyleBeersPayload> => {
+		const cached = rowInfoCache.get(styleId);
+		if (cached) {
+			return cached;
 		}
 
 		const response = await fetch(
-			`/api/related/${styleId}${await getLocationQuery()}`,
+			`/api/style/${styleId}/beers${await getLocationQuery()}`,
 		);
-		const items: RelatedBeersResponse[] = response.ok
+		const styleBeers: StyleBeersPayload = response.ok
 			? await response.json()
-			: [];
-		// The same beer is often checked in at several venues; keep the nearest
-		const relatedBeers = [...items]
-			.sort((a, b) => a.distance - b.distance)
-			.filter(
-				(item, index, all) =>
-					all.findIndex((other) => other.beer.bid === item.beer.bid) === index,
-			);
-		rowInfoCache.set(styleId, relatedBeers);
+			: { topRated: [], nearby: [] };
+		rowInfoCache.set(styleId, styleBeers);
 
-		return relatedBeers;
+		return styleBeers;
 	};
 
 	const toggleRow = async (styleId: number) => {
@@ -70,9 +69,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 			setLoading(true);
 			setOpenRow(styleId);
 
-			const relatedBeers = await getRelatedBeers(styleId);
-
-			setRelatedBeers(relatedBeers);
+			setStyleBeers(await getStyleBeers(styleId));
 			setLoading(false);
 		}
 	};
@@ -196,7 +193,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 													<Loader color="untappd" my="lg" />
 												</Flex>
 											) : (
-												<NearbyStyleBeers items={relatedBeers} />
+												<StyleBeers {...styleBeers} />
 											)}
 										</Collapse>
 									</Table.Td>

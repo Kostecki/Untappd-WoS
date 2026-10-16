@@ -10,7 +10,7 @@ import {
 	Switch,
 	Text,
 } from "@mantine/core";
-import { IconMapPin } from "@tabler/icons-react";
+import { IconMapPin, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 
 import countryToEmoji from "~/countries";
@@ -77,11 +77,15 @@ const Places = ({
 	);
 };
 
-const NearbyBeer = ({
+// Search engines find web shops better than Untappd does
+const getOnlineSearchURL = (beerName: string, breweryName: string) =>
+	`https://www.google.com/search?${new URLSearchParams({ q: `"${beerName}" ${breweryName} buy` })}`;
+
+const StyleBeer = ({
 	item,
 	shopsOnly,
 }: {
-	item: RelatedBeersResponse;
+	item: TopRatedBeer | RelatedBeersResponse;
 	shopsOnly: boolean;
 }) => {
 	const [places, setPlaces] = useState<BeerFindPlace[] | undefined>(
@@ -91,10 +95,10 @@ const NearbyBeer = ({
 	const [loading, setLoading] = useState(false);
 
 	const {
-		beer: { bid, beer_name, beer_slug },
+		beer: { bid, beer_name, beer_slug, rating_score },
 		brewery: { brewery_name, country_name },
-		venue,
 	} = item;
+	const seenNearby = "venue" in item ? item : undefined;
 
 	const toggle = async () => {
 		setOpen((value) => !value);
@@ -128,22 +132,42 @@ const NearbyBeer = ({
 					<Text size="sm" c="dimmed">
 						{brewery_name}, {country_name} {countryToEmoji(country_name)}
 					</Text>
-					{venue && (
+					{seenNearby ? (
 						<Text size="xs" c="dimmed">
-							Seen at {venue.venue_name} · {formatDistance(item.distance)} ·{" "}
-							{formatAgo(item.recent_created_at)}
+							{seenNearby.venue
+								? `Seen at ${seenNearby.venue.venue_name}`
+								: "Checked in"}{" "}
+							· {formatDistance(seenNearby.distance)} ·{" "}
+							{formatAgo(seenNearby.recent_created_at)}
+						</Text>
+					) : (
+						<Text size="xs" c="dimmed">
+							Rated {rating_score.toFixed(2)}
 						</Text>
 					)}
 				</Stack>
-				<Button
-					size="compact-xs"
-					variant="subtle"
-					color="gray"
-					leftSection={<IconMapPin size={14} />}
-					onClick={toggle}
-				>
-					Where to find
-				</Button>
+				<Stack gap={2} align="flex-end">
+					<Button
+						component="a"
+						href={getOnlineSearchURL(beer_name, brewery_name)}
+						target="_blank"
+						size="compact-xs"
+						variant="subtle"
+						color="gray"
+						leftSection={<IconSearch size={14} />}
+					>
+						Search online
+					</Button>
+					<Button
+						size="compact-xs"
+						variant="subtle"
+						color="gray"
+						leftSection={<IconMapPin size={14} />}
+						onClick={toggle}
+					>
+						Where to find
+					</Button>
+				</Stack>
 			</Flex>
 
 			<Collapse expanded={open}>
@@ -157,27 +181,20 @@ const NearbyBeer = ({
 	);
 };
 
-export const NearbyStyleBeers = ({
-	items,
-}: {
-	items: RelatedBeersResponse[];
-}) => {
+export const StyleBeers = ({ topRated, nearby }: StyleBeersPayload) => {
 	const [shopsOnly, setShopsOnly] = useState(false);
 
-	if (items.length === 0) {
+	if (topRated.length === 0 && nearby.length === 0) {
 		return (
 			<Text size="sm" c="dimmed" fs="italic" ta="center" my="lg">
-				No beers in this style checked in nearby lately
+				No beers found in this style
 			</Text>
 		);
 	}
 
 	return (
 		<Stack gap={0} my="sm">
-			<Group justify="space-between" px="sm" mb="xs">
-				<Text size="xs" c="dimmed">
-					Checked in near you recently
-				</Text>
+			<Group justify="flex-end" px="sm">
 				<Switch
 					size="xs"
 					color="untappd"
@@ -186,9 +203,28 @@ export const NearbyStyleBeers = ({
 					onChange={(event) => setShopsOnly(event.currentTarget.checked)}
 				/>
 			</Group>
-			{items.map((item) => (
-				<NearbyBeer key={item.beer.bid} item={item} shopsOnly={shopsOnly} />
-			))}
+
+			{topRated.length > 0 && (
+				<>
+					<Text size="xs" c="dimmed" fw="500" px="sm" mt="xs">
+						Top rated, still brewed
+					</Text>
+					{topRated.map((item) => (
+						<StyleBeer key={item.beer.bid} item={item} shopsOnly={shopsOnly} />
+					))}
+				</>
+			)}
+
+			{nearby.length > 0 && (
+				<>
+					<Text size="xs" c="dimmed" fw="500" px="sm" mt="md">
+						Seen near you
+					</Text>
+					{nearby.map((item) => (
+						<StyleBeer key={item.beer.bid} item={item} shopsOnly={shopsOnly} />
+					))}
+				</>
+			)}
 		</Stack>
 	);
 };

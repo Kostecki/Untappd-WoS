@@ -406,6 +406,19 @@ declare global {
 		your_count: number;
 	}
 
+	// Item from /beer/top_rated
+	interface TopRatedBeer {
+		has_had: boolean;
+		beer: Beer;
+		brewery: Brewery;
+	}
+
+	// Payload of /api/style/:styleId/beers
+	interface StyleBeersPayload {
+		topRated: TopRatedBeer[];
+		nearby: RelatedBeersResponse[];
+	}
+
 	// /beer/find/{bid}
 	interface BeerFindResponse {
 		verified: {

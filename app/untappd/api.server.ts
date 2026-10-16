@@ -103,6 +103,13 @@ const getTrendingBeers = (
 		},
 	}).then((response) => response.items);
 
+/** Top rated beers of a style worldwide, only those still in production */
+const getTopRatedBeers = (accessToken: string, typeId: number | string) =>
+	untappd<{ beers: { items: TopRatedBeer[] } }>("/beer/top_rated", {
+		accessToken,
+		params: { type_id: typeId, in_production: 1 },
+	}).then((response) => response.beers.items);
+
 /**
  * Where a beer can be found nearby: `verified` = on a verified venue's menu,
  * `unverified` = recently checked in at a venue
@@ -156,6 +163,7 @@ export {
 	getBeerInfo,
 	getListView,
 	getStylesNotHad,
+	getTopRatedBeers,
 	getTrendingBeers,
 	getUserBadges,
 	getUserInfo,
