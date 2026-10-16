@@ -16,17 +16,22 @@ const normalize = (text: string) =>
 		.replace(/æ/gi, "ae")
 		.toLowerCase();
 
-/** Active temporary venues whose name or location contains every search word */
+/**
+ * All active temporary venues, so they're always at hand while they run;
+ * those whose name or location matches every search word come first
+ */
 const findTemporaryVenues = async (query: string) => {
 	const words = normalize(query).split(/\s+/).filter(Boolean);
-	const venues = await listVisibleTemporaryVenues();
+	const matches = (venue: TemporaryVenue) => {
+		const haystack = normalize(`${venue.name} ${venue.location ?? ""}`);
+		return words.every((word) => haystack.includes(word));
+	};
 
-	return venues
-		.filter((venue) => {
-			const haystack = normalize(`${venue.name} ${venue.location ?? ""}`);
-			return words.every((word) => haystack.includes(word));
-		})
-		.map(toVenueDetails);
+	const venues = await listVisibleTemporaryVenues();
+	return [
+		...venues.filter(matches),
+		...venues.filter((venue) => !matches(venue)),
+	].map(toVenueDetails);
 };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
