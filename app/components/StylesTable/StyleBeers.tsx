@@ -15,7 +15,7 @@ const formatAgo = (date: string) => {
 
 const StyleBeer = ({ item }: { item: TopRatedBeer | RelatedBeersResponse }) => {
 	const {
-		beer: { bid, beer_name, beer_slug, rating_score },
+		beer: { bid, beer_name, beer_slug },
 		brewery: { brewery_name, country_name },
 	} = item;
 	const seenNearby = "venue" in item ? item : undefined;
@@ -33,17 +33,15 @@ const StyleBeer = ({ item }: { item: TopRatedBeer | RelatedBeersResponse }) => {
 				<Text size="sm" c="dimmed">
 					{brewery_name}, {country_name} {countryToEmoji(country_name)}
 				</Text>
-				<Text size="xs" c="dimmed">
-					{seenNearby
-						? `${
-								seenNearby.venue
-									? `Seen at ${seenNearby.venue.venue_name}`
-									: "Checked in"
-							} · ${formatDistance(seenNearby.distance)} · ${formatAgo(
-								seenNearby.recent_created_at,
-							)}`
-						: `Rated ${rating_score.toFixed(2)}`}
-				</Text>
+				{seenNearby && (
+					<Text size="xs" c="dimmed">
+						{seenNearby.venue
+							? `Seen at ${seenNearby.venue.venue_name}`
+							: "Checked in"}{" "}
+						· {formatDistance(seenNearby.distance)} ·{" "}
+						{formatAgo(seenNearby.recent_created_at)}
+					</Text>
+				)}
 			</Stack>
 		</Anchor>
 	);
@@ -60,16 +58,9 @@ export const StyleBeers = ({ topRated, nearby }: StyleBeersPayload) => {
 
 	return (
 		<Stack gap={0} my="sm">
-			{topRated.length > 0 && (
-				<>
-					<Text size="xs" c="dimmed" fw="500" px="sm">
-						Top rated, still brewed (European breweries first)
-					</Text>
-					{topRated.map((item) => (
-						<StyleBeer key={item.beer.bid} item={item} />
-					))}
-				</>
-			)}
+			{topRated.map((item) => (
+				<StyleBeer key={item.beer.bid} item={item} />
+			))}
 
 			{nearby.length > 0 && (
 				<>
