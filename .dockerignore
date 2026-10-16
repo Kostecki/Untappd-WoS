@@ -4,3 +4,14 @@ README.md
 todo.md
 node_modules
 .pnpm-store
+
+# Secrets and local-only files (CI builds from a clean checkout, but keep
+# local `docker build` from baking these into the image)
+.env
+.env.*
+.git
+.DS_Store
+docs
+*.xapk
+*.apk
+mbcc-*.json
