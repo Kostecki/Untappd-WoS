@@ -274,7 +274,7 @@ const VenueRow = ({
 		<>
 			<Table.Tr>
 				<Table.Td>
-					<Group gap="xs" wrap="nowrap" align="center">
+					<Group gap="md" wrap="nowrap" align="center">
 						<ActionIcon
 							variant="subtle"
 							color="gray"
