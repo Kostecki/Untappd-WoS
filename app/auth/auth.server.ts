@@ -32,7 +32,7 @@ authenticator.use(
 		const formUsername = String(form.get("username"));
 		const formPassword = String(form.get("password"));
 
-		let session: { access_token: string; username: string };
+		let session: Awaited<ReturnType<typeof login>>;
 		try {
 			session = await login(formUsername, formPassword);
 		} catch (error) {
@@ -40,6 +40,11 @@ authenticator.use(
 				throw new Error("INVALID_PASSWORD");
 			}
 			throw error;
+		}
+
+		if (!session.access_token) {
+			// The credentials match several accounts; we have no account picker
+			throw new Error("MULTIPLE_ACCOUNTS");
 		}
 		const { access_token, username } = session;
 

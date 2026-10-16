@@ -34,6 +34,11 @@ export async function action({ request }: Route.ActionArgs) {
 
 			if (errorMessage === "INVALID_PASSWORD") {
 				return dataWithError(null, "Invalid username or password.");
+			} else if (errorMessage === "MULTIPLE_ACCOUNTS") {
+				return dataWithError(
+					null,
+					"This email is linked to several Untappd accounts. Log in with your username instead.",
+				);
 			} else {
 				return dataWithError(
 					"Error",

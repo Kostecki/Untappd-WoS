@@ -5,6 +5,9 @@ import {
 	APP_VERSION,
 	CLIENT_ID,
 	CLIENT_SECRET,
+	LANGUAGE,
+	USER_AGENT,
+	UTV,
 } from "./config.server";
 
 type QueryValue = string | number | boolean | null | undefined;
@@ -68,12 +71,16 @@ const untappd = async <T>(
 	appendQuery(url.searchParams, {
 		client_id: CLIENT_ID,
 		client_secret: CLIENT_SECRET,
-		utv: APP_VERSION,
+		utv: UTV,
 		...params,
 	});
 
 	const headers: Record<string, string> = {
 		Accept: "application/json; charset=utf-8",
+		"Accept-Encoding": "gzip, deflate",
+		"Accept-Language": LANGUAGE,
+		"User-Agent": USER_AGENT,
+		"X-React-Native": "1",
 		"X-Untappd-App": "android",
 		"X-Untappd-App-Version": APP_VERSION,
 	};

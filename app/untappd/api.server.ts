@@ -1,17 +1,32 @@
 import { untappd } from "./client.server";
-import { DEVICE_UDID } from "./config.server";
+import { APP_VERSION, DEVICE, getDeviceUdid } from "./config.server";
 
 // Endpoints and params mirror the official Android app 5.0.0, see docs/untappd-api.md
 
 // Auth
 
+/**
+ * With multi_account, credentials matching several accounts (e.g. a shared
+ * email) return `multiple_users` instead of a token; the app then shows an
+ * account picker
+ */
+type LoginResponse =
+	| { access_token: string; username: string; multiple_users?: undefined }
+	| { access_token?: undefined; multiple_users: unknown };
+
 const login = (userName: string, password: string) =>
-	untappd<{ access_token: string; username: string }>("/xauth", {
+	untappd<LoginResponse>("/xauth", {
 		method: "POST",
+		// Same fields as the app's login screen
 		body: {
 			user_name: userName,
 			user_password: password,
-			device_udid: DEVICE_UDID,
+			device_udid: getDeviceUdid(userName),
+			device_name: DEVICE.name,
+			device_version: DEVICE.systemVersion,
+			device_platform: DEVICE.systemName,
+			app_version: APP_VERSION,
+			multi_account: true,
 		},
 	});
 
