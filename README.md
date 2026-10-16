@@ -21,10 +21,10 @@ Untappd style name). Optional: `menu` (groups beers into menus), `abv`,
 `country`, `rating`. The admin page has a template (`/admin/template.xlsx`)
 with a dropdown of all Untappd styles.
 
-Venues are stored as JSON files in `DATA_DIR` (default `./data`). Mount it as a
-volume in production so they survive redeploys, e.g.
-`-v wos-data:/app/data`, and make sure it's writable by the container user
-(uid 1001).
+Venues are stored as JSON files in `DATA_DIR` (`/app/data` in the Docker image,
+`./data` otherwise). Mount a volume there so they survive redeploys. A named
+volume (`wos-data:/app/data`) gets the right owner automatically; a bind mount
+must be writable by the container user (uid 1001).
 
 ### MBCC
 

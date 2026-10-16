@@ -18,6 +18,11 @@ RUN pnpm install --frozen-lockfile --prod
 
 COPY . /app
 
+# Temporary venues are stored here; mount a volume on it (see README). It must
+# exist in the image so a named volume inherits the wos user's ownership.
+ENV DATA_DIR=/app/data
+RUN mkdir -p /app/data
+
 RUN addgroup --system --gid 1001 wos
 RUN adduser --system --uid 1001 wos
 RUN chown -R wos:wos /app
