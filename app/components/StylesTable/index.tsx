@@ -9,9 +9,14 @@ import {
 	Table,
 	Text,
 	TextInput,
+	Tooltip,
 } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+import {
+	IconChevronDown,
+	IconChevronUp,
+	IconInfoCircle,
+} from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
 import { getLocationQuery } from "~/hooks/location";
@@ -99,7 +104,26 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 						<Table.Tr>
 							<Table.Th>{`Styles (${filteredStyles.length})`}</Table.Th>
 							<Table.Th ta="center" w={1} style={{ whiteSpace: "nowrap" }}>
-								Have Had
+								<Tooltip
+									multiline
+									w={220}
+									withArrow
+									label={
+										<Stack gap={4}>
+											<Text size="xs">✓ Had this style</Text>
+											<Text size="xs">
+												– Not had, but a beer in this style is on your stock
+												list
+											</Text>
+											<Text size="xs">☐ Not had yet</Text>
+										</Stack>
+									}
+								>
+									<Flex align="center" justify="center" gap={4}>
+										Have Had
+										<IconInfoCircle size={14} color="gray" stroke={1.5} />
+									</Flex>
+								</Tooltip>
 							</Table.Th>
 						</Table.Tr>
 					</Table.Thead>
@@ -151,7 +175,8 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 												<Checkbox
 													color="untappd"
 													checked={style.had}
-													indeterminate={haveStyleInStock}
+													// Dash only for styles not had yet; a had style stays ticked
+													indeterminate={!style.had && haveStyleInStock}
 													readOnly
 												/>
 											</Flex>
