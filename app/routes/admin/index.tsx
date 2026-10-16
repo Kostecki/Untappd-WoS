@@ -1,7 +1,6 @@
 import {
 	ActionIcon,
 	Anchor,
-	Badge,
 	Button,
 	Card,
 	Code,
@@ -242,14 +241,6 @@ const uploadHelp = (
 	</Text>
 );
 
-const statusBadge = (
-	venue: Route.ComponentProps["loaderData"]["venues"][0],
-) => {
-	if (venue.visible) return <Badge color="green">Visible</Badge>;
-	if (!venue.active) return <Badge color="gray">Inactive</Badge>;
-	return <Badge color="orange">Ended</Badge>;
-};
-
 const VenueRow = ({
 	venue,
 }: {
@@ -333,7 +324,6 @@ const VenueRow = ({
 						</Stack>
 					</Group>
 				</Table.Td>
-				<Table.Td>{statusBadge(venue)}</Table.Td>
 				<Table.Td>
 					<fetcher.Form method="post">
 						<input type="hidden" name="intent" value="toggle" />
@@ -357,6 +347,9 @@ const VenueRow = ({
 							defaultValue={venue.endsOn ?? ""}
 							onChange={(event) => fetcher.submit(event.currentTarget.form)}
 							aria-label="Last day"
+							// Active but hidden: the last day has passed
+							error={venue.active && !venue.visible ? "Ended" : undefined}
+							styles={{ error: { color: "var(--mantine-color-orange-7)" } }}
 						/>
 					</fetcher.Form>
 				</Table.Td>
@@ -410,7 +403,7 @@ const VenueRow = ({
 			</Table.Tr>
 			{showBeers && (
 				<Table.Tr>
-					<Table.Td colSpan={5} bg="var(--mantine-color-gray-0)">
+					<Table.Td colSpan={4} bg="var(--mantine-color-gray-0)">
 						{!menus ? (
 							<Loader size="sm" color="untappd" m="sm" />
 						) : (
@@ -630,7 +623,6 @@ export default function Admin({
 					<Table.Thead>
 						<Table.Tr>
 							<Table.Th>Venue</Table.Th>
-							<Table.Th>Status</Table.Th>
 							<Table.Th>Active</Table.Th>
 							<Table.Th>Last day</Table.Th>
 							<Table.Th />
