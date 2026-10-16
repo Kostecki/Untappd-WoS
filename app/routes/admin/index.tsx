@@ -1,4 +1,5 @@
 import {
+	ActionIcon,
 	Anchor,
 	Badge,
 	Button,
@@ -10,6 +11,7 @@ import {
 	Input,
 	List,
 	Loader,
+	Menu,
 	Stack,
 	Switch,
 	Table,
@@ -19,7 +21,16 @@ import {
 	Tooltip,
 } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
-import { IconArrowLeft, IconFileSpreadsheet, IconX } from "@tabler/icons-react";
+import {
+	IconArrowLeft,
+	IconChevronDown,
+	IconChevronRight,
+	IconDots,
+	IconFileSpreadsheet,
+	IconTrash,
+	IconUpload,
+	IconX,
+} from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Form, Link, useFetcher, useNavigation, useSubmit } from "react-router";
 import { dataWithError, dataWithSuccess } from "remix-toast";
@@ -272,40 +283,55 @@ const VenueRow = ({
 		<>
 			<Table.Tr>
 				<Table.Td>
-					<Stack gap={2}>
-						<Text fw={500}>
-							{venue.url ? (
-								<Anchor href={venue.url} target="_blank" c="dark">
-									{venue.name}
-								</Anchor>
+					<Group gap="xs" wrap="nowrap" align="flex-start">
+						<ActionIcon
+							variant="subtle"
+							color="gray"
+							onClick={toggleBeers}
+							aria-label={showBeers ? "Hide beers" : "Show beers"}
+							aria-expanded={showBeers}
+						>
+							{showBeers ? (
+								<IconChevronDown size={18} stroke={1.5} />
 							) : (
-								venue.name
+								<IconChevronRight size={18} stroke={1.5} />
 							)}
-						</Text>
-						{venue.location && (
-							<Text size="xs" c="dimmed">
-								{venue.location}
+						</ActionIcon>
+						<Stack gap={2}>
+							<Text fw={500}>
+								{venue.url ? (
+									<Anchor href={venue.url} target="_blank" c="dark">
+										{venue.name}
+									</Anchor>
+								) : (
+									venue.name
+								)}
 							</Text>
-						)}
-						<Text size="xs" c="dimmed">
-							{beerCount} beers ·{" "}
-							{venue.menus
-								.map((menu) => `${menu.name} (${menu.count})`)
-								.join(", ")}
-						</Text>
-						{venue.unknownStyles.length > 0 && (
-							<Tooltip
-								multiline
-								w={320}
-								withArrow
-								label={venue.unknownStyles.join(", ")}
-							>
-								<Text size="xs" c="orange" w="fit-content">
-									{venue.unknownStyles.length} unknown style name(s)
+							{venue.location && (
+								<Text size="xs" c="dimmed">
+									{venue.location}
 								</Text>
-							</Tooltip>
-						)}
-					</Stack>
+							)}
+							<Text size="xs" c="dimmed">
+								{beerCount} beers ·{" "}
+								{venue.menus
+									.map((menu) => `${menu.name} (${menu.count})`)
+									.join(", ")}
+							</Text>
+							{venue.unknownStyles.length > 0 && (
+								<Tooltip
+									multiline
+									w={320}
+									withArrow
+									label={venue.unknownStyles.join(", ")}
+								>
+									<Text size="xs" c="orange" w="fit-content">
+										{venue.unknownStyles.length} unknown style name(s)
+									</Text>
+								</Tooltip>
+							)}
+						</Stack>
+					</Group>
 				</Table.Td>
 				<Table.Td>{statusBadge(venue)}</Table.Td>
 				<Table.Td>
@@ -335,29 +361,27 @@ const VenueRow = ({
 					</fetcher.Form>
 				</Table.Td>
 				<Table.Td>
-					<Group gap="xs" wrap="nowrap">
-						<Button
-							size="compact-xs"
-							variant="subtle"
-							color="gray"
-							onClick={toggleBeers}
-						>
-							{showBeers ? "Hide beers" : "Show beers"}
-						</Button>
-						<Form method="post" encType="multipart/form-data" ref={replaceForm}>
-							<input type="hidden" name="intent" value="replace" />
-							<input type="hidden" name="id" value={venue.id} />
-							<input
-								type="file"
-								name="file"
-								accept={uploadAccept}
-								hidden
-								onChange={() => replaceForm.current?.requestSubmit()}
-							/>
-							<Button
-								size="compact-xs"
-								variant="subtle"
-								color="gray"
+					{/* Picked from the menu below; submits as soon as a file is chosen */}
+					<Form method="post" encType="multipart/form-data" ref={replaceForm}>
+						<input type="hidden" name="intent" value="replace" />
+						<input type="hidden" name="id" value={venue.id} />
+						<input
+							type="file"
+							name="file"
+							accept={uploadAccept}
+							hidden
+							onChange={() => replaceForm.current?.requestSubmit()}
+						/>
+					</Form>
+					<Menu position="bottom-end" withArrow>
+						<Menu.Target>
+							<ActionIcon variant="subtle" color="gray" aria-label="Actions">
+								<IconDots size={18} stroke={1.5} />
+							</ActionIcon>
+						</Menu.Target>
+						<Menu.Dropdown>
+							<Menu.Item
+								leftSection={<IconUpload size={14} />}
 								onClick={() =>
 									replaceForm.current
 										?.querySelector<HTMLInputElement>("input[type=file]")
@@ -365,26 +389,23 @@ const VenueRow = ({
 								}
 							>
 								Replace beers
-							</Button>
-						</Form>
-						<fetcher.Form
-							method="post"
-							onSubmit={(event) => {
-								if (!confirm(`Delete "${venue.name}"?`)) event.preventDefault();
-							}}
-						>
-							<input type="hidden" name="intent" value="delete" />
-							<input type="hidden" name="id" value={venue.id} />
-							<Button
-								size="compact-xs"
-								variant="subtle"
+							</Menu.Item>
+							<Menu.Item
 								color="red"
-								type="submit"
+								leftSection={<IconTrash size={14} />}
+								onClick={() => {
+									if (confirm(`Delete "${venue.name}"?`)) {
+										fetcher.submit(
+											{ intent: "delete", id: venue.id },
+											{ method: "post" },
+										);
+									}
+								}}
 							>
 								Delete
-							</Button>
-						</fetcher.Form>
-					</Group>
+							</Menu.Item>
+						</Menu.Dropdown>
+					</Menu>
 				</Table.Td>
 			</Table.Tr>
 			{showBeers && (
