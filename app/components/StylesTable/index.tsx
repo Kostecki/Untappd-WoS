@@ -12,11 +12,7 @@ import {
 	Tooltip,
 } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-import {
-	IconChevronDown,
-	IconChevronUp,
-	IconInfoCircle,
-} from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
 import { getLocationQuery } from "~/hooks/location";
@@ -118,10 +114,9 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 										</Stack>
 									}
 								>
-									<Flex align="center" justify="center" gap={4}>
+									<Text component="span" fw="inherit" fz="inherit">
 										Have Had
-										<IconInfoCircle size={14} color="gray" stroke={1.5} />
-									</Flex>
+									</Text>
 								</Tooltip>
 							</Table.Th>
 						</Table.Tr>
