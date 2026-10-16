@@ -11,6 +11,7 @@ export default [
 	route("logout", "./routes/auth/logout.ts"),
 	route("settings/stock-list", "./routes/settings/stock-list.ts"),
 	route("admin", "./routes/admin/index.tsx"),
+	route("admin/template.xlsx", "./routes/admin/template.ts"),
 	...prefix("api", [
 		route("style/:styleId/beers", "./routes/untappd/style-beers.ts"),
 		route("venues/:searchQuery", "./routes/untappd/venues.ts"),

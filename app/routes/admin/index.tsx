@@ -23,7 +23,7 @@ import { Form, Link, useFetcher, useNavigation } from "react-router";
 import { dataWithError, dataWithSuccess } from "remix-toast";
 
 import { requireAdmin } from "~/auth/user.server";
-import { importCsv } from "~/temporary-venues/import.server";
+import { importFile } from "~/temporary-venues/import.server";
 import {
 	deleteTemporaryVenue,
 	getTemporaryVenue,
@@ -77,26 +77,27 @@ const optionalDate = (value: FormDataEntryValue | null) => {
 	return text && /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : null;
 };
 
-/** Reads and imports the uploaded CSV, matching styles against Untappd's list */
+const getStyles = (accessToken: string) =>
+	cached("beer-types", styleListTtlMs, () => getBeerTypes(accessToken));
+
+/** Reads and imports the uploaded file, matching styles against Untappd's list */
 const importUpload = async (
 	file: FormDataEntryValue | null,
 	accessToken: string,
 ) => {
 	if (!(file instanceof File) || file.size === 0) {
-		return { ok: false as const, errors: ["Choose a CSV file."] };
+		return { ok: false as const, errors: ["Choose an .xlsx or .csv file."] };
 	}
 	if (file.size > maxUploadBytes) {
 		return { ok: false as const, errors: ["The file is larger than 2 MB."] };
 	}
 
-	const styles = await cached("beer-types", styleListTtlMs, () =>
-		getBeerTypes(accessToken),
-	);
+	const styles = await getStyles(accessToken);
 	const styleIdsByName = new Map(
 		styles.map((style) => [style.type_name.toLowerCase(), style.type_id]),
 	);
 
-	return importCsv(await file.text(), styleIdsByName);
+	return importFile(file, styleIdsByName);
 };
 
 const summary = (menus: TemporaryVenueMenu[], unknownStyles: string[]) => {
@@ -202,13 +203,21 @@ export async function action({ request }: Route.ActionArgs) {
 	}
 }
 
-const csvHelp = (
+const uploadAccept =
+	".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+const uploadHelp = (
 	<Text size="sm" c="dimmed">
-		One row per beer with a header row. Required: <Code>bid</Code>,{" "}
-		<Code>name</Code>, <Code>brewery</Code>, <Code>style</Code> (the Untappd
-		style name). Optional: <Code>menu</Code> (groups beers into menus),{" "}
-		<Code>abv</Code>, <Code>country</Code>, <Code>rating</Code>. Comma or
-		semicolon separated.
+		An Excel file from the{" "}
+		<Anchor href="/admin/template.xlsx" size="sm" download>
+			template
+		</Anchor>{" "}
+		(it has a dropdown of all Untappd styles), or a CSV. One row per beer with a
+		header row. Required: <Code>bid</Code>, <Code>name</Code>,{" "}
+		<Code>brewery</Code>, <Code>style</Code> (the Untappd style name). Optional:{" "}
+		<Code>menu</Code> (groups beers into menus), <Code>abv</Code>,{" "}
+		<Code>country</Code>, <Code>rating</Code>. For CSV, comma or semicolon
+		separated.
 	</Text>
 );
 
@@ -302,7 +311,7 @@ const VenueRow = ({
 						<input
 							type="file"
 							name="file"
-							accept=".csv,text/csv"
+							accept={uploadAccept}
 							hidden
 							onChange={() => replaceForm.current?.requestSubmit()}
 						/>
@@ -316,7 +325,7 @@ const VenueRow = ({
 									?.click()
 							}
 						>
-							Replace CSV
+							Replace beers
 						</Button>
 					</Form>
 					<fetcher.Form
@@ -395,11 +404,11 @@ export default function Admin({
 								description="Hidden after this day"
 							/>
 						</Group>
-						<Input.Wrapper label="Beers (CSV)" required description={csvHelp}>
+						<Input.Wrapper label="Beers" required description={uploadHelp}>
 							<input
 								type="file"
 								name="file"
-								accept=".csv,text/csv"
+								accept={uploadAccept}
 								required
 								style={{ display: "block", marginTop: 8 }}
 							/>

@@ -14,9 +14,11 @@ Festivals and other venues that aren't on Untappd can be uploaded on `/admin`
 (only for the user in `ADMIN_USER_ID`). They show up in every venue search
 while active and until their last day.
 
-Uploads are a list of beers with a header row. Required columns: `bid`
-(Untappd beer id), `name`, `brewery`, `style` (the Untappd style name).
-Optional: `menu` (groups beers into menus), `abv`, `country`, `rating`.
+Uploads are an Excel file or a CSV with one beer per row and a header row.
+Required columns: `bid` (Untappd beer id), `name`, `brewery`, `style` (the
+Untappd style name). Optional: `menu` (groups beers into menus), `abv`,
+`country`, `rating`. The admin page has a template (`/admin/template.xlsx`)
+with a dropdown of all Untappd styles.
 
 Venues are stored as JSON files in `DATA_DIR` (default `./data`). Mount it as a
 volume in production so they survive redeploys, e.g.

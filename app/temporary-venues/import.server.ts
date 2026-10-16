@@ -1,4 +1,5 @@
 import { parseCsv } from "./csv.server";
+import { readXlsxRows } from "./xlsx.server";
 
 const requiredColumns = ["bid", "name", "brewery", "style"] as const;
 const defaultMenuName = "All beers";
@@ -15,16 +16,14 @@ const parseOptionalNumber = (value: string | undefined) => {
 };
 
 /**
- * Turns an uploaded CSV into menus. Rows are grouped by the optional `menu`
+ * Turns uploaded rows into menus. Rows are grouped by the optional `menu`
  * column; `bid`, `name`, `brewery` and `style` are required. Style names
  * are matched to Untappd style ids; unknown names are kept and reported.
  */
-const importCsv = (
-	csv: string,
+const importRows = (
+	rows: Record<string, string>[],
 	styleIdsByName: Map<string, number>,
 ): ImportResult => {
-	const rows = parseCsv(csv);
-
 	if (rows.length === 0) {
 		return { ok: false, errors: ["The file has no rows."] };
 	}
@@ -101,4 +100,27 @@ const importCsv = (
 	};
 };
 
-export { importCsv };
+/** Reads an uploaded .xlsx (first sheet) or .csv file and imports it */
+const importFile = async (
+	file: File,
+	styleIdsByName: Map<string, number>,
+): Promise<ImportResult> => {
+	const isXlsx = /\.xlsx$/i.test(file.name);
+
+	let rows: Record<string, string>[];
+	try {
+		rows = isXlsx
+			? await readXlsxRows(await file.arrayBuffer())
+			: parseCsv(await file.text());
+	} catch (error) {
+		console.error("Failed to read upload", error);
+		return {
+			ok: false,
+			errors: [`Couldn't read the file as ${isXlsx ? "Excel" : "CSV"}.`],
+		};
+	}
+
+	return importRows(rows, styleIdsByName);
+};
+
+export { importFile };
