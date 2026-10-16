@@ -478,13 +478,6 @@ declare global {
 		styles: { count?: number; items: StyleList[] };
 	}
 
-	// Payload of the /api/list/:listId route
-	interface ListDetailsPayload {
-		list_name: string;
-		listItems: BeerWithBrewery[];
-		styleIds: number[];
-	}
-
 	interface StylesInfo {
 		styles: {
 			styleId: number;

@@ -19,6 +19,9 @@ export type SessionUser = {
 	isAdmin: boolean;
 };
 
+/** The session user as sent to the browser, without the access token */
+export type PublicUser = Omit<SessionUser, "accessToken">;
+
 export const authenticator = new Authenticator<SessionUser>();
 
 const ADMIN_USER_ID = process.env.ADMIN_USER_ID;

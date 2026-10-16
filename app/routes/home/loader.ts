@@ -1,6 +1,7 @@
 import type { SessionUser } from "~/auth/auth.server";
 import {
 	getBadge,
+	getListView,
 	getStylesNotHad as fetchStylesNotHad,
 	getUserLists as fetchUserLists,
 } from "~/untappd/api.server";
@@ -68,4 +69,26 @@ const getStylesInfo = async (user: SessionUser): Promise<StylesInfo> => {
 const getUserLists = (user: SessionUser): Promise<UserLists[]> =>
 	withFallback(fetchUserLists(user.accessToken), []);
 
-export { getStylesInfo, getUserLists };
+/** The selected stock list with the style ids of all its beers */
+const getStockList = async (
+	user: SessionUser,
+	listId: string | null,
+): Promise<StockListDetails | null> => {
+	if (!listId) {
+		return null;
+	}
+
+	const list = await withFallback(getListView(user.accessToken, listId), null);
+	if (!list) {
+		return null;
+	}
+
+	return {
+		listId,
+		listName: list.list.list_name,
+		listItems: list.items,
+		styles: list.styles.items.map((style) => style.type_id),
+	};
+};
+
+export { getStockList, getStylesInfo, getUserLists };

@@ -12,19 +12,19 @@ import {
 import { useElementSize } from "@mantine/hooks";
 import { IconLogout } from "@tabler/icons-react";
 import { Link } from "react-router";
-import type { SessionUser } from "~/auth/auth.server";
+import type { PublicUser } from "~/auth/auth.server";
 import { useIsMobile, Settings, setSettings } from "~/utils";
 
 import { Ring } from "../Ring";
 import { SettingsModal } from "../SettingsModal";
 
 interface InputProps {
-	user: SessionUser;
+	user: PublicUser;
 	stylesInfo: StylesInfo;
 	userLists: UserLists[];
 	stockList?: StockList;
 	stockListDetails?: StockListDetails;
-	setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
+	setStockListId: (listId: string | null) => void;
 	setProfileFilters: React.Dispatch<React.SetStateAction<Filters>>;
 	profileFilters: Filters;
 	latestCommit: LatestCommit;
@@ -36,7 +36,7 @@ export const Profile = ({
 	userLists,
 	stockList,
 	stockListDetails,
-	setStockList,
+	setStockListId,
 	setProfileFilters,
 	profileFilters,
 	latestCommit,
@@ -103,7 +103,7 @@ export const Profile = ({
 						user={user}
 						userLists={userLists}
 						stockList={stockList}
-						setStockList={setStockList}
+						setStockListId={setStockListId}
 						latestCommit={latestCommit}
 					/>
 					<ActionIcon

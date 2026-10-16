@@ -5,6 +5,7 @@ declare global {
 	}
 
 	interface StockListDetails {
+		listId: string;
 		listName: string;
 		listItems: BeerWithBrewery[];
 		styles: number[];

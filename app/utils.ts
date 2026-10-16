@@ -6,7 +6,8 @@ enum Settings {
 }
 
 interface SettingsTypes {
-  [Settings.STOCK_LIST]: { listId: string; listName: string };
+  // Legacy: moved to a cookie, only read once to migrate
+  [Settings.STOCK_LIST]: { listId: string; listName: string } | undefined;
   [Settings.TABLE_FILTERS]: {
     showHaveHad: boolean;
     showOnlyMissing: boolean;

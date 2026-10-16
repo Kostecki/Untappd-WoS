@@ -2,7 +2,6 @@ import {
 	ActionIcon,
 	Anchor,
 	Button,
-	type ComboboxItem,
 	Flex,
 	Group,
 	Modal,
@@ -14,22 +13,21 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { IconSettings } from "@tabler/icons-react";
 
-import type { SessionUser } from "~/auth/auth.server";
-import { Settings, setSettings } from "~/utils";
+import type { PublicUser } from "~/auth/auth.server";
 
 interface InputProps {
-	user: SessionUser;
+	user: PublicUser;
 	userLists: UserLists[];
 	latestCommit: LatestCommit;
 	stockList?: StockList;
-	setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
+	setStockListId: (listId: string | null) => void;
 }
 
 export const SettingsModal = ({
 	user,
 	userLists,
 	stockList,
-	setStockList,
+	setStockListId,
 	latestCommit,
 }: InputProps) => {
 	const [opened, { open, close }] = useDisclosure(false);
@@ -40,16 +38,6 @@ export const SettingsModal = ({
 			label: list.list_name,
 		}))
 		.sort((a, b) => a.label.localeCompare(b.label));
-
-	const handleListSelect = (option: ComboboxItem) => {
-		const newStockList = {
-			listId: option.value,
-			listName: option.label,
-		};
-
-		setStockList(newStockList);
-		setSettings(Settings.STOCK_LIST, newStockList);
-	};
 
 	return (
 		<>
@@ -62,7 +50,8 @@ export const SettingsModal = ({
 					value={stockList ? stockList.listId : null}
 					allowDeselect
 					clearable
-					onChange={(_, option) => handleListSelect(option)}
+					// null when the selection is cleared
+					onChange={(listId) => setStockListId(listId)}
 				/>
 
 				{/* TODO: Actually implement this */}
