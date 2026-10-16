@@ -130,6 +130,11 @@ declare global {
 		parent_style_name: string;
 		is_non_alcoholic: boolean;
 		friends_ratings: { rating_score: number; rating_count: number };
+		/** The user's lists that contain this beer (up to 5) */
+		lists: {
+			count: number;
+			items: Pick<UserLists, "list_id" | "list_name" | "is_wish_list">[];
+		};
 	}
 
 	interface BeerInfoResponse extends BeerWithBrewery {

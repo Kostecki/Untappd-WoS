@@ -102,6 +102,25 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		combobox?.closeDropdown();
 	};
 
+	/** Names of the user's lists with this beer, or undefined if it is on none */
+	const getListNames = (beer: BeerWithStylesHad) => {
+		// From /beer/info: the actual lists
+		if ("lists" in beer.beer && beer.beer.lists) {
+			const names = beer.beer.lists.items.map((list) => list.list_name);
+			return names.length > 0 ? names.join(", ") : undefined;
+		}
+
+		// From a barcode lookup: only whether it's on any list
+		if ("on_list" in beer.beer && beer.beer.on_list) {
+			const onStockList = stockListDetails?.listItems.some(
+				(item) => item.beer.bid === beer.beer.bid,
+			);
+			return onStockList ? stockListDetails?.listName : "one of your lists";
+		}
+
+		return undefined;
+	};
+
 	// Same source as the styles table: the style ids of the whole stock list
 	const isStyleOnList = ({ beer_style, beer_style_id }: Beer) =>
 		beer_style_id
@@ -217,6 +236,8 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 								brewery: { brewery_name, country_name },
 							} = beer;
 
+							const onLists = getListNames(beer);
+
 							const hadBeer = () => {
 								if ("stats" in beer.beer) {
 									const stats = beer.beer.stats;
@@ -261,6 +282,17 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 											<Text ta="center" size="sm" c="dimmed">
 												Had beer: {hadBeer()}
 											</Text>
+											{onLists && (
+												<>
+													<Divider orientation="vertical" />
+													<Text size="sm" c="dimmed">
+														On list:{" "}
+														<Text fs="italic" component="span">
+															{onLists}
+														</Text>
+													</Text>
+												</>
+											)}
 										</Group>
 									</Card>
 								</Anchor>
