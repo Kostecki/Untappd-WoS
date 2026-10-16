@@ -12,7 +12,8 @@
 
 Festivals and other venues that aren't on Untappd can be uploaded on `/admin`
 (only for the user in `ADMIN_USER_ID`). While active and until their last day,
-they're listed at the top of every venue search, matching ones first.
+they're suggested as soon as the venue search is focused and listed at the top
+of every search, matching ones first.
 
 Uploads are an Excel file or a CSV with one beer per row and a header row.
 Required columns: `bid` (Untappd beer id), `name`, `brewery`, `style` (the

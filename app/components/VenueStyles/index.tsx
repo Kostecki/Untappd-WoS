@@ -128,6 +128,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
 
 			<SearchSelect
 				apiURL="/api/venues"
+				emptyQueryURL="/api/temporary-venues"
 				placeholder="Search for a venue"
 				emptyText="No venues found"
 				loading={loading}

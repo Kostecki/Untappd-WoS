@@ -23,6 +23,8 @@ interface InputProps {
 	apiURL: string;
 	placeholder: string;
 	emptyText: string;
+	/** Fetched while the search is empty, e.g. suggestions */
+	emptyQueryURL?: string;
 	loading: boolean;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	optionSelectHandler: (
@@ -52,6 +54,7 @@ export const SearchSelect = ({
 	apiURL,
 	placeholder,
 	emptyText,
+	emptyQueryURL,
 	loading,
 	setLoading,
 	optionSelectHandler,
@@ -80,7 +83,7 @@ export const SearchSelect = ({
 	useEffect(() => {
 		const query = debouncedSearch.trim();
 
-		if (!query) {
+		if (!query && !emptyQueryURL) {
 			setData(undefined);
 			setEmpty(false);
 			setLoading(false);
@@ -92,14 +95,15 @@ export const SearchSelect = ({
 		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const response = await apiFetch(
-					`${apiURL}/${encodeURIComponent(query)}`,
-					{ signal: controller.signal },
-				);
+				const url = query
+					? `${apiURL}/${encodeURIComponent(query)}`
+					: (emptyQueryURL as string);
+				const response = await apiFetch(url, { signal: controller.signal });
 				const responseData: VenueDetails[] = await response.json();
 
 				setData(responseData);
-				setEmpty(responseData.length === 0);
+				// Nothing to suggest isn't "no results"
+				setEmpty(Boolean(query) && responseData.length === 0);
 			} catch (error) {
 				if (controller.signal.aborted) return;
 				console.error("Failed to get data", apiURL, error);
@@ -110,7 +114,7 @@ export const SearchSelect = ({
 		fetchData();
 
 		return () => controller.abort();
-	}, [debouncedSearch, apiURL, setLoading]);
+	}, [debouncedSearch, apiURL, emptyQueryURL, setLoading]);
 
 	const VerifiedImageComponent = ({
 		is_verified,
@@ -223,6 +227,7 @@ export const SearchSelect = ({
 		return Boolean(item && "temporary" in item && item.temporary);
 	};
 	const hasTemporaryVenues = options.some((_, index) => isTemporary(index));
+	const hasUntappdVenues = options.some((_, index) => !isTemporary(index));
 
 	const selected = selectedBeer || selectedVenue;
 	const setDetails = setBeerDetails || setVenueDetails;
@@ -300,9 +305,11 @@ export const SearchSelect = ({
 								<Combobox.Group label="Temporary venues">
 									{options.filter((_, index) => isTemporary(index))}
 								</Combobox.Group>
-								<Combobox.Group label="Untappd">
-									{options.filter((_, index) => !isTemporary(index))}
-								</Combobox.Group>
+								{hasUntappdVenues && (
+									<Combobox.Group label="Untappd">
+										{options.filter((_, index) => !isTemporary(index))}
+									</Combobox.Group>
+								)}
 							</>
 						) : (
 							options

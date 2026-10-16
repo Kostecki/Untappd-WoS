@@ -15,6 +15,7 @@ export default [
 	...prefix("api", [
 		route("style/:styleId/beers", "./routes/untappd/style-beers.ts"),
 		route("venues/:searchQuery", "./routes/untappd/venues.ts"),
+		route("temporary-venues", "./routes/untappd/temporary-venues.ts"),
 		route("venue/:venueId", "./routes/untappd/venue.ts"),
 		route("beers/:searchQuery", "./routes/untappd/beers.ts"),
 		route("beer/:beerId", "./routes/untappd/beer.ts"),
