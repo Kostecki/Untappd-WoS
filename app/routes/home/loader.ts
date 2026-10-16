@@ -5,14 +5,26 @@ import {
 	getStylesNotHad as fetchStylesNotHad,
 	getUserLists as fetchUserLists,
 } from "~/untappd/api.server";
+import { cached } from "~/untappd/cache.server";
 import { withFallback } from "~/untappd/client.server";
 
 const checkInsPerLevel = 5;
 
+// Reloads within this window reuse the previous Untappd responses
+const cacheTtlMs = 60 * 1000;
+
+const cachedForUser = <T>(user: SessionUser, key: string, load: () => Promise<T>) =>
+	cached(`${user.id}:${key}`, cacheTtlMs, load);
+
 type StyleEntry = StylesInfo["styles"][number];
 
 const getStylesNotHad = async (user: SessionUser): Promise<StyleEntry[]> => {
-	const items = await withFallback(fetchStylesNotHad(user.accessToken), []);
+	const items = await withFallback(
+		cachedForUser(user, "styles-not-had", () =>
+			fetchStylesNotHad(user.accessToken),
+		),
+		[],
+	);
 
 	return items.map((item) => ({
 		styleId: item.style_id,
@@ -27,8 +39,11 @@ const getStylesHad = async (user: SessionUser): Promise<StyleEntry[]> => {
 		return [];
 	}
 
+	const { wosBadgeId } = user;
 	const badge = await withFallback(
-		getBadge(user.accessToken, user.wosBadgeId),
+		cachedForUser(user, `badge:${wosBadgeId}`, () =>
+			getBadge(user.accessToken, wosBadgeId),
+		),
 		null,
 	);
 	const items = badge?.special_status_list.items[0]?.items ?? [];
@@ -67,7 +82,10 @@ const getStylesInfo = async (user: SessionUser): Promise<StylesInfo> => {
 };
 
 const getUserLists = (user: SessionUser): Promise<UserLists[]> =>
-	withFallback(fetchUserLists(user.accessToken), []);
+	withFallback(
+		cachedForUser(user, "lists", () => fetchUserLists(user.accessToken)),
+		[],
+	);
 
 /** The selected stock list with the style ids of all its beers */
 const getStockList = async (
@@ -78,7 +96,12 @@ const getStockList = async (
 		return null;
 	}
 
-	const list = await withFallback(getListView(user.accessToken, listId), null);
+	const list = await withFallback(
+		cachedForUser(user, `list:${listId}`, () =>
+			getListView(user.accessToken, listId),
+		),
+		null,
+	);
 	if (!list) {
 		return null;
 	}
