@@ -8,45 +8,27 @@
 
 ![screenshot](https://github.com/user-attachments/assets/12dc7f95-c9b4-495d-9094-bdcf37d68698)
 
-## MBCC precompile
+## Temporary venues
 
-The MBCC data file is generated into `data/mbcc-2026.compiled.json` using:
+Festivals and other venues that aren't on Untappd can be uploaded on `/admin`
+(only for the user in `ADMIN_USER_ID`). They show up in every venue search
+while active and until their last day.
 
-```bash
-pnpm mbcc:precompile
-```
+Uploads are a list of beers with a header row. Required columns: `bid`
+(Untappd beer id), `name`, `brewery`, `style` (the Untappd style name).
+Optional: `menu` (groups beers into menus), `abv`, `country`, `rating`.
 
-For MBCC, style is enriched by scraping the public Untappd beer page by `bid`.
-The scraper is intentionally throttled and can be tuned with env vars:
+Venues are stored as JSON files in `DATA_DIR` (default `./data`). Mount it as a
+volume in production so they survive redeploys, e.g.
+`-v wos-data:/app/data`, and make sure it's writable by the container user
+(uid 1001).
 
-- `MBCC_SCRAPE_STYLES` (`1` by default, set to `0` to disable scraping)
-- `MBCC_SCRAPE_CONCURRENCY` (`2` by default)
-- `MBCC_SCRAPE_DELAY_MS` (`400` by default)
-- `MBCC_SOURCE_URL` (defaults to `https://mbcc.jonpacker.com/latest.json`)
-- `MBCC_COMPILED_PATH` (defaults to `data/mbcc-2026.compiled.json`)
+### MBCC
 
-## Schedule with cron
-
-Use the cron-safe wrapper script:
-
-```bash
-pnpm mbcc:precompile:cron
-```
-
-Or run directly:
-
-```bash
-./scripts/mbcc-precompile-cron.sh
-```
-
-The wrapper:
-
-- prevents overlapping runs with a lock directory
-- writes logs to `data/logs/`
-- exits cleanly if a previous run is still active
-
-Example crontab (every hour at minute 5):
-
-```cron
-5 * * * * cd /Users/jacob/Dev/personal/untappd-wos && /bin/bash ./scripts/mbcc-precompile-cron.sh
-```
+`pnpm venues:jonpacker [source] [output.csv]` converts the beer list from
+[mbcc.jonpacker.com](https://mbcc.jonpacker.com) (default
+`https://mbcc.jonpacker.com/latest.json`) into an upload file. The source has no
+Untappd styles, so they're scraped from each beer's public Untappd page,
+throttled via `MBCC_SCRAPE_CONCURRENCY` (default `2`), `MBCC_SCRAPE_DELAY_MS`
+(default `1200`) and related `MBCC_SCRAPE_*` env vars. Re-running reuses the
+styles already in the output file and only scrapes new beers.

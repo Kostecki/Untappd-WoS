@@ -10,10 +10,9 @@ export default [
 	route("login", "./routes/auth/login.tsx"),
 	route("logout", "./routes/auth/logout.ts"),
 	route("settings/stock-list", "./routes/settings/stock-list.ts"),
+	route("admin", "./routes/admin/index.tsx"),
 	...prefix("api", [
 		route("style/:styleId/beers", "./routes/untappd/style-beers.ts"),
-		route("mbcc/venues", "./routes/untappd/mbcc-venues.ts"),
-		route("mbcc/venue", "./routes/untappd/mbcc-venue.ts"),
 		route("venues/:searchQuery", "./routes/untappd/venues.ts"),
 		route("venue/:venueId", "./routes/untappd/venue.ts"),
 		route("beers/:searchQuery", "./routes/untappd/beers.ts"),

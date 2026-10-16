@@ -62,6 +62,16 @@ const getBadge = (accessToken: string, userBadgeId: number) =>
 		accessToken,
 	}).then((response) => response.badge);
 
+// Styles
+
+/** All Untappd beer styles (id + name) */
+const getBeerTypes = (accessToken: string) =>
+	untappd<{
+		items: { type_id: number; type_name: string; parent_id: number }[];
+	}>("/helpers/list_beer_types", { accessToken }).then(
+		(response) => response.items,
+	);
+
 // Lists
 
 // /custom_lists/view returns 25 items per page
@@ -188,6 +198,7 @@ export {
 	checkBarcode,
 	getBadge,
 	getBeerInfo,
+	getBeerTypes,
 	getListView,
 	getStylesNotHad,
 	getTopRatedBeers,

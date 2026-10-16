@@ -30,4 +30,15 @@ const requireUser = async (request: Request): Promise<SessionUser> => {
 	return user;
 };
 
-export { getSessionUser, requireUser, setSessionUser };
+/** The logged in admin (ADMIN_USER_ID); a 404 for everyone else */
+const requireAdmin = async (request: Request): Promise<SessionUser> => {
+	const user = await requireUser(request);
+
+	if (!user.isAdmin) {
+		throw new Response("Not Found", { status: 404 });
+	}
+
+	return user;
+};
+
+export { getSessionUser, requireAdmin, requireUser, setSessionUser };

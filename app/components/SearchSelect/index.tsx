@@ -1,4 +1,5 @@
 import {
+	Badge,
 	CloseButton,
 	Combobox,
 	type ComboboxStore,
@@ -25,7 +26,6 @@ interface InputProps {
 	emptyText: string;
 	loading: boolean;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	prependVenues?: VenueDetails[];
 	optionSelectHandler: (
 		inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
 		barcode?: string,
@@ -55,7 +55,6 @@ export const SearchSelect = ({
 	emptyText,
 	loading,
 	setLoading,
-	prependVenues,
 	optionSelectHandler,
 	selectedBeer,
 	setSelectedBeer,
@@ -100,18 +99,8 @@ export const SearchSelect = ({
 				);
 				const responseData: VenueDetails[] = await response.json();
 
-				const results =
-					apiURL.includes("/venues") && prependVenues?.length
-						? [...prependVenues, ...responseData].filter(
-								(venue, index, allVenues) =>
-									allVenues.findIndex(
-										(item) => item.venue_id === venue.venue_id,
-									) === index,
-							)
-						: responseData;
-
-				setData(results);
-				setEmpty(results.length === 0);
+				setData(responseData);
+				setEmpty(responseData.length === 0);
 			} catch (error) {
 				if (controller.signal.aborted) return;
 				console.error("Failed to get data", apiURL, error);
@@ -122,7 +111,7 @@ export const SearchSelect = ({
 		fetchData();
 
 		return () => controller.abort();
-	}, [debouncedSearch, apiURL, prependVenues, setLoading]);
+	}, [debouncedSearch, apiURL, setLoading]);
 
 	const VerifiedImageComponent = ({
 		is_verified,
@@ -158,6 +147,27 @@ export const SearchSelect = ({
 
 	const options = (data || []).map((input) => {
 		if (apiURL.includes("/venues")) {
+			if ("venue_id" in input && input.temporary) {
+				return (
+					<Combobox.Option
+						value={input.venue_id.toString()}
+						key={input.venue_id}
+					>
+						<Group gap="xs" wrap="nowrap">
+							<Badge size="xs" color="untappd" variant="light">
+								Temporary
+							</Badge>
+							<Text size="sm">{input.venue_name}</Text>
+							{input.venue_address && (
+								<Text size="sm" c="dimmed" fs="italic">
+									({input.venue_address})
+								</Text>
+							)}
+						</Group>
+					</Combobox.Option>
+				);
+			}
+
 			if ("venue_id" in input && "is_verified" in input) {
 				const { venue_id, is_verified } = input;
 
@@ -205,6 +215,13 @@ export const SearchSelect = ({
 		}
 		return null;
 	});
+
+	// Temporary venues (uploaded in /admin) get their own group at the top
+	const isTemporary = (index: number) => {
+		const item = data?.[index];
+		return Boolean(item && "temporary" in item && item.temporary);
+	};
+	const hasTemporaryVenues = options.some((_, index) => isTemporary(index));
 
 	const selected = selectedBeer || selectedVenue;
 	const setDetails = setBeerDetails || setVenueDetails;
@@ -277,7 +294,18 @@ export const SearchSelect = ({
 				<Combobox.Options>
 					{empty && <Combobox.Empty>{emptyText}</Combobox.Empty>}
 					<ScrollArea.Autosize type="scroll" mah={200}>
-						{options}
+						{hasTemporaryVenues ? (
+							<>
+								<Combobox.Group label="Temporary venues">
+									{options.filter((_, index) => isTemporary(index))}
+								</Combobox.Group>
+								<Combobox.Group label="Untappd">
+									{options.filter((_, index) => !isTemporary(index))}
+								</Combobox.Group>
+							</>
+						) : (
+							options
+						)}
 					</ScrollArea.Autosize>
 				</Combobox.Options>
 			</Combobox.Dropdown>

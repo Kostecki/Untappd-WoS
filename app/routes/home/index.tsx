@@ -37,8 +37,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	const isProd = import.meta.env.PROD;
 
-	const mbccEnabled = process.env.MBCC_ENABLED !== "0";
-
 	return {
 		user,
 		stylesInfo,
@@ -46,7 +44,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 		stockList,
 		latestCommit,
 		isProd,
-		mbccEnabled,
 	};
 }
 
@@ -58,7 +55,7 @@ const defaultProfileFilters: Filters = {
 
 export default function Home() {
 	const data = useLoaderData<typeof loader>();
-	const { user, stylesInfo, userLists, latestCommit, mbccEnabled } = data;
+	const { user, stylesInfo, userLists, latestCommit } = data;
 	const stockListDetails = data.stockList ?? undefined;
 	const stockList: StockList | undefined = stockListDetails && {
 		listId: stockListDetails.listId,
@@ -147,7 +144,7 @@ export default function Home() {
 						latestCommit={latestCommit}
 					/>
 					<Box my="md">
-						<VenueStyles styles={stylesInfo.styles} mbccEnabled={mbccEnabled} />
+						<VenueStyles styles={stylesInfo.styles} />
 					</Box>
 					<CheckBeer
 						styles={stylesInfo.styles}

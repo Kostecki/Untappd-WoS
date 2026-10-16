@@ -8,10 +8,9 @@
     "dev": "react-router dev",
     "format": "biome check --write .",
     "lint": "biome check .",
-    "mbcc:precompile": "node ./scripts/mbcc-precompile.mjs",
-    "mbcc:precompile:cron": "bash ./scripts/mbcc-precompile-cron.sh",
     "start": "dotenv -e .env react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "venues:jonpacker": "node ./scripts/jonpacker-to-csv.mjs"
   },
   "dependencies": {
     "@mantine/core": "^9.5.0",
@@ -21,7 +20,6 @@
     "@react-router/serve": "^8.3.0",
     "@tabler/icons-react": "^3.46.0",
     "barcode-detector": "^3.2.1",
-    "cheerio": "^1.2.0",
     "dotenv-cli": "^11.0.0",
     "isbot": "^5.2.1",
     "react": "^19.2.8",
@@ -40,6 +38,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "autoprefixer": "^10.5.4",
+    "cheerio": "^1.2.0",
     "postcss": "^8.5.25",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",

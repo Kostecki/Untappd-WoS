@@ -23,6 +23,8 @@ declare global {
 	}
 
 	interface VenueDetails extends Venue {
+		/** Uploaded from /admin rather than an Untappd venue */
+		temporary?: true;
 		has_beer: number;
 		has_food: number;
 		has_wine: number;
@@ -32,12 +34,6 @@ declare global {
 
 	interface VenueSearchAPIResponse {
 		venue: Venue;
-	}
-
-	type MBCCSession = "yellow" | "blue" | "red" | "green";
-
-	interface MBCCVenueDetails extends VenueDetails {
-		mbcc_event: true;
 	}
 
 	interface VenueMenuDetails {
@@ -55,23 +51,6 @@ declare global {
 
 	interface VenueDetailsAPIResponse {
 		menu: VenueMenuDetails;
-	}
-
-	interface MBCCVenueMenuDetails extends VenueMenuDetails {
-		mbcc_event: true;
-		mbcc_session: MBCCSession;
-	}
-
-	interface MBCCCompiledData {
-		event_id: "mbcc-2026";
-		generated_at: string;
-		venues: MBCCVenueDetails[];
-		menus: Record<MBCCSession, MBCCVenueMenuDetails[]>;
-		diagnostics: {
-			source_version: string;
-			resolved_beers: number;
-			unresolved_beers: number;
-		};
 	}
 
 	// Beer and Brewery

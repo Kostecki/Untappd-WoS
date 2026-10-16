@@ -1,6 +1,8 @@
 import { redirect } from "react-router";
 
 import { requireUser } from "~/auth/user.server";
+import { toMenus as toTemporaryMenus } from "~/temporary-venues/mappers.server";
+import { getTemporaryVenue } from "~/temporary-venues/store.server";
 import { getVenueMenuSections, getVenueMenus } from "~/untappd/api.server";
 import { isInvalidToken, withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/venue";
@@ -81,6 +83,12 @@ const toMenus = (sections: MenuSectionsSection[]): VenueMenuDetails[] => {
 export async function loader({ request, params }: Route.LoaderArgs) {
 	const user = await requireUser(request);
 	const { venueId } = params;
+
+	// Temporary venues have negative ids and are served from storage
+	if (Number(venueId) < 0) {
+		const venue = await getTemporaryVenue(Number(venueId));
+		return Response.json(venue ? toTemporaryMenus(venue) : []);
+	}
 
 	try {
 		const sections = await getVenueMenuSections(user.accessToken, venueId);

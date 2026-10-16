@@ -1,12 +1,22 @@
-import { mkdir, rename, writeFile } from "node:fs/promises";
-import path from "node:path";
+// Converts an MBCC beer list from mbcc.jonpacker.com into the CSV format the
+// /admin page accepts for temporary venues.
+//
+//   pnpm venues:jonpacker [source] [output.csv]
+//
+// source: URL or local file (default https://mbcc.jonpacker.com/latest.json)
+// output: CSV path (default mbcc.csv)
+//
+// The source has no Untappd styles, so each beer's style is scraped from its
+// public Untappd page, throttled (see the MBCC_SCRAPE_* env vars). If the output
+// CSV already exists, its styles are reused and only new beers are scraped.
+import { existsSync } from "node:fs";
+import { readFile, rename, writeFile } from "node:fs/promises";
 import * as cheerio from "cheerio";
 
-const outPath =
-	process.env.MBCC_COMPILED_PATH ??
-	path.resolve(process.cwd(), "data/mbcc-2026.compiled.json");
-const sourceURL =
-	process.env.MBCC_SOURCE_URL ?? "https://mbcc.jonpacker.com/latest.json";
+const [sourceArg, outArg] = process.argv.slice(2);
+const source = sourceArg ?? "https://mbcc.jonpacker.com/latest.json";
+const outPath = outArg ?? "mbcc.csv";
+
 const scrapeEnabled = process.env.MBCC_SCRAPE_STYLES !== "0";
 const scrapeConcurrency = Number(process.env.MBCC_SCRAPE_CONCURRENCY ?? "2");
 const scrapeDelayMs = Number(process.env.MBCC_SCRAPE_DELAY_MS ?? "1200");
@@ -18,49 +28,23 @@ const scrapeRateLimitCooldownMs = Number(
 	process.env.MBCC_SCRAPE_RATE_LIMIT_COOLDOWN_MS ?? "60000",
 );
 
-const sessionMeta = {
-	yellow: { id: -202601, title: "Yellow" },
-	blue: { id: -202602, title: "Blue" },
-	red: { id: -202603, title: "Red" },
-	green: { id: -202604, title: "Green" },
-};
-const mbccVenueId = -202600;
-
-const baseVenue = {
-	venue_slug: "mbcc-2026",
-	venue_address: "Øksnehallen",
-	venue_city: "København",
-	venue_state: "Hovedstaden",
-	venue_country: "Danmark",
-	venue_icon: { sm: "", md: "", lg: "" },
-	is_verified: true,
-	is_closed: 0,
-	primary_category: "Festival",
-	location: "55.6694, 12.5621",
-	has_beer: 1,
-	has_food: 1,
-	has_wine: 0,
-	has_spirits: 0,
+const sessionNames = {
+	yellow: "Yellow session",
+	blue: "Blue session",
+	red: "Red session",
+	green: "Green session",
 };
 
-const isSession = (value) => {
-	return (
-		value === "yellow" ||
-		value === "blue" ||
-		value === "red" ||
-		value === "green"
-	);
-};
-
-const parseRating = (value) => {
-	const rating = Number(value);
-	return Number.isFinite(rating) ? rating : 0;
-};
-
-const parseNumber = (value) => {
-	const num = Number(value);
-	return Number.isFinite(num) ? num : 0;
-};
+const columns = [
+	"menu",
+	"bid",
+	"name",
+	"brewery",
+	"style",
+	"abv",
+	"country",
+	"rating",
+];
 
 const sleep = async (ms) => {
 	if (ms <= 0) {
@@ -70,31 +54,6 @@ const sleep = async (ms) => {
 	await new Promise((resolve) => {
 		setTimeout(resolve, ms);
 	});
-};
-
-const slugify = (value) => {
-	return String(value)
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/(^-|-$)/g, "");
-};
-
-const fetchSourceBeers = async () => {
-	const response = await fetch(sourceURL);
-	if (!response.ok) {
-		throw new Error(`Failed to fetch MBCC source (${response.status})`);
-	}
-
-	const payload = await response.json();
-	if (
-		!payload ||
-		typeof payload !== "object" ||
-		!Array.isArray(payload.beers)
-	) {
-		throw new Error("MBCC source schema invalid: missing beers array");
-	}
-
-	return payload.beers;
 };
 
 const createBeerLink = (beerId) => {
@@ -311,171 +270,141 @@ const scrapeStylesByBid = async (bids) => {
 	return stylesByBid;
 };
 
-const mapBeerToSectionItem = (rawBeer, generatedAt, scrapedStyles) => {
-	const bid = parseNumber(rawBeer.ut_bid);
-	const beerName = String(rawBeer.name || "Unknown Beer");
-	const breweryName = String(rawBeer.brewery || "Unknown Brewery");
-	const beerSlug = slugify(beerName) || `beer-${bid}`;
-	const brewerySlug = slugify(breweryName) || `brewery-${rawBeer.id ?? bid}`;
-	const scrapedStyle = scrapedStyles.get(bid);
+const readSource = async () => {
+	const payload = /^https?:\/\//.test(source)
+		? await fetch(source).then((response) => {
+				if (!response.ok) {
+					throw new Error(`Failed to fetch ${source} (${response.status})`);
+				}
+				return response.json();
+			})
+		: JSON.parse(await readFile(source, "utf8"));
 
-	return {
-		created_at: generatedAt,
-		price: { value: "0", currency: "DKK", currency_symbol: "kr" },
-		serving_type: "taster",
-		beer: {
-			bid,
-			beer_name: beerName,
-			beer_label: String(rawBeer.logo || ""),
-			beer_abv: parseNumber(rawBeer.percent),
-			beer_ibu: 0,
-			beer_slug: beerSlug,
-			beer_description: String(rawBeer.desc || ""),
-			// MBCC-only enhancement: prefer scraped Untappd style by bid.
-			beer_style: String(scrapedStyle || rawBeer.superstyle || "Unknown"),
-			// Source does not provide Untappd style ids, use synthetic stable marker.
-			beer_style_id: -1,
-			is_in_production: rawBeer.disabled ? 0 : 1,
-			rating_score: parseRating(rawBeer.ut_rating),
-			rating_count: parseNumber(rawBeer.ut_rating_count),
-		},
-		brewery: {
-			brewery_id: parseNumber(rawBeer.id) || bid,
-			brewery_name: breweryName,
-			brewery_slug: brewerySlug,
-			brewery_page_url: "",
-			brewery_label: String(rawBeer.breweryLogo || ""),
-			country_name: String(rawBeer.breweryCountryCode || "Unknown"),
-			location: {
-				brewery_city: "",
-				brewery_state: "",
-				lat: 0,
-				lng: 0,
-			},
-		},
-	};
-};
-
-const buildCompiled = async (sourceBeers) => {
-	const generatedAt = new Date().toISOString();
-	const sessions = Object.keys(sessionMeta);
-	const scrapeBids = sourceBeers
-		.filter((rawBeer) => isSession(rawBeer?.session))
-		.map((rawBeer) => parseNumber(rawBeer.ut_bid))
-		.filter((bid) => bid > 0);
-	const scrapedStyles = await scrapeStylesByBid(scrapeBids);
-
-	const groupedBeers = {
-		yellow: [],
-		blue: [],
-		red: [],
-		green: [],
-	};
-	const seenInSession = {
-		yellow: new Set(),
-		blue: new Set(),
-		red: new Set(),
-		green: new Set(),
-	};
-
-	let unresolvedBeers = 0;
-
-	for (const rawBeer of sourceBeers) {
-		if (!isSession(rawBeer?.session)) {
-			unresolvedBeers += 1;
-			continue;
-		}
-
-		const session = rawBeer.session;
-		const bid = parseNumber(rawBeer.ut_bid);
-		if (!bid) {
-			unresolvedBeers += 1;
-			continue;
-		}
-
-		if (seenInSession[session].has(bid)) {
-			continue;
-		}
-
-		seenInSession[session].add(bid);
-		groupedBeers[session].push(
-			mapBeerToSectionItem(rawBeer, generatedAt, scrapedStyles),
-		);
+	if (!Array.isArray(payload?.beers)) {
+		throw new Error("Source schema invalid: missing beers array");
 	}
-
-	const venues = [
-		{
-			venue_id: mbccVenueId,
-			venue_name: "MBCC 2026",
-			mbcc_event: true,
-			url: "https://mbcc.jonpacker.com",
-			...baseVenue,
-		},
-	];
-
-	const menus = sessions.reduce((acc, session) => {
-		const { id, title } = sessionMeta[session];
-		const items = groupedBeers[session] ?? [];
-		acc[session] = [
-			{
-				menu_id: id,
-				menu_name: title,
-				menu_description: `Beer list for the ${title} Session at MBCC 2026`,
-				created_at: generatedAt,
-				updated_at: generatedAt,
-				total_item_count: items.length,
-				sections: {
-					count: 1,
-					items: [
-						{
-							section_id: id,
-							section_name: "All beers",
-							section_description: "",
-							count: items.length,
-							items,
-						},
-					],
-				},
-				mbcc_event: true,
-				mbcc_session: session,
-			},
-		];
-		return acc;
-	}, {});
-
-	const resolvedBeers =
-		groupedBeers.yellow.length +
-		groupedBeers.blue.length +
-		groupedBeers.red.length +
-		groupedBeers.green.length;
-
-	return {
-		event_id: "mbcc-2026",
-		generated_at: generatedAt,
-		venues,
-		menus,
-		diagnostics: {
-			source_version: sourceURL,
-			resolved_beers: resolvedBeers,
-			unresolved_beers: unresolvedBeers,
-		},
-	};
+	return payload.beers;
 };
+
+// Minimal CSV parsing for our own output (quoted fields, "" escapes)
+const parseCsvLine = (line) => {
+	const cells = [];
+	let cell = "";
+	let quoted = false;
+	for (let i = 0; i < line.length; i++) {
+		const char = line[i];
+		if (quoted && char === '"' && line[i + 1] === '"') {
+			cell += '"';
+			i++;
+		} else if (char === '"') {
+			quoted = !quoted;
+		} else if (char === "," && !quoted) {
+			cells.push(cell);
+			cell = "";
+		} else {
+			cell += char;
+		}
+	}
+	cells.push(cell);
+	return cells;
+};
+
+/** Styles from a previous run of this script, so they aren't scraped again */
+const readPreviousStyles = async () => {
+	const styles = new Map();
+	if (!existsSync(outPath)) return styles;
+
+	const [header, ...lines] = (await readFile(outPath, "utf8"))
+		.split(/\r?\n/)
+		.filter(Boolean);
+	const keys = parseCsvLine(header);
+	const bidIndex = keys.indexOf("bid");
+	const styleIndex = keys.indexOf("style");
+	const scrapedIndex = keys.indexOf("style_source");
+
+	for (const line of lines) {
+		const cells = parseCsvLine(line);
+		// Only reuse styles that actually came from Untappd
+		if (cells[scrapedIndex] === "untappd" && cells[styleIndex]) {
+			styles.set(Number(cells[bidIndex]), cells[styleIndex]);
+		}
+	}
+	return styles;
+};
+
+const csvCell = (value) => {
+	const text = value === null || value === undefined ? "" : String(value);
+	return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+};
+
+// Homebrew beers show their style as "Homebrew, <style>" on Untappd
+const cleanStyle = (style) => style.replace(/^Homebrew,\s*/i, "").trim();
 
 const main = async () => {
-	const sourceBeers = await fetchSourceBeers();
-	const compiled = await buildCompiled(sourceBeers);
-	const outDir = path.dirname(outPath);
-	await mkdir(outDir, { recursive: true });
+	const sourceBeers = await readSource();
+	const previousStyles = await readPreviousStyles();
 
-	const tempPath = `${outPath}.tmp`;
-	await writeFile(tempPath, `${JSON.stringify(compiled, null, 2)}\n`, "utf8");
-	await rename(tempPath, outPath);
+	const beers = sourceBeers.filter(
+		(beer) => sessionNames[beer?.session] && Number(beer.ut_bid) > 0,
+	);
+	const skipped = sourceBeers.length - beers.length;
 
-	console.log(`MBCC compiled data written: ${outPath}`);
+	const toScrape = beers
+		.map((beer) => Number(beer.ut_bid))
+		.filter((bid) => !previousStyles.has(bid));
+	console.log(
+		`${beers.length} beers, ${previousStyles.size} styles reused from ${outPath}, ${new Set(toScrape).size} to scrape`,
+	);
+	const scrapedStyles = await scrapeStylesByBid(toScrape);
+
+	const seen = new Set();
+	const rows = [];
+	let fallbacks = 0;
+
+	for (const beer of beers) {
+		const bid = Number(beer.ut_bid);
+		const menu = sessionNames[beer.session];
+		// The same beer listed twice in one session is shown once anyway
+		if (seen.has(`${menu}:${bid}`)) continue;
+		seen.add(`${menu}:${bid}`);
+
+		const untappdStyle = previousStyles.get(bid) ?? scrapedStyles.get(bid);
+		if (!untappdStyle) fallbacks++;
+
+		rows.push({
+			menu,
+			bid,
+			name: beer.name,
+			brewery: beer.brewery,
+			// Falls back to jonpacker's own style name, shown as unknown on upload
+			style: untappdStyle ? cleanStyle(untappdStyle) : beer.superstyle,
+			abv: beer.percent,
+			country: beer.breweryCountryCode,
+			rating: beer.ut_rating,
+			style_source: untappdStyle ? "untappd" : "jonpacker",
+		});
+	}
+
+	const header = [...columns, "style_source"];
+	const csv = [
+		header.join(","),
+		...rows.map((row) => header.map((key) => csvCell(row[key])).join(",")),
+	].join("\n");
+
+	await writeFile(`${outPath}.tmp`, `${csv}\n`, "utf8");
+	await rename(`${outPath}.tmp`, outPath);
+
+	console.log(
+		`Wrote ${rows.length} rows to ${outPath} (${skipped} source beers without session or bid skipped)`,
+	);
+	if (fallbacks > 0) {
+		console.warn(
+			`${fallbacks} beers have no Untappd style and use jonpacker's style name; run again to retry them`,
+		);
+	}
 };
 
 main().catch((error) => {
-	console.error("Failed to precompile MBCC data", error);
+	console.error("Failed to convert MBCC data", error);
 	process.exitCode = 1;
 });
