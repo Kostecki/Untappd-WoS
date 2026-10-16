@@ -8,9 +8,10 @@ import {
 	Stack,
 	Switch,
 	Text,
+	Tooltip,
 } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import { IconLogout } from "@tabler/icons-react";
+import { IconLogout, IconTool } from "@tabler/icons-react";
 import { Link } from "react-router";
 import type { PublicUser } from "~/auth/auth.server";
 import { Settings, setSettings, useIsMobile } from "~/utils";
@@ -99,6 +100,19 @@ export const Profile = ({
 					<Text>{fullName}</Text>
 				</Group>
 				<Group>
+					{user.isAdmin && (
+						<Tooltip label="Temporary venues" withArrow>
+							<ActionIcon
+								component={Link}
+								variant="transparent"
+								aria-label="Admin"
+								color="dark"
+								to="/admin"
+							>
+								<IconTool stroke={1} />
+							</ActionIcon>
+						</Tooltip>
+					)}
 					<SettingsModal
 						user={user}
 						userLists={userLists}
