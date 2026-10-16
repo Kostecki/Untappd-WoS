@@ -1,4 +1,5 @@
 import {
+	Box,
 	Card,
 	Checkbox,
 	Collapse,
@@ -84,95 +85,98 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 				onChange={(event) => setSearchTerm(event.currentTarget.value)}
 			/>
 
-			<Table
+			{/* Scroll on a wrapper so the table keeps its normal full-width layout */}
+			<Box
 				mt="lg"
-				stickyHeader
 				style={{
-					display: "block",
-					overflowY: "scroll",
+					overflowY: "auto",
 					maxHeight: windowHeight - 140,
 					scrollbarWidth: "thin",
 				}}
 			>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th w="360px">{`Styles (${filteredStyles.length})`}</Table.Th>
-						<Table.Th ta="center">Have Had</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{filteredStyles.map((style) => {
-						const haveStyleInStock = stockListDetails?.styles.includes(
-							style.styleId,
-						);
+				<Table stickyHeader>
+					<Table.Thead>
+						<Table.Tr>
+							<Table.Th>{`Styles (${filteredStyles.length})`}</Table.Th>
+							<Table.Th ta="center" w={1} style={{ whiteSpace: "nowrap" }}>
+								Have Had
+							</Table.Th>
+						</Table.Tr>
+					</Table.Thead>
+					<Table.Tbody>
+						{filteredStyles.map((style) => {
+							const haveStyleInStock = stockListDetails?.styles.includes(
+								style.styleId,
+							);
 
-						const ShowHaveStyleInStock = () => {
-							if (haveStyleInStock) {
-								const beer = findBeerByStyle(style.styleId);
+							const ShowHaveStyleInStock = () => {
+								if (haveStyleInStock) {
+									const beer = findBeerByStyle(style.styleId);
 
-								if (beer) {
-									return (
-										<Text fw="500" size="xs" ml="sm" fs="italic" c="dimmed">
-											On list: {stockListDetails?.listName}
-										</Text>
-									);
+									if (beer) {
+										return (
+											<Text fw="500" size="xs" ml="sm" fs="italic" c="dimmed">
+												On list: {stockListDetails?.listName}
+											</Text>
+										);
+									}
 								}
-							}
-						};
+							};
 
-						return (
-							<Fragment key={style.styleId}>
-								<Table.Tr
-									onClick={() => toggleRow(style.styleId)}
-									style={{ cursor: "pointer", userSelect: "none" }}
-								>
-									<Table.Td>
-										<Flex align="center">
-											{openRow === style.styleId ? (
-												<IconChevronDown size={20} color="gray" stroke={1.5} />
-											) : (
-												<IconChevronUp size={20} color="gray" stroke={1.5} />
-											)}
+							return (
+								<Fragment key={style.styleId}>
+									<Table.Tr
+										onClick={() => toggleRow(style.styleId)}
+										style={{ cursor: "pointer", userSelect: "none" }}
+									>
+										<Table.Td>
+											<Flex align="center">
+												{openRow === style.styleId ? (
+													<IconChevronDown size={20} color="gray" stroke={1.5} />
+												) : (
+													<IconChevronUp size={20} color="gray" stroke={1.5} />
+												)}
 
-											<Stack gap={0}>
-												<Text fw="500" size="xs" ml="sm">
-													{style.styleName}
-												</Text>
-												<ShowHaveStyleInStock />
-											</Stack>
-										</Flex>
-									</Table.Td>
+												<Stack gap={0}>
+													<Text fw="500" size="xs" ml="sm">
+														{style.styleName}
+													</Text>
+													<ShowHaveStyleInStock />
+												</Stack>
+											</Flex>
+										</Table.Td>
 
-									<Table.Td>
-										<Flex justify="center">
-											<Checkbox
-												color="untappd"
-												checked={style.had}
-												indeterminate={haveStyleInStock}
-												readOnly
-											/>
-										</Flex>
-									</Table.Td>
+										<Table.Td>
+											<Flex justify="center">
+												<Checkbox
+													color="untappd"
+													checked={style.had}
+													indeterminate={haveStyleInStock}
+													readOnly
+												/>
+											</Flex>
+										</Table.Td>
 
-								</Table.Tr>
-								<Table.Tr style={{ border: "none" }}>
-									<Table.Td colSpan={2} p={0}>
-										<Collapse expanded={openRow === style.styleId}>
-											{loading ? (
-												<Flex justify="center">
-													<Loader color="untappd" my="lg" />
-												</Flex>
-											) : (
-												<StyleBeers {...styleBeers} />
-											)}
-										</Collapse>
-									</Table.Td>
-								</Table.Tr>
-							</Fragment>
-						);
-					})}
-				</Table.Tbody>
-			</Table>
+									</Table.Tr>
+									<Table.Tr style={{ border: "none" }}>
+										<Table.Td colSpan={2} p={0}>
+											<Collapse expanded={openRow === style.styleId}>
+												{loading ? (
+													<Flex justify="center">
+														<Loader color="untappd" my="lg" />
+													</Flex>
+												) : (
+													<StyleBeers {...styleBeers} />
+												)}
+											</Collapse>
+										</Table.Td>
+									</Table.Tr>
+								</Fragment>
+							);
+						})}
+					</Table.Tbody>
+				</Table>
+			</Box>
 		</Card>
 	);
 };
