@@ -8,3 +8,6 @@
 .env
 
 mbcc-2026.json
+# Reverse-engineering inputs
+*.xapk
+*.apk
