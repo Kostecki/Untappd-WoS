@@ -25,6 +25,7 @@ import { getToast } from "remix-toast";
 import type { Route } from "./+types/root";
 
 import "@mantine/core/styles.css";
+import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import stylesheet from "./app.css?url";
 

@@ -17,9 +17,10 @@ import {
 	Title,
 	Tooltip,
 } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
-import { useEffect, useRef } from "react";
-import { Form, Link, useFetcher, useNavigation } from "react-router";
+import { Dropzone } from "@mantine/dropzone";
+import { IconArrowLeft, IconFileSpreadsheet, IconX } from "@tabler/icons-react";
+import { useEffect, useRef, useState } from "react";
+import { Form, Link, useFetcher, useNavigation, useSubmit } from "react-router";
 import { dataWithError, dataWithSuccess } from "remix-toast";
 
 import { requireAdmin } from "~/auth/user.server";
@@ -203,6 +204,15 @@ export async function action({ request }: Route.ActionArgs) {
 	}
 }
 
+// Browsers report CSV as text/csv or (Windows) application/vnd.ms-excel
+const dropzoneAccept = {
+	"text/csv": [".csv"],
+	"application/vnd.ms-excel": [".csv"],
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+		".xlsx",
+	],
+};
+
 const uploadAccept =
 	".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
@@ -357,7 +367,10 @@ export default function Admin({
 }: Route.ComponentProps) {
 	const { venues } = loaderData;
 	const navigation = useNavigation();
+	const submit = useSubmit();
 	const createForm = useRef<HTMLFormElement>(null);
+	const [file, setFile] = useState<File | null>(null);
+	const [fileError, setFileError] = useState<string | null>(null);
 	const creating =
 		navigation.state === "submitting" &&
 		navigation.formData?.get("intent") === "create";
@@ -366,8 +379,22 @@ export default function Admin({
 	useEffect(() => {
 		if (navigation.state === "idle" && !actionData?.errors) {
 			createForm.current?.reset();
+			setFile(null);
 		}
 	}, [navigation.state, actionData]);
+
+	// The dropzone keeps the file in state, so add it to the form data here
+	const handleCreate = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (!file) {
+			setFileError("Add a file with the beers.");
+			return;
+		}
+
+		const formData = new FormData(event.currentTarget);
+		formData.set("file", file);
+		submit(formData, { method: "post", encType: "multipart/form-data" });
+	};
 
 	return (
 		<Container size="1000" my="lg">
@@ -388,7 +415,12 @@ export default function Admin({
 				<Text fw={500} mb="xs">
 					Add a venue
 				</Text>
-				<Form method="post" encType="multipart/form-data" ref={createForm}>
+				<Form
+					method="post"
+					encType="multipart/form-data"
+					ref={createForm}
+					onSubmit={handleCreate}
+				>
 					<input type="hidden" name="intent" value="create" />
 					<Stack gap="sm">
 						<Group grow align="flex-start">
@@ -397,21 +429,59 @@ export default function Admin({
 						</Group>
 						<Group grow align="flex-start">
 							<TextInput name="url" label="Link" type="url" />
-							<TextInput
-								name="endsOn"
-								label="Last day"
-								type="date"
-								description="Hidden after this day"
-							/>
+							<TextInput name="endsOn" label="Last day" type="date" />
 						</Group>
-						<Input.Wrapper label="Beers" required description={uploadHelp}>
-							<input
-								type="file"
-								name="file"
-								accept={uploadAccept}
-								required
-								style={{ display: "block", marginTop: 8 }}
-							/>
+						<Input.Wrapper
+							label="Beers"
+							required
+							description={uploadHelp}
+							error={fileError}
+						>
+							<Dropzone
+								mt="xs"
+								multiple={false}
+								accept={dropzoneAccept}
+								maxSize={maxUploadBytes}
+								onDrop={([dropped]) => {
+									setFile(dropped);
+									setFileError(null);
+								}}
+								onReject={([rejection]) => {
+									setFile(null);
+									setFileError(
+										rejection?.errors[0]?.code === "file-too-large"
+											? "The file is larger than 2 MB."
+											: "Use an .xlsx or .csv file.",
+									);
+								}}
+							>
+								<Group
+									justify="center"
+									gap="sm"
+									mih={80}
+									style={{ pointerEvents: "none" }}
+								>
+									<Dropzone.Accept>
+										<IconFileSpreadsheet size={32} stroke={1.5} />
+									</Dropzone.Accept>
+									<Dropzone.Reject>
+										<IconX size={32} stroke={1.5} />
+									</Dropzone.Reject>
+									<Dropzone.Idle>
+										<IconFileSpreadsheet size={32} stroke={1.5} color="gray" />
+									</Dropzone.Idle>
+									<Stack gap={0}>
+										<Text size="sm" fw={file ? 500 : undefined}>
+											{file ? file.name : "Drop an .xlsx or .csv file here"}
+										</Text>
+										<Text size="xs" c="dimmed">
+											{file
+												? "Drop or click to choose another file"
+												: "or click to choose a file"}
+										</Text>
+									</Stack>
+								</Group>
+							</Dropzone>
 						</Input.Wrapper>
 						{actionData?.errors && (
 							<List size="sm" c="red" spacing={2}>
