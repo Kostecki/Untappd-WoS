@@ -1,5 +1,4 @@
 import {
-	Badge,
 	CloseButton,
 	Combobox,
 	type ComboboxStore,
@@ -153,17 +152,19 @@ export const SearchSelect = ({
 						value={input.venue_id.toString()}
 						key={input.venue_id}
 					>
-						<Group gap="xs" wrap="nowrap">
-							<Badge size="xs" color="untappd" variant="light">
-								Temporary
-							</Badge>
+						{/* Same layout as Untappd venues, minus the verified icon */}
+						<Flex
+							direction={mobile ? "column" : "row"}
+							justify="space-between"
+							w="100%"
+						>
 							<Text size="sm">{input.venue_name}</Text>
 							{input.venue_address && (
 								<Text size="sm" c="dimmed" fs="italic">
 									({input.venue_address})
 								</Text>
 							)}
-						</Group>
+						</Flex>
 					</Combobox.Option>
 				);
 			}

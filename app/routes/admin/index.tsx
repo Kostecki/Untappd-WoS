@@ -9,6 +9,7 @@ import {
 	Group,
 	Input,
 	List,
+	Loader,
 	Stack,
 	Switch,
 	Table,
@@ -19,7 +20,7 @@ import {
 } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { IconArrowLeft, IconFileSpreadsheet, IconX } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Form, Link, useFetcher, useNavigation, useSubmit } from "react-router";
 import { dataWithError, dataWithSuccess } from "remix-toast";
 
@@ -221,13 +222,12 @@ const uploadHelp = (
 		An Excel file from the{" "}
 		<Anchor href="/admin/template.xlsx" size="sm" download>
 			template
-		</Anchor>{" "}
-		(it has a dropdown of all Untappd styles), or a CSV. One row per beer with a
-		header row. Required: <Code>bid</Code>, <Code>name</Code>,{" "}
-		<Code>brewery</Code>, <Code>style</Code> (the Untappd style name). Optional:{" "}
-		<Code>menu</Code> (groups beers into menus), <Code>abv</Code>,{" "}
-		<Code>country</Code>, <Code>rating</Code>. For CSV, comma or semicolon
-		separated.
+		</Anchor>
+		, or a CSV. One row per beer with a header row. Required: <Code>bid</Code>,{" "}
+		<Code>name</Code>, <Code>brewery</Code>, <Code>style</Code> (the Untappd
+		style name). Optional: <Code>menu</Code> (groups beers into menus),{" "}
+		<Code>abv</Code>, <Code>country</Code>, <Code>rating</Code>. For CSV, comma
+		or semicolon separated.
 	</Text>
 );
 
@@ -245,121 +245,220 @@ const VenueRow = ({
 	venue: Route.ComponentProps["loaderData"]["venues"][0];
 }) => {
 	const fetcher = useFetcher();
+	const beersFetcher = useFetcher();
 	const replaceForm = useRef<HTMLFormElement>(null);
+	const [showBeers, setShowBeers] = useState(false);
 	const beerCount = venue.menus.reduce((sum, menu) => sum + menu.count, 0);
+	const menus = beersFetcher.data as VenueMenuDetails[] | undefined;
+
+	const { load } = beersFetcher;
+	const loadBeers = useCallback(
+		() => load(`/api/venue/${venue.id}`),
+		[load, venue.id],
+	);
+
+	// Reload while open when the beers are replaced
+	// biome-ignore lint/correctness/useExhaustiveDependencies: updatedAt is the trigger
+	useEffect(() => {
+		if (showBeers) loadBeers();
+	}, [venue.updatedAt]);
+
+	const toggleBeers = () => {
+		if (!showBeers) loadBeers();
+		setShowBeers(!showBeers);
+	};
 
 	return (
-		<Table.Tr>
-			<Table.Td>
-				<Stack gap={2}>
-					<Text fw={500}>
-						{venue.url ? (
-							<Anchor href={venue.url} target="_blank" c="dark">
-								{venue.name}
-							</Anchor>
-						) : (
-							venue.name
-						)}
-					</Text>
-					{venue.location && (
-						<Text size="xs" c="dimmed">
-							{venue.location}
+		<>
+			<Table.Tr>
+				<Table.Td>
+					<Stack gap={2}>
+						<Text fw={500}>
+							{venue.url ? (
+								<Anchor href={venue.url} target="_blank" c="dark">
+									{venue.name}
+								</Anchor>
+							) : (
+								venue.name
+							)}
 						</Text>
-					)}
-					<Text size="xs" c="dimmed">
-						{beerCount} beers ·{" "}
-						{venue.menus
-							.map((menu) => `${menu.name} (${menu.count})`)
-							.join(", ")}
-					</Text>
-					{venue.unknownStyles.length > 0 && (
-						<Tooltip
-							multiline
-							w={320}
-							withArrow
-							label={venue.unknownStyles.join(", ")}
-						>
-							<Text size="xs" c="orange" w="fit-content">
-								{venue.unknownStyles.length} unknown style name(s)
+						{venue.location && (
+							<Text size="xs" c="dimmed">
+								{venue.location}
 							</Text>
-						</Tooltip>
-					)}
-				</Stack>
-			</Table.Td>
-			<Table.Td>{statusBadge(venue)}</Table.Td>
-			<Table.Td>
-				<fetcher.Form method="post">
-					<input type="hidden" name="intent" value="toggle" />
-					<input type="hidden" name="id" value={venue.id} />
-					<Switch
-						color="untappd"
-						checked={venue.active}
-						onChange={(event) => fetcher.submit(event.currentTarget.form)}
-						aria-label="Active"
-					/>
-				</fetcher.Form>
-			</Table.Td>
-			<Table.Td>
-				<fetcher.Form method="post">
-					<input type="hidden" name="intent" value="set-end-date" />
-					<input type="hidden" name="id" value={venue.id} />
-					<TextInput
-						type="date"
-						name="endsOn"
-						size="xs"
-						defaultValue={venue.endsOn ?? ""}
-						onChange={(event) => fetcher.submit(event.currentTarget.form)}
-						aria-label="Last day"
-					/>
-				</fetcher.Form>
-			</Table.Td>
-			<Table.Td>
-				<Group gap="xs" wrap="nowrap">
-					<Form method="post" encType="multipart/form-data" ref={replaceForm}>
-						<input type="hidden" name="intent" value="replace" />
+						)}
+						<Text size="xs" c="dimmed">
+							{beerCount} beers ·{" "}
+							{venue.menus
+								.map((menu) => `${menu.name} (${menu.count})`)
+								.join(", ")}
+						</Text>
+						{venue.unknownStyles.length > 0 && (
+							<Tooltip
+								multiline
+								w={320}
+								withArrow
+								label={venue.unknownStyles.join(", ")}
+							>
+								<Text size="xs" c="orange" w="fit-content">
+									{venue.unknownStyles.length} unknown style name(s)
+								</Text>
+							</Tooltip>
+						)}
+					</Stack>
+				</Table.Td>
+				<Table.Td>{statusBadge(venue)}</Table.Td>
+				<Table.Td>
+					<fetcher.Form method="post">
+						<input type="hidden" name="intent" value="toggle" />
 						<input type="hidden" name="id" value={venue.id} />
-						<input
-							type="file"
-							name="file"
-							accept={uploadAccept}
-							hidden
-							onChange={() => replaceForm.current?.requestSubmit()}
+						<Switch
+							color="untappd"
+							checked={venue.active}
+							onChange={(event) => fetcher.submit(event.currentTarget.form)}
+							aria-label="Active"
 						/>
+					</fetcher.Form>
+				</Table.Td>
+				<Table.Td>
+					<fetcher.Form method="post">
+						<input type="hidden" name="intent" value="set-end-date" />
+						<input type="hidden" name="id" value={venue.id} />
+						<TextInput
+							type="date"
+							name="endsOn"
+							size="xs"
+							defaultValue={venue.endsOn ?? ""}
+							onChange={(event) => fetcher.submit(event.currentTarget.form)}
+							aria-label="Last day"
+						/>
+					</fetcher.Form>
+				</Table.Td>
+				<Table.Td>
+					<Group gap="xs" wrap="nowrap">
 						<Button
 							size="compact-xs"
 							variant="subtle"
 							color="gray"
-							onClick={() =>
-								replaceForm.current
-									?.querySelector<HTMLInputElement>("input[type=file]")
-									?.click()
-							}
+							onClick={toggleBeers}
 						>
-							Replace beers
+							{showBeers ? "Hide beers" : "Show beers"}
 						</Button>
-					</Form>
-					<fetcher.Form
-						method="post"
-						onSubmit={(event) => {
-							if (!confirm(`Delete "${venue.name}"?`)) event.preventDefault();
-						}}
-					>
-						<input type="hidden" name="intent" value="delete" />
-						<input type="hidden" name="id" value={venue.id} />
-						<Button
-							size="compact-xs"
-							variant="subtle"
-							color="red"
-							type="submit"
+						<Form method="post" encType="multipart/form-data" ref={replaceForm}>
+							<input type="hidden" name="intent" value="replace" />
+							<input type="hidden" name="id" value={venue.id} />
+							<input
+								type="file"
+								name="file"
+								accept={uploadAccept}
+								hidden
+								onChange={() => replaceForm.current?.requestSubmit()}
+							/>
+							<Button
+								size="compact-xs"
+								variant="subtle"
+								color="gray"
+								onClick={() =>
+									replaceForm.current
+										?.querySelector<HTMLInputElement>("input[type=file]")
+										?.click()
+								}
+							>
+								Replace beers
+							</Button>
+						</Form>
+						<fetcher.Form
+							method="post"
+							onSubmit={(event) => {
+								if (!confirm(`Delete "${venue.name}"?`)) event.preventDefault();
+							}}
 						>
-							Delete
-						</Button>
-					</fetcher.Form>
-				</Group>
-			</Table.Td>
-		</Table.Tr>
+							<input type="hidden" name="intent" value="delete" />
+							<input type="hidden" name="id" value={venue.id} />
+							<Button
+								size="compact-xs"
+								variant="subtle"
+								color="red"
+								type="submit"
+							>
+								Delete
+							</Button>
+						</fetcher.Form>
+					</Group>
+				</Table.Td>
+			</Table.Tr>
+			{showBeers && (
+				<Table.Tr>
+					<Table.Td colSpan={5} bg="var(--mantine-color-gray-0)">
+						{!menus ? (
+							<Loader size="sm" color="untappd" m="sm" />
+						) : (
+							<VenueBeers menus={menus} />
+						)}
+					</Table.Td>
+				</Table.Tr>
+			)}
+		</>
 	);
 };
+
+/** The uploaded beers per menu; styles Untappd doesn't know are highlighted */
+const VenueBeers = ({ menus }: { menus: VenueMenuDetails[] }) => (
+	<Stack gap="md" p="xs">
+		{menus.map((menu) => {
+			const beers = menu.sections.items.flatMap((section) => section.items);
+
+			return (
+				<Stack key={menu.menu_id} gap={4}>
+					<Text size="sm" fw={500}>
+						{menu.menu_name} ({beers.length})
+					</Text>
+					<Table striped withRowBorders={false} fz="xs" verticalSpacing={2}>
+						<Table.Thead>
+							<Table.Tr>
+								<Table.Th>Beer</Table.Th>
+								<Table.Th>Brewery</Table.Th>
+								<Table.Th>Style</Table.Th>
+								<Table.Th ta="right">ABV</Table.Th>
+							</Table.Tr>
+						</Table.Thead>
+						<Table.Tbody>
+							{beers.map(({ beer, brewery }) => (
+								<Table.Tr key={beer.bid}>
+									<Table.Td>
+										<Anchor
+											href={`https://untappd.com/b/-/${beer.bid}`}
+											target="_blank"
+											size="xs"
+											c="dark"
+										>
+											{beer.beer_name}
+										</Anchor>
+									</Table.Td>
+									<Table.Td>{brewery.brewery_name}</Table.Td>
+									<Table.Td>
+										{beer.beer_style_id ? (
+											beer.beer_style
+										) : (
+											<Tooltip label="Not an Untappd style name" withArrow>
+												<Text span fz="xs" c="orange">
+													{beer.beer_style}
+												</Text>
+											</Tooltip>
+										)}
+									</Table.Td>
+									<Table.Td ta="right">
+										{beer.beer_abv ? `${beer.beer_abv}%` : ""}
+									</Table.Td>
+								</Table.Tr>
+							))}
+						</Table.Tbody>
+					</Table>
+				</Stack>
+			);
+		})}
+	</Stack>
+);
 
 export default function Admin({
 	loaderData,
