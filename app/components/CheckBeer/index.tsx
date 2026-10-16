@@ -52,7 +52,7 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 
 	const setStylesHadStatus = <T extends BarcodeAPIResponse | BeerInfoResponse>(
 		beers: T[],
-	): BeerWithStylesHad[] => {
+	): WithStyleHad<T>[] => {
 		return beers.map((beer) => {
 			const matchedStyle = findStyle(beer.beer);
 

@@ -110,7 +110,16 @@ declare global {
 		brewery: Brewery;
 	}
 
-	interface BarcodeAPIResponse extends BeerWithBrewery {}
+	// Item from /beer/checkbarcodemultiple
+	interface BarcodeAPIResponse extends BeerWithBrewery {
+		beer: Beer & {
+			beer_style_id: number;
+			/** Per logged-in user */
+			has_had: boolean;
+			/** On any of the user's lists */
+			on_list: boolean;
+		};
+	}
 
 	// /beer/info/{bid}?compact=enhanced (subset)
 	interface BeerInfo extends Beer {
@@ -147,9 +156,13 @@ declare global {
 		brewery: Brewery;
 	}
 
-	type BeerWithStylesHad = (BarcodeAPIResponse | BeerInfoResponse) & {
-		beer: Beer & { style_had: boolean };
+	type WithStyleHad<T extends BeerWithBrewery> = T & {
+		beer: T["beer"] & { style_had: boolean };
 	};
+
+	type BeerWithStylesHad =
+		| WithStyleHad<BarcodeAPIResponse>
+		| WithStyleHad<BeerInfoResponse>;
 
 	// Menu and User
 	interface SectionItem {
