@@ -369,14 +369,72 @@ declare global {
 		special_status_list: BadgeSpecialStatusList;
 	}
 
+	// Venue as embedded in /beer/trending and /beer/find items
+	interface NearbyVenue {
+		venue_id: number;
+		venue_name: string;
+		venue_slug: string;
+		is_verified: boolean;
+		categories: {
+			count: number;
+			items: {
+				category_key: string;
+				category_name: string;
+				category_name_en?: string;
+				is_primary: boolean;
+			}[];
+		};
+		location: {
+			venue_address: string;
+			venue_city: string;
+			venue_country: string;
+			lat: number;
+			lng: number;
+		};
+	}
+
+	// Item from /beer/trending (type=local)
 	interface RelatedBeersResponse {
-		beer: Beer;
+		beer: Beer & { has_had: boolean; on_list: boolean };
 		brewery: Brewery;
+		/** km, from dist_pref=km */
 		distance: number;
 		distinct_users: number;
 		recent_created_at: string;
-		venue: Venue | null;
+		/** Missing for some check-ins */
+		venue: NearbyVenue | null;
 		your_count: number;
+	}
+
+	// /beer/find/{bid}
+	interface BeerFindResponse {
+		verified: {
+			count: number;
+			/** created_at = when it was added to the menu */
+			items: { created_at: string; distance: number; venue: NearbyVenue }[];
+		};
+		unverified: {
+			count: number;
+			/** created_at = most recent check-in */
+			items: {
+				created_at: string;
+				distance: number;
+				total_users: number;
+				venue: NearbyVenue;
+			}[];
+		};
+	}
+
+	// Payload of /api/beer/:beerId/find
+	interface BeerFindPlace {
+		venueId: number;
+		venueName: string;
+		venueSlug: string;
+		distance: number;
+		isShop: boolean;
+		/** "menu" = on a verified venue's menu, "checkin" = recently checked in */
+		source: "menu" | "checkin";
+		date: string;
 	}
 
 	// User (subset of /user/info?compact=enhanced)

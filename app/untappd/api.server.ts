@@ -78,22 +78,44 @@ const checkBarcode = (accessToken: string, upc: string) =>
 		params: { upc },
 	}).then((response) => response.items);
 
-interface TrendingOptions {
+interface NearbyOptions {
 	lat: number;
 	lng: number;
+	/** In km */
 	radius: number;
-	typeId: number | string;
-	type?: "local" | "global";
 }
 
+/** Beers of a style recently checked in nearby, with where they were seen */
 const getTrendingBeers = (
 	accessToken: string,
-	{ lat, lng, radius, typeId, type = "local" }: TrendingOptions,
+	{ lat, lng, radius, typeId }: NearbyOptions & { typeId: number | string },
 ) =>
 	untappd<{ items: RelatedBeersResponse[] }>("/beer/trending", {
 		accessToken,
-		params: { lat, lng, radius, range: radius, type_id: typeId, type },
+		params: {
+			lat,
+			lng,
+			radius,
+			range: radius,
+			dist_pref: "km",
+			type_id: typeId,
+			type: "local",
+		},
 	}).then((response) => response.items);
+
+/**
+ * Where a beer can be found nearby: `verified` = on a verified venue's menu,
+ * `unverified` = recently checked in at a venue
+ */
+const findBeer = (
+	accessToken: string,
+	beerId: number | string,
+	{ lat, lng, radius }: NearbyOptions,
+) =>
+	untappd<BeerFindResponse>(`/beer/find/${beerId}`, {
+		accessToken,
+		params: { lat, lng, radius, dis_pref: "km", mode: "enhanced" },
+	});
 
 // Venues
 
@@ -129,6 +151,7 @@ const getVenueMenus = (accessToken: string, venueId: string | number) =>
 
 export {
 	checkBarcode,
+	findBeer,
 	getBadge,
 	getBeerInfo,
 	getListView,

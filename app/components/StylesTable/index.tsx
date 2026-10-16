@@ -1,12 +1,10 @@
 import {
 	ActionIcon,
-	Anchor,
 	Card,
 	Checkbox,
 	Collapse,
 	CopyButton,
 	Flex,
-	List,
 	Loader,
 	Stack,
 	Table,
@@ -22,7 +20,8 @@ import {
 } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
-import countryToEmoji from "~/countries";
+import { getLocationQuery } from "~/hooks/location";
+import { NearbyStyleBeers } from "./NearbyStyleBeers";
 
 import "./style.css";
 
@@ -46,8 +45,19 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 			return rowInfoCache.get(styleId) || [];
 		}
 
-		const response = await fetch(`/api/related/${styleId}`);
-		const relatedBeers = (await response.json()) as RelatedBeersResponse[];
+		const response = await fetch(
+			`/api/related/${styleId}${await getLocationQuery()}`,
+		);
+		const items: RelatedBeersResponse[] = response.ok
+			? await response.json()
+			: [];
+		// The same beer is often checked in at several venues; keep the nearest
+		const relatedBeers = [...items]
+			.sort((a, b) => a.distance - b.distance)
+			.filter(
+				(item, index, all) =>
+					all.findIndex((other) => other.beer.bid === item.beer.bid) === index,
+			);
 		rowInfoCache.set(styleId, relatedBeers);
 
 		return relatedBeers;
@@ -186,38 +196,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 													<Loader color="untappd" my="lg" />
 												</Flex>
 											) : (
-												<List my="lg">
-													{relatedBeers.map((beer: BeerWithBrewery) => {
-														const {
-															beer: { beer_name, bid },
-															brewery: { brewery_name, country_name },
-														} = beer;
-
-														return (
-															<Anchor
-																href={`https://untappd.com/beer/${bid}`}
-																target="_blank"
-																key={bid}
-															>
-																<List.Item
-																	key={bid}
-																	px="sm"
-																	py="xs"
-																	className="related-beer"
-																	icon={<></>}
-																>
-																	<Text component="div" size="sm" c="dark">
-																		{beer_name}
-																	</Text>
-																	<Text component="div" size="sm" c="dimmed">
-																		{brewery_name}, {country_name}{" "}
-																		{countryToEmoji(country_name)}
-																	</Text>
-																</List.Item>
-															</Anchor>
-														);
-													})}
-												</List>
+												<NearbyStyleBeers items={relatedBeers} />
 											)}
 										</Collapse>
 									</Table.Td>
