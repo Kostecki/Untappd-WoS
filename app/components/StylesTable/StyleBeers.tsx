@@ -1,5 +1,5 @@
 import { ActionIcon, Anchor, Group, Stack, Text, Tooltip } from "@mantine/core";
-import { IconBrandGoogle } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 
 import countryToEmoji from "~/countries";
 
@@ -57,9 +57,10 @@ const StyleBeer = ({ item }: { item: TopRatedBeer | RelatedBeersResponse }) => {
 					target="_blank"
 					variant="subtle"
 					color="gray"
+					size="sm"
 					aria-label={`Search Google for ${beer_name}`}
 				>
-					<IconBrandGoogle size={18} stroke={1.5} />
+					<IconSearch size={16} stroke={1.5} />
 				</ActionIcon>
 			</Tooltip>
 		</Group>
