@@ -175,7 +175,15 @@ The 5.0.0 app no longer uses `/inventory/view/{vid}`. Venue menus go through:
 > **form-encoded**; a JSON body returns HTTP 200 with
 > `response.response_code: 403`. Sections are paged at 10 items by default;
 > `limit=100` returns whole sections. `types[]=Items::Beer` drops spirits/wine.
-> Each item carries per-user `has_had` and `on_list`. `name`/`style` are the
+> Each item carries per-user `has_had` and `on_list`.
+>
+> **Compared with `/inventory/view` across 11 verified venues (2026-10-17):**
+> every venue with a published menu works, on both `premium` and `essentials`
+> plans. Sections are paged per `limit`: at `limit=100` sections over 100
+> beers were cut off (`next_page` set); `limit=500` returned everything. A
+> single section pages with `section_id` + `page`. Venues without published
+> menus (`/menus/menus_count` → `published_count: 0`) answer
+> `response_code: 403`; `/inventory/view` is empty for them too. `name`/`style` are the
 > venue's display values (e.g. `"1. Darkness (Nitro)"`); use
 > `original_name`/`original_style` for Untappd values. `/inventory/view` and
 > `/search/venue` still work, and `Authorization: Bearer` is accepted.
@@ -504,8 +512,8 @@ beer_style, is_in_production, rating_count, rating_score, beer_slug`.
 
 ## Ideas for this app
 
-- **Venue menus**: switch `app/routes/untappd/venue.ts` from
-  `/inventory/view/{vid}` to `POST /menus/sections` (JSON body). It supports
+- **Venue menus** (done): `app/routes/untappd/venue.ts` uses
+  `POST /menus/sections` (form-encoded) instead of `/inventory/view/{vid}`. It supports
   server-side `styles` / `has_not_had_before` filters, which fits the Wheel of
   Styles use case well.
 - **Wheel of Styles**: `/badges/styles_not_had` takes a `user_id`, so you can

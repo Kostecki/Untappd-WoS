@@ -1,10 +1,8 @@
-import { redirect } from "react-router";
-
 import { requireUser } from "~/auth/user.server";
 import { toMenus as toTemporaryMenus } from "~/temporary-venues/mappers.server";
 import { getTemporaryVenue } from "~/temporary-venues/store.server";
-import { getVenueMenuSections, getVenueMenus } from "~/untappd/api.server";
-import { isInvalidToken, withFallback } from "~/untappd/client.server";
+import { getVenueMenuSections } from "~/untappd/api.server";
+import { UntappdError, withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/venue";
 
 const toSectionItem = (item: MenuSectionItem): SectionItem => {
@@ -90,20 +88,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		return Response.json(venue ? toTemporaryMenus(venue) : []);
 	}
 
-	try {
-		const sections = await getVenueMenuSections(user.accessToken, venueId);
-		return Response.json(toMenus(sections));
-	} catch (error) {
-		if (isInvalidToken(error)) {
-			throw redirect("/logout");
-		}
+	// Untappd answers 403 for venues without published menus
+	const sections = await withFallback(
+		getVenueMenuSections(user.accessToken, venueId).catch((error) => {
+			if (error instanceof UntappdError && error.status === 403) return [];
+			throw error;
+		}),
+		[],
+	);
 
-		// Fall back to the legacy endpoint, which still works for now
-		console.error(error instanceof Error ? error.message : error);
-		const menus = await withFallback(
-			getVenueMenus(user.accessToken, venueId),
-			[],
-		);
-		return Response.json(menus);
-	}
+	return Response.json(toMenus(sections));
 }

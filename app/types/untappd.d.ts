@@ -49,10 +49,6 @@ declare global {
 		};
 	}
 
-	interface VenueDetailsAPIResponse {
-		menu: VenueMenuDetails;
-	}
-
 	// Beer and Brewery
 	interface Brewery {
 		brewery_id: number;

@@ -189,24 +189,55 @@ const searchVenues = (accessToken: string, query: string) =>
  * form-encoded (a JSON body is rejected with response_code 403). Items include
  * per-user `has_had` and `on_list`.
  */
-const getVenueMenuSections = (accessToken: string, venueId: string | number) =>
+// Items per section and page; the default is 10. 500 covered the biggest
+// sections seen (a 135-beer section was cut off at 100)
+const menuPageSize = 500;
+const maxMenuPages = 10;
+
+const getMenuSectionsPage = (
+	accessToken: string,
+	venueId: string | number,
+	page?: { sectionId: number; page: number },
+) =>
 	untappd<MenuSectionsResponse>("/menus/sections", {
 		accessToken,
 		method: "POST",
 		body: {
 			venue_id: venueId,
 			flatten_when_filtering: true,
-			// Default page size is 10 per section; 100 returns whole sections
-			limit: 100,
+			limit: menuPageSize,
 			"types[]": "Items::Beer",
+			section_id: page?.sectionId,
+			page: page?.page,
 		},
 	}).then((response) => response.sections);
 
-/** Legacy menus endpoint, no longer used by the official app */
-const getVenueMenus = (accessToken: string, venueId: string | number) =>
-	untappd<{ items: VenueDetailsAPIResponse[] }>(`/inventory/view/${venueId}`, {
-		accessToken,
-	}).then((response) => response.items.map(({ menu }) => menu));
+/**
+ * All beer sections of a venue's menus, the way the official app loads them.
+ * Sections still longer than a page are paged like the app's "show more".
+ * Throws an UntappdError with status 403 for venues without published menus.
+ */
+const getVenueMenuSections = async (
+	accessToken: string,
+	venueId: string | number,
+) => {
+	const sections = await getMenuSectionsPage(accessToken, venueId);
+
+	for (const section of sections) {
+		let next = section.next_page;
+		for (let pages = 1; next && pages < maxMenuPages; pages++) {
+			const [more] = await getMenuSectionsPage(accessToken, venueId, {
+				sectionId: section.section_id,
+				page: next,
+			});
+			if (!more) break;
+			section.items.push(...more.items);
+			next = more.next_page;
+		}
+	}
+
+	return sections;
+};
 
 export {
 	checkBarcode,
@@ -222,7 +253,6 @@ export {
 	getUserInfo,
 	getUserLists,
 	getVenueMenuSections,
-	getVenueMenus,
 	login,
 	searchBeers,
 	searchVenues,
