@@ -3,11 +3,11 @@ name: Create and deploy application
 on:
   push:
     branches:
-      - master
+      - main
   # Checks and a test image build; nothing is pushed or deployed
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
@@ -105,7 +105,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: build-and-push_image
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
 
     permissions:
       id-token: write
