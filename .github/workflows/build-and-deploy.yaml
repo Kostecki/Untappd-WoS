@@ -10,6 +10,13 @@ on:
       - main
   workflow_dispatch:
 
+# One run per PR or branch at a time. A new push to a PR cancels its running
+# check; on main runs queue instead, so deploys finish in order and only the
+# newest waiting run is kept
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   checks:
     name: Checks
