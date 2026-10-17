@@ -9,6 +9,7 @@
     "format": "biome check --write .",
     "lint": "biome check .",
     "start": "dotenv -e .env react-router-serve ./build/server/index.js",
+    "test": "vitest run",
     "typecheck": "react-router typegen && tsc",
     "venues:jonpacker": "node ./scripts/jonpacker-to-csv.mjs"
   },
@@ -45,6 +46,7 @@
     "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "7.0.1",
     "typescript": "7.0.2",
-    "vite": "8.3.4"
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   }
 }
