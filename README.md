@@ -8,6 +8,15 @@
 
 ![screenshot](https://github.com/user-attachments/assets/12dc7f95-c9b4-495d-9094-bdcf37d68698)
 
+## Development
+
+- `pnpm dev`: run the app locally (needs a `.env`)
+- `pnpm test`: unit tests (Vitest); Untappd is mocked, no `.env` needed
+- `pnpm lint` / `pnpm format`: Biome
+- `pnpm typecheck`
+
+CI runs lint, typecheck, tests and a build on every pull request.
+
 ## Temporary venues
 
 Festivals and other venues that aren't on Untappd can be uploaded on `/admin`
