@@ -13,6 +13,10 @@ on:
 # One run per PR or branch at a time. A new push to a PR cancels its running
 # check; on main runs queue instead, so deploys finish in order and only the
 # newest waiting run is kept
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: kostecki/wheel-of-styles
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -20,7 +24,7 @@ concurrency:
 jobs:
   checks:
     name: Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
 
@@ -42,17 +46,26 @@ jobs:
       - name: Test
         run: pnpm test
 
+  # Each platform builds natively on its own runner and is pushed by digest;
+  # publish-image combines them into one multi-platform image
   build-and-push_image:
-    name: Build image
+    name: Build image (${{ matrix.arch }})
     needs: checks
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
 
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: kostecki/wheel-of-styles
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+            runner: ubuntu-24.04
+          # Also for running the image locally on Apple Silicon
+          - arch: arm64
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
 
     steps:
       - name: Checkout repository
@@ -61,7 +74,6 @@ jobs:
           persist-credentials: false
 
       - name: Get the latest commit hash and message
-        id: git_info
         run: |
           LATEST_COMMIT_HASH=$(git log -1 --pretty=format:"%h")
           LATEST_COMMIT_MESSAGE=$(git log -1 --pretty=%s)
@@ -76,10 +88,8 @@ jobs:
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4.4.1
-        with:
-          driver-opts: image=moby/buildkit:latest
 
-      - name: Extract metadata (tags and labels) for Docker
+      - name: Extract metadata (labels) for Docker
         id: meta
         uses: docker/metadata-action@v6.2.0
         with:
@@ -93,25 +103,92 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      # Pull requests build both platforms but push nothing
+      - name: Build and push Docker image by digest
+        id: build
         uses: docker/build-push-action@v7.4.0
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          platforms: ${{ matrix.platform }}
           build-args: |
             LATEST_COMMIT_HASH=${{ env.LATEST_COMMIT_HASH }}
             LATEST_COMMIT_MESSAGE=${{ env.LATEST_COMMIT_MESSAGE }}
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
-          # Pull requests only check that the image builds
-          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || 'linux/amd64,linux/arm64' }}
+          # No provenance attestation, which shows up as an unknown/unknown platform
+          provenance: false
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=${{ github.event_name != 'pull_request' }}
+
+      - name: Export digest
+        if: github.event_name != 'pull_request'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          touch "${{ runner.temp }}/digests/${DIGEST#sha256:}"
+
+      - name: Upload digest
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: digests-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish-image:
+    name: Publish image
+    needs: build-and-push_image
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v8.0.2
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4.4.1
+
+      - name: Extract metadata (tags) for Docker
+        id: meta
+        uses: docker/metadata-action@v6.2.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Login to the container registry
+        uses: docker/login-action@v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create the multi-platform image
+        working-directory: ${{ runner.temp }}/digests
+        env:
+          METADATA: ${{ steps.meta.outputs.json }}
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$METADATA") \
+            $(printf '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+
+      - name: Inspect the image
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: docker buildx imagetools inspect "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${VERSION}"
 
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
-    needs: build-and-push_image
+    runs-on: ubuntu-24.04
+    needs: publish-image
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
 
     permissions:
