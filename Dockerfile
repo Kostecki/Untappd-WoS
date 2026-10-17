@@ -1,4 +1,4 @@
-# Same Node version as CI (.github/workflows/build-and-deploy.yaml)
+# Same Node version as CI (.github/actions/setup/action.yml)
 FROM node:24.21.0-slim
 
 ENV NODE_ENV=production
