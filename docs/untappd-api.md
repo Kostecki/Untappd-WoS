@@ -2,8 +2,9 @@
 
 Reverse-engineered statically from `untappd_5.0.0.xapk` → `com.untappdllc.app.apk` →
 `assets/index.android.bundle` (Hermes bytecode v96, decompiled with `hermes-dec`).
-No requests were made to the API. The app is React Native / Expo (SDK 55); the
-JS still reports itself as `utv=4.0.0`.
+The menus section notes behaviour checked against the live API.
+The app is React Native / Expo (SDK 55). Its JS sends `utv=4.0.0`, while the
+native app version (`X-Untappd-App-Version`) is 5.0.0.
 
 Confidence notes:
 
@@ -12,10 +13,9 @@ Confidence notes:
 - **Response shapes**: only where the bundle ships a fixture or where the UI
   maps fields explicitly. Everything else is "returns `response.X`" with no
   further shape guarantee.
-- Endpoints the current web app uses that are **not referenced** by 5.0.0:
-  `GET /search/venue` and `GET /inventory/view/{venue_id}`. They may still
-  work (legacy), but the official app no longer calls them — see
-  [Search](#search-algolia) and [Menus](#menus-new-api) for the replacements.
+- `GET /search/venue` and `GET /inventory/view/{venue_id}` aren't used by the
+  5.0.0 app but respond; it uses [Algolia](#search-algolia) and
+  [`/menus/sections`](#menus) instead.
 
 ---
 
@@ -68,9 +68,6 @@ environments. Default method is `get`. Bodies are `qs.stringify`'d unless
 Error handling: `MAINTENANCE_MODE` error → maintenance overlay. Every response
 may carry `notifications.unread_count`, which the client pushes into the
 notification badge.
-
-> Note: the web app currently sends `access_token=` as a query param. The
-> mobile app uses `Authorization: Bearer` instead.
 
 ### Paginated lists
 
@@ -157,9 +154,9 @@ page is fetched by calling `pagination.next_url` directly.
 | POST | `/helpers/suggest_verified_venue/{vid}` | `lat, lng` | |
 | GET | `/location/coords` | `q` | `response` (location search) |
 
-### Menus (new API)
+### Menus
 
-The 5.0.0 app no longer uses `/inventory/view/{vid}`. Venue menus go through:
+Venue menus go through:
 
 | Method | Path | Params / body | Returns |
 |---|---|---|---|
@@ -171,22 +168,14 @@ The 5.0.0 app no longer uses `/inventory/view/{vid}`. Venue menus go through:
 
 `/menus/sections` body (`flatten_when_filtering` is always sent).
 
-> **Verified against the live API (2026-10-16):** the body must be sent
-> **form-encoded**; a JSON body returns HTTP 200 with
-> `response.response_code: 403`. Sections are paged at 10 items by default;
-> `limit=100` returns whole sections. `types[]=Items::Beer` drops spirits/wine.
-> Each item carries per-user `has_had` and `on_list`.
->
-> **Compared with `/inventory/view` across 11 verified venues (2026-10-17):**
-> every venue with a published menu works, on both `premium` and `essentials`
-> plans. Sections are paged per `limit`: at `limit=100` sections over 100
-> beers were cut off (`next_page` set); `limit=500` returned everything. A
-> single section pages with `section_id` + `page`. Venues without published
-> menus (`/menus/menus_count` → `published_count: 0`) answer
-> `response_code: 403`; `/inventory/view` is empty for them too. `name`/`style` are the
-> venue's display values (e.g. `"1. Darkness (Nitro)"`); use
-> `original_name`/`original_style` for Untappd values. `/inventory/view` and
-> `/search/venue` still work, and `Authorization: Bearer` is accepted.
+> The body must be **form-encoded**; a JSON body returns HTTP 200 with
+> `response.response_code: 403`. Each section returns up to `limit` items
+> (default 10) and sets `next_page` when it has more; a single section pages
+> with `section_id` + `page`. `types[]=Items::Beer` limits it to beers. Venues
+> without published menus (`/menus/menus_count` → `published_count: 0`) answer
+> `response_code: 403`. Each item carries per-user `has_had` and `on_list`.
+> `name`/`style` are the venue's display values (e.g. `"1. Darkness (Nitro)"`);
+> `original_name`/`original_style` are the Untappd values.
 
 
 ```ts
@@ -395,8 +384,7 @@ orders, recommendations, summaries. Not relevant to this app; skipped.
 
 ## Search (Algolia)
 
-Typed search no longer goes through `/search/beer` for the main search UI;
-`/search/beer` is only used for exact-name dupe checks (`q, brewery_id,
+The main search UI doesn't use `/search/beer`; it's only used for exact-name dupe checks (`q, brewery_id,
 search_type=exact`) when adding a beer.
 
 - `GET /helpers/appInit` → `response.keys.algolia.{ app_id, beer_secured_search_key }`.
@@ -507,19 +495,3 @@ interface Promotion {
 Search-result beer (from a search-results fixture):
 `bid, beer_name, beer_label, beer_abv, beer_ibu, beer_description,
 beer_style, is_in_production, rating_count, rating_score, beer_slug`.
-
----
-
-## Ideas for this app
-
-- **Venue menus** (done): `app/routes/untappd/venue.ts` uses
-  `POST /menus/sections` (form-encoded) instead of `/inventory/view/{vid}`. It supports
-  server-side `styles` / `has_not_had_before` filters, which fits the Wheel of
-  Styles use case well.
-- **Wheel of Styles**: `/badges/styles_not_had` takes a `user_id`, so you can
-  look at a friend's missing styles. `/user/user_beer_list?mode=v3` returns the IDs
-  of every beer the user has had, which helps for "not had" checks.
-- **Lists**: `/custom_lists/nearby/{list_id}` returns nearby venues that carry
-  list items.
-- **Auth**: move from the `access_token` query param to
-  `Authorization: Bearer` and send `utv`, like the app does.

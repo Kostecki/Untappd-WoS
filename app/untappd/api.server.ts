@@ -189,8 +189,8 @@ const searchVenues = (accessToken: string, query: string) =>
  * form-encoded (a JSON body is rejected with response_code 403). Items include
  * per-user `has_had` and `on_list`.
  */
-// Items per section and page; the default is 10. 500 covered the biggest
-// sections seen (a 135-beer section was cut off at 100)
+// Items per section and page (the default is 10); 500 covers the largest
+// sections seen
 const menuPageSize = 500;
 const maxMenuPages = 10;
 
