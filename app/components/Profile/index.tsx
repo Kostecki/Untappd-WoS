@@ -5,12 +5,13 @@ import {
 	Divider,
 	Flex,
 	Group,
+	Menu,
 	Stack,
 	Switch,
 	Text,
 } from "@mantine/core";
-import { useElementSize } from "@mantine/hooks";
-import { IconLogout, IconTool } from "@tabler/icons-react";
+import { useDisclosure, useElementSize } from "@mantine/hooks";
+import { IconLogout, IconSettings, IconTool } from "@tabler/icons-react";
 import { Link } from "react-router";
 import type { PublicUser } from "~/auth/auth.server";
 import { Settings, setSettings, useIsMobile } from "~/utils";
@@ -42,6 +43,9 @@ export const Profile = ({
 	latestCommit,
 }: InputProps) => {
 	const { ref, width } = useElementSize();
+	// Opened from the menu; the modal lives outside the menu, which unmounts
+	// its dropdown when it closes
+	const [settingsOpened, settings] = useDisclosure(false);
 	const mobile = useIsMobile();
 
 	const fullName = `${user.firstName} ${user.lastName}`;
@@ -93,41 +97,69 @@ export const Profile = ({
 
 	return (
 		<Card shadow="sm" padding="lg" radius="md" withBorder>
-			<Flex justify="space-between">
+			<Flex justify="space-between" align="center">
 				<Group>
 					<Avatar src={user.userAvatarURL} alt={fullName} />
-					<Text>{fullName}</Text>
-				</Group>
-				<Group>
-					{user.isAdmin && (
-						<ActionIcon
-							component={Link}
-							variant="transparent"
-							aria-label="Admin"
-							color="dark"
-							to="/admin"
+					<Stack gap={0}>
+						<Text size="md">{fullName}</Text>
+						<Text
+							size="xs"
+							fs="italic"
+							c="dimmed"
+							component="a"
+							href={`https://untappd.com/user/${user.userName}`}
+							target="_blank"
 						>
-							<IconTool stroke={1} />
-						</ActionIcon>
-					)}
-					<SettingsModal
-						user={user}
-						userLists={userLists}
-						stockList={stockList}
-						setStockListId={setStockListId}
-						latestCommit={latestCommit}
-					/>
-					<ActionIcon
-						component={Link}
-						variant="transparent"
-						aria-label="Logout"
-						color="dark"
-						to="/logout"
-					>
-						<IconLogout stroke={1} />
-					</ActionIcon>
+							@{user.userName}
+						</Text>
+					</Stack>
 				</Group>
+				<Menu width={200} withArrow>
+					<Menu.Target>
+						<ActionIcon variant="transparent" color="dark" aria-label="Menu">
+							<IconSettings stroke={1} />
+						</ActionIcon>
+					</Menu.Target>
+
+					<Menu.Dropdown>
+						<Menu.Item
+							leftSection={<IconSettings stroke={1} />}
+							onClick={settings.open}
+						>
+							User Settings
+						</Menu.Item>
+						{user.isAdmin && (
+							<Menu.Item
+								leftSection={<IconTool stroke={1} />}
+								component={Link}
+								to="/admin"
+								aria-label="Admin"
+							>
+								Admin Panel
+							</Menu.Item>
+						)}
+						<Menu.Divider />
+						<Menu.Item
+							leftSection={<IconLogout stroke={1} />}
+							component={Link}
+							to="/logout"
+							aria-label="Logout"
+						>
+							Logout
+						</Menu.Item>
+					</Menu.Dropdown>
+				</Menu>
 			</Flex>
+
+			<SettingsModal
+				opened={settingsOpened}
+				onClose={settings.close}
+				user={user}
+				userLists={userLists}
+				stockList={stockList}
+				setStockListId={setStockListId}
+				latestCommit={latestCommit}
+			/>
 
 			<Divider my="md" />
 
