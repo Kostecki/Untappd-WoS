@@ -15,3 +15,6 @@ mbcc-*.csv
 # Reverse-engineering inputs
 *.xapk
 *.apk
+
+# Docker Compose: env file and local data folders
+/app/data/

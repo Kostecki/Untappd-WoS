@@ -1,0 +1,20 @@
+services:
+  app:
+    image: ghcr.io/kostecki/wheel-of-styles:latest
+    restart: unless-stopped
+    container_name: wheel-of-styles
+    hostname: wheel-of-styles-docker-tower
+    ports:
+      - 3005:3000
+    environment:
+      SESSION_SECRET: ${SESSION_SECRET}
+      ADMIN_USER_ID: ${ADMIN_USER_ID}
+      UNTAPPD_API_URL: ${UNTAPPD_API_URL}
+      UNTAPPD_DEVICE_UDID: ${UNTAPPD_DEVICE_UDID}
+      UNTAPPD_CLIENT_ID: ${UNTAPPD_CLIENT_ID}
+      UNTAPPD_CLIENT_SECRET: ${UNTAPPD_CLIENT_SECRET}
+    volumes:
+      - ${DATA_DIR:-.}/app/data:/app/data
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "nautical-backup.group=wheel-of-styles"
