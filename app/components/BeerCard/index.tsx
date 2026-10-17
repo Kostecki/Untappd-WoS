@@ -1,4 +1,13 @@
-import { Badge, Card, Flex, Group, Rating, Stack, Text } from "@mantine/core";
+import {
+	Badge,
+	Card,
+	Flex,
+	Group,
+	Rating,
+	Stack,
+	Text,
+	Tooltip,
+} from "@mantine/core";
 import { IconCircleFilled, IconExternalLink } from "@tabler/icons-react";
 
 import countryToEmoji from "~/countries";
@@ -12,7 +21,14 @@ interface BeerCardItem {
 	on_list?: boolean;
 }
 
-export const BeerCard = ({ beerItem }: { beerItem: BeerCardItem }) => {
+export const BeerCard = ({
+	beerItem,
+	styleCoveredBy,
+}: {
+	beerItem: BeerCardItem;
+	/** Name of the list with another beer in this style */
+	styleCoveredBy?: string;
+}) => {
 	const {
 		beer: { bid, beer_name, beer_slug, beer_abv, beer_style, rating_score },
 		brewery: { brewery_name, country_name },
@@ -43,6 +59,16 @@ export const BeerCard = ({ beerItem }: { beerItem: BeerCardItem }) => {
 								<Badge size="xs" variant="light" color="untappd">
 									On your list
 								</Badge>
+							)}
+							{styleCoveredBy && (
+								<Tooltip
+									label={`A beer in this style is on "${styleCoveredBy}"`}
+									withArrow
+								>
+									<Badge size="xs" variant="outline" color="untappd">
+										Style on your list
+									</Badge>
+								</Tooltip>
 							)}
 						</Group>
 						<Text size="sm" fs="italic" c="gray">

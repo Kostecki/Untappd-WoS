@@ -144,7 +144,10 @@ export default function Home() {
 						latestCommit={latestCommit}
 					/>
 					<Box my="md">
-						<VenueStyles styles={stylesInfo.styles} />
+						<VenueStyles
+							styles={stylesInfo.styles}
+							stockListDetails={stockListDetails}
+						/>
 					</Box>
 					<CheckBeer
 						styles={stylesInfo.styles}

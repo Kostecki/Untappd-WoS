@@ -1,6 +1,7 @@
 import { Card, Collapse, Divider, Group, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+import { getStyleCoveredBy } from "~/styles";
 import { BeerCard } from "../BeerCard";
 
 import "./style.css";
@@ -9,9 +10,11 @@ import { Fragment } from "react/jsx-runtime";
 export const VenueBeerCard = ({
 	group,
 	startOpen,
+	stockListDetails,
 }: {
 	group: { beer_style: string; beers: SectionItem[] };
 	startOpen: boolean;
+	stockListDetails?: StockListDetails;
 }) => {
 	const [opened, { toggle }] = useDisclosure(startOpen);
 
@@ -40,7 +43,11 @@ export const VenueBeerCard = ({
 					{group.beers.map((beer, index) => {
 						return (
 							<Fragment key={beer.beer.bid}>
-								<BeerCard key={beer.beer.bid} beerItem={beer} />
+								<BeerCard
+									key={beer.beer.bid}
+									beerItem={beer}
+									styleCoveredBy={getStyleCoveredBy(stockListDetails, beer)}
+								/>
 								{index < group.beers.length - 1 && <Divider my="sm" />}
 							</Fragment>
 						);

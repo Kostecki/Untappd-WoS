@@ -18,9 +18,10 @@ import { VenueBeerCard } from "../VenueBeerCard";
 
 interface InputProps {
 	styles: { styleId: number; styleName: string; had: boolean }[];
+	stockListDetails?: StockListDetails;
 }
 
-export const VenueStyles = ({ styles }: InputProps) => {
+export const VenueStyles = ({ styles, stockListDetails }: InputProps) => {
 	const [loading, setLoading] = useState(false);
 	const [selectedVenue, setSelectedVenue] = useState<VenueDetails | undefined>(
 		undefined,
@@ -207,6 +208,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
 											key={group.beer_style}
 											group={group}
 											startOpen={index === 0}
+											stockListDetails={stockListDetails}
 										/>
 									))}
 								</Tabs.Panel>

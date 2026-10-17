@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createNewStyleFilter, findStyle, isStyleOnList } from "./styles";
+import {
+	createNewStyleFilter,
+	findStyle,
+	getStyleCoveredBy,
+	isStyleOnList,
+} from "./styles";
 
 const styles = [
 	{ styleId: 1, styleName: "IPA - American", had: true },
@@ -74,5 +79,35 @@ describe("createNewStyleFilter", () => {
 	it("drops beers without a matchable style", () => {
 		expect(isNewStyle(beer("Not a style"))).toBe(false);
 		expect(isNewStyle(beer("", 0))).toBe(false);
+	});
+});
+
+describe("getStyleCoveredBy", () => {
+	const stockList: StockListDetails = {
+		listId: "1",
+		listName: "På lager",
+		styles: [2],
+		listItems: [],
+	};
+
+	it("names the stock list when another beer on it has the style", () => {
+		expect(getStyleCoveredBy(stockList, { beer: beer("x", 2) })).toBe(
+			"På lager",
+		);
+	});
+
+	it("is undefined when the beer itself is on a list", () => {
+		expect(
+			getStyleCoveredBy(stockList, { beer: beer("x", 2), on_list: true }),
+		).toBeUndefined();
+	});
+
+	it("is undefined when the style isn't on the stock list, or there's none", () => {
+		expect(
+			getStyleCoveredBy(stockList, { beer: beer("x", 3) }),
+		).toBeUndefined();
+		expect(
+			getStyleCoveredBy(undefined, { beer: beer("x", 2) }),
+		).toBeUndefined();
 	});
 });

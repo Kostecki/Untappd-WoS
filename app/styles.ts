@@ -24,6 +24,18 @@ const isStyleOnList = (
 	);
 
 /**
+ * The stock list's name when a beer isn't on the user's lists itself but its
+ * style is covered by a beer on the stock list; otherwise undefined
+ */
+const getStyleCoveredBy = (
+	stockList: StockListDetails | undefined,
+	item: { beer: BeerStyle; on_list?: boolean },
+) =>
+	stockList && !item.on_list && isStyleOnList(stockList, item.beer)
+		? stockList.listName
+		: undefined;
+
+/**
  * A filter for beers in styles the user hasn't had yet. Styles are matched
  * by id, else by name; beers whose style can't be matched are left out.
  */
@@ -53,4 +65,4 @@ const createNewStyleFilter = (styles: StyleEntry[]) => {
 	};
 };
 
-export { createNewStyleFilter, findStyle, isStyleOnList };
+export { createNewStyleFilter, findStyle, getStyleCoveredBy, isStyleOnList };
