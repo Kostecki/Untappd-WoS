@@ -1,35 +1,36 @@
-FROM node:26-slim
-
-ARG LATEST_COMMIT_HASH
-ARG LATEST_COMMIT_MESSAGE
+# Same Node version as CI (.github/workflows/build-and-deploy.yaml)
+FROM node:24.21.0-slim
 
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
-ENV LATEST_COMMIT_HASH=$LATEST_COMMIT_HASH
-ENV LATEST_COMMIT_MESSAGE=$LATEST_COMMIT_MESSAGE
 ENV CI=true
-
-RUN npm install -g pnpm
 
 WORKDIR /app
 
+# pnpm at the version in package.json's packageManager field
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
-RUN pnpm install --frozen-lockfile --prod
+RUN npm install -g "$(node -p "require('./package.json').packageManager.split('+')[0]")" \
+	&& pnpm install --frozen-lockfile --prod
 
+# The app (built in CI) is read-only to the app user
 COPY . /app
 
-# Temporary venues are stored here; mount a volume on it (see README). It must
-# exist in the image so a named volume inherits the wos user's ownership.
-ENV DATA_DIR=/app/data
-RUN mkdir -p /app/data
+RUN addgroup --system --gid 1001 wos \
+	&& adduser --system --uid 1001 wos
 
-RUN addgroup --system --gid 1001 wos
-RUN adduser --system --uid 1001 wos
-RUN chown -R wos:wos /app
-RUN chmod 755 /app
+# Temporary venues are stored here; mount a volume on it (see README). It must
+# exist in the image, owned by wos, so a named volume inherits the ownership.
+ENV DATA_DIR=/app/data
+RUN mkdir -p /app/data && chown wos:wos /app/data
 
 USER wos
 
 EXPOSE 3000
+
+# Last, as these change on every commit and would invalidate the layers above
+ARG LATEST_COMMIT_HASH
+ARG LATEST_COMMIT_MESSAGE
+ENV LATEST_COMMIT_HASH=$LATEST_COMMIT_HASH
+ENV LATEST_COMMIT_MESSAGE=$LATEST_COMMIT_MESSAGE
 
 CMD ["./node_modules/.bin/react-router-serve", "./build/server/index.js"]
