@@ -1,14 +1,4 @@
-import {
-	Anchor,
-	Button,
-	Flex,
-	Group,
-	Modal,
-	Select,
-	Switch,
-	Text,
-	Tooltip,
-} from "@mantine/core";
+import { Modal, Select, Switch, Text } from "@mantine/core";
 import type { PublicUser } from "~/auth/auth.server";
 
 interface InputProps {
@@ -16,7 +6,6 @@ interface InputProps {
 	onClose: () => void;
 	user: PublicUser;
 	userLists: UserLists[];
-	latestCommit: LatestCommit;
 	stockList?: StockList;
 	setStockListId: (listId: string | null) => void;
 }
@@ -24,11 +13,9 @@ interface InputProps {
 export const SettingsModal = ({
 	opened,
 	onClose,
-	user,
 	userLists,
 	stockList,
 	setStockListId,
-	latestCommit,
 }: InputProps) => {
 	const lists = userLists
 		.map((list) => ({
@@ -63,38 +50,6 @@ export const SettingsModal = ({
 					/>
 				</>
 			)}
-
-			<Flex justify="space-between" align="center" mt="xl">
-				{user.isAdmin && (
-					<Group gap={0}>
-						<Text size="sm" mr="5">
-							Last commit:
-						</Text>
-						<Tooltip label={latestCommit.message} position="bottom" withArrow>
-							<Anchor
-								href={`https://github.com/Kostecki/Untappd-WoS/commit/${latestCommit.hash}`}
-								target="_blank"
-								fs="italic"
-								c="dimmed"
-								size="sm"
-							>
-								<Text>{latestCommit.hash}</Text>
-							</Anchor>
-						</Tooltip>
-					</Group>
-				)}
-				<Group ml="lg">
-					<Button
-						size="compact-sm"
-						variant="transparent"
-						color="untappd"
-						mr="-6px"
-						onClick={onClose}
-					>
-						Save
-					</Button>
-				</Group>
-			</Flex>
 		</Modal>
 	);
 };

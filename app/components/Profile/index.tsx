@@ -1,5 +1,6 @@
 import {
 	ActionIcon,
+	Anchor,
 	Avatar,
 	Card,
 	Divider,
@@ -9,6 +10,7 @@ import {
 	Stack,
 	Switch,
 	Text,
+	Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useElementSize } from "@mantine/hooks";
 import { IconLogout, IconSettings, IconTool } from "@tabler/icons-react";
@@ -139,6 +141,7 @@ export const Profile = ({
 							</Menu.Item>
 						)}
 						<Menu.Divider />
+
 						<Menu.Item
 							leftSection={<IconLogout stroke={1} />}
 							component={Link}
@@ -147,6 +150,28 @@ export const Profile = ({
 						>
 							Logout
 						</Menu.Item>
+
+						<Menu.Divider />
+
+						{user.isAdmin && (
+							<Group gap={0} justify="center" mt="xs" mb="5">
+								<Tooltip
+									label={latestCommit.message}
+									position="bottom"
+									withArrow
+								>
+									<Anchor
+										href={`https://github.com/Kostecki/Untappd-WoS/commit/${latestCommit.hash}`}
+										target="_blank"
+										fs="italic"
+										c="dimmed"
+										size="xs"
+									>
+										<Text>Latest commit: {latestCommit.hash}</Text>
+									</Anchor>
+								</Tooltip>
+							</Group>
+						)}
 					</Menu.Dropdown>
 				</Menu>
 			</Flex>
@@ -158,7 +183,6 @@ export const Profile = ({
 				userLists={userLists}
 				stockList={stockList}
 				setStockListId={setStockListId}
-				latestCommit={latestCommit}
 			/>
 
 			<Divider my="md" />
