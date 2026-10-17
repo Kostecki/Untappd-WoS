@@ -47,8 +47,8 @@ export const BeerCard = ({
 								</Badge>
 							)}
 							{on_list && (
-								<Badge size="xs" variant="light" color="untappd">
-									On your list
+								<Badge size="xs" variant="dot" color="untappd">
+									Beer on your list
 								</Badge>
 							)}
 							{styleCoveredBy && (
