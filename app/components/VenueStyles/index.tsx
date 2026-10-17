@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 
 import { apiFetch } from "~/api.client";
+import { createNewStyleFilter } from "~/styles";
 
 import { SearchSelect } from "../SearchSelect";
 import { VenueBeerCard } from "../VenueBeerCard";
@@ -44,19 +45,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
 		if (venue) {
 			setSelectedVenue(venue);
 
-			const styleNameToId = new Map(
-				styles.map((style) => [
-					style.styleName.trim().toLowerCase(),
-					style.styleId,
-				]),
-			);
-
-			const haveHadStyleIds = styles
-				.filter((style) => style.styleId && style.had)
-				.map((style) => style.styleId);
-
-			// Add 0 to filter out items without a style ("other" as style)
-			haveHadStyleIds.push(0);
+			const isNewStyle = createNewStyleFilter(styles);
 
 			const venueDetails = await apiFetch(`/api/venue/${venue.venue_id}`);
 			const venueDetailsData: VenueMenuDetails[] = await venueDetails.json();
@@ -72,22 +61,7 @@ export const VenueStyles = ({ styles }: InputProps) => {
 					updated_at: menu.updated_at,
 					items: menu.sections.items
 						.flatMap((section) => section.items)
-						.filter((item) => {
-							const rawStyleId = item.beer.beer_style_id;
-							const normalizedStyleName =
-								item.beer.beer_style?.trim().toLowerCase() ?? "";
-							const mappedStyleId = styleNameToId.get(normalizedStyleName);
-							const effectiveStyleId =
-								typeof rawStyleId === "number" && rawStyleId > 0
-									? rawStyleId
-									: mappedStyleId;
-
-							if (effectiveStyleId === undefined) {
-								return false;
-							}
-
-							return !haveHadStyleIds.includes(effectiveStyleId);
-						}),
+						.filter((item) => isNewStyle(item.beer)),
 				};
 			}) as FlattenedMenuData[];
 

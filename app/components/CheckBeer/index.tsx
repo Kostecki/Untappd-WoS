@@ -17,6 +17,7 @@ import { useState } from "react";
 
 import { apiFetch } from "~/api.client";
 import countryToEmoji from "~/countries";
+import { findStyle, isStyleOnList } from "~/styles";
 import { Barcode } from "../BarcodeScanner";
 import { SearchSelect } from "../SearchSelect";
 
@@ -44,17 +45,11 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		searchOptions.TEXT,
 	);
 
-	// Prefer the style id (stable); names change when Untappd renames a style
-	const findStyle = ({ beer_style, beer_style_id }: Beer) =>
-		beer_style_id
-			? styles.find((style) => style.styleId === beer_style_id)
-			: styles.find((style) => style.styleName === beer_style);
-
 	const setStylesHadStatus = <T extends BarcodeAPIResponse | BeerInfoResponse>(
 		beers: T[],
 	): WithStyleHad<T>[] => {
 		return beers.map((beer) => {
-			const matchedStyle = findStyle(beer.beer);
+			const matchedStyle = findStyle(styles, beer.beer);
 
 			return {
 				...beer,
@@ -123,17 +118,9 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		return undefined;
 	};
 
-	// Same source as the styles table: the style ids of the whole stock list
-	const isStyleOnList = ({ beer_style, beer_style_id }: Beer) =>
-		beer_style_id
-			? stockListDetails?.styles.includes(beer_style_id)
-			: stockListDetails?.listItems.some(
-					(item) => item.beer.beer_style === beer_style,
-				);
-
 	const HaveHadStatus = ({ beer }: { beer: BeerWithStylesHad }) => {
 		const { style_had } = beer.beer;
-		const haveStyleInStock = isStyleOnList(beer.beer);
+		const haveStyleInStock = isStyleOnList(stockListDetails, beer.beer);
 		const haveButNotDrunk = !style_had && haveStyleInStock;
 
 		const text = style_had ? "Yes" : "No";
