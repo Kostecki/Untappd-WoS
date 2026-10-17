@@ -1,5 +1,5 @@
 import { Badge, Card, Flex, Group, Rating, Stack, Text } from "@mantine/core";
-import { IconCircleFilled, IconExternalLink } from "@tabler/icons-react";
+import { IconCircleFilled } from "@tabler/icons-react";
 
 import countryToEmoji from "~/countries";
 
@@ -79,9 +79,6 @@ export const BeerCard = ({
 							<Text size="xs">({rating_score.toFixed(2)})</Text>
 						</Group>
 					</Group>
-				</Stack>
-				<Stack gap="0">
-					<IconExternalLink size={16} />
 				</Stack>
 			</Flex>
 		</Card>
