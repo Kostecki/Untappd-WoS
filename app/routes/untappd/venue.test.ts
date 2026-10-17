@@ -92,7 +92,6 @@ describe("venue menus", () => {
 			serving_type: "Pint",
 			price: { value: "75.00", currency: "DKK", currency_symbol: "kr." },
 			has_had: false,
-			on_list: true,
 			tap_number: "3",
 			// The venue's display values ("1. Darkness (Nitro)") aren't Untappd's
 			beer: {

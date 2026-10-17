@@ -166,7 +166,6 @@ declare global {
 			Partial<Brewery>;
 		// Only from /menus/sections, per logged-in user
 		has_had?: boolean;
-		on_list?: boolean;
 		tap_number?: string;
 	}
 

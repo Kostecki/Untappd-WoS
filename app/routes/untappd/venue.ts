@@ -17,7 +17,6 @@ const toSectionItem = (item: MenuSectionItem): SectionItem => {
 			currency_symbol: container.currency_symbol,
 		},
 		has_had: item.has_had,
-		on_list: item.on_list,
 		tap_number: item.tap_number || undefined,
 		beer: {
 			bid: item.untappd_id,

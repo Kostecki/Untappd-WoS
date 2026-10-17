@@ -9,22 +9,20 @@ interface BeerCardItem {
 	beer: Beer;
 	brewery: Pick<Brewery, "brewery_name" | "country_name">;
 	has_had?: boolean;
-	on_list?: boolean;
 }
 
 export const BeerCard = ({
 	beerItem,
-	styleCoveredBy,
+	listMatch,
 }: {
 	beerItem: BeerCardItem;
-	/** Name of the list with another beer in this style */
-	styleCoveredBy?: string;
+	/** Whether the beer, or another beer in its style, is on the stock list */
+	listMatch?: "beer" | "style";
 }) => {
 	const {
 		beer: { bid, beer_name, beer_slug, beer_abv, beer_style, rating_score },
 		brewery: { brewery_name, country_name },
 		has_had,
-		on_list,
 	} = beerItem;
 
 	return (
@@ -46,12 +44,12 @@ export const BeerCard = ({
 									Had
 								</Badge>
 							)}
-							{on_list && (
+							{listMatch === "beer" && (
 								<Badge size="xs" variant="dot" color="untappd">
 									Beer on your list
 								</Badge>
 							)}
-							{styleCoveredBy && (
+							{listMatch === "style" && (
 								<Badge size="xs" variant="dot" color="untappd">
 									Style on your list
 								</Badge>

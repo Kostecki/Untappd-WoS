@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	createNewStyleFilter,
 	findStyle,
-	getStyleCoveredBy,
+	getListMatch,
 	isStyleOnList,
 } from "./styles";
 
@@ -82,32 +82,46 @@ describe("createNewStyleFilter", () => {
 	});
 });
 
-describe("getStyleCoveredBy", () => {
+describe("getListMatch", () => {
 	const stockList: StockListDetails = {
 		listId: "1",
 		listName: "På lager",
 		styles: [2],
-		listItems: [],
+		listItems: [
+			{
+				beer: { bid: 10, beer_style: "Kölsch - Wiess" } as Beer,
+				brewery: {} as Brewery,
+			},
+		],
 	};
+	const menuBeer = (bid: number, style: string, styleId?: number) => ({
+		bid,
+		...beer(style, styleId),
+	});
 
-	it("names the stock list when another beer on it has the style", () => {
-		expect(getStyleCoveredBy(stockList, { beer: beer("x", 2) })).toBe(
-			"På lager",
+	it("is 'beer' when the same beer is on the stock list", () => {
+		expect(getListMatch(stockList, menuBeer(10, "Kölsch - Wiess", 2))).toBe(
+			"beer",
 		);
 	});
 
-	it("is undefined when the beer itself is on a list", () => {
-		expect(
-			getStyleCoveredBy(stockList, { beer: beer("x", 2), on_list: true }),
-		).toBeUndefined();
+	it("is 'style' when another beer on the stock list has the style", () => {
+		expect(getListMatch(stockList, menuBeer(11, "Kölsch - Wiess", 2))).toBe(
+			"style",
+		);
+		expect(getListMatch(stockList, menuBeer(11, "Kölsch - Wiess"))).toBe(
+			"style",
+		);
 	});
 
-	it("is undefined when the style isn't on the stock list, or there's none", () => {
+	it("ignores Untappd's on_list (any list, e.g. a wish list)", () => {
+		const onWishList = { ...menuBeer(12, "Mild - Ruby", 3), on_list: true };
+		expect(getListMatch(stockList, onWishList)).toBeUndefined();
+	});
+
+	it("is undefined without a stock list", () => {
 		expect(
-			getStyleCoveredBy(stockList, { beer: beer("x", 3) }),
-		).toBeUndefined();
-		expect(
-			getStyleCoveredBy(undefined, { beer: beer("x", 2) }),
+			getListMatch(undefined, menuBeer(10, "Kölsch - Wiess", 2)),
 		).toBeUndefined();
 	});
 });
