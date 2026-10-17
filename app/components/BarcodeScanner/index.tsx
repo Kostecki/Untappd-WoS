@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 interface InputProps {
 	fetchDetailsHandler: (
 		beers?: BeerStringSearchResponse[],
-		barcode?: number,
+		barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => Promise<void>;
@@ -58,7 +58,8 @@ export const Barcode = ({ fetchDetailsHandler }: InputProps) => {
 							videoRef.current,
 						);
 						if (barcodes.length > 0) {
-							fetchDetailsHandler(undefined, parseInt(barcodes[0].rawValue));
+							// Keep as a string: barcodes like UPC-A can start with 0
+							fetchDetailsHandler(undefined, barcodes[0].rawValue);
 							detectionComplete.current = true;
 						}
 					} catch (error) {

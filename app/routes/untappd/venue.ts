@@ -1,28 +1,101 @@
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
+import { toMenus as toTemporaryMenus } from "~/temporary-venues/mappers.server";
+import { getTemporaryVenue } from "~/temporary-venues/store.server";
+import { getVenueMenuSections } from "~/untappd/api.server";
+import { UntappdError, withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/venue";
-import { API_BASE_URL } from "./config";
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
-	const venueId = params.venueId;
+const toSectionItem = (item: MenuSectionItem): SectionItem => {
+	const [container] = item.containers;
 
-	const searchParams = new URLSearchParams({
-		access_token: user.accessToken,
-	});
-	const url = `${API_BASE_URL}/inventory/view/${venueId}?${searchParams}`;
-	const response = await fetch(url);
+	return {
+		created_at: item.created_at,
+		serving_type: container?.name ?? "",
+		price: container && {
+			value: container.price,
+			currency: container.currency,
+			currency_symbol: container.currency_symbol,
+		},
+		has_had: item.has_had,
+		on_list: item.on_list,
+		tap_number: item.tap_number || undefined,
+		beer: {
+			bid: item.untappd_id,
+			// `name`/`style` are the venue's display values, e.g. "1. Darkness (Nitro)"
+			beer_name: item.original_name || item.name,
+			beer_label: item.label_image,
+			beer_label_hd: item.label_image_hd,
+			beer_abv: Number(item.abv) || 0,
+			beer_ibu: Number(item.ibu) || 0,
+			beer_slug: item.untappd_beer_slug,
+			beer_description: item.description,
+			beer_style: item.original_style || item.style,
+			is_in_production: Number(item.in_production),
+			rating_score: Number(item.rating) || 0,
+			rating_count: item.rating_count,
+		},
+		brewery: {
+			brewery_id: item.untappd_brewery_id,
+			brewery_name: item.brewery,
+			brewery_slug: item.untappd_brewery_slug,
+			brewery_page_url: item.untappd_brewery_page_url,
+			brewery_label: "",
+			country_name: item.brewery_country,
+		},
+	};
+};
 
-	if (!response.ok) {
-		console.error("Failed to get venue", response);
-		return Response.json([]);
+/** Groups the flat section list from /menus/sections back into menus */
+const toMenus = (sections: MenuSectionsSection[]): VenueMenuDetails[] => {
+	const menus = new Map<number, VenueMenuDetails>();
+
+	for (const section of sections) {
+		let menu = menus.get(section.menu_id);
+		if (!menu) {
+			menu = {
+				menu_id: section.menu_id,
+				menu_name: section.menu_name,
+				menu_description: section.menu_description,
+				created_at: "",
+				updated_at: "",
+				total_item_count: 0,
+				sections: { count: 0, items: [] },
+			};
+			menus.set(section.menu_id, menu);
+		}
+
+		menu.total_item_count += section.total_count;
+		menu.sections.count += 1;
+		menu.sections.items.push({
+			section_id: section.section_id,
+			section_name: section.section_name.trim(),
+			section_description: section.section_description,
+			count: section.items.length,
+			items: section.items.map(toSectionItem),
+		});
 	}
 
-	const data = (await response.json()) as {
-		response: { items: VenueDetailsAPIResponse[] };
-	};
-	const { items } = data.response;
+	return [...menus.values()];
+};
 
-	const menus = items.map(({ menu }) => menu);
+export async function loader({ request, params }: Route.LoaderArgs) {
+	const user = await requireUser(request);
+	const { venueId } = params;
 
-	return Response.json(menus);
+	// Temporary venues have negative ids and are served from storage
+	if (Number(venueId) < 0) {
+		const venue = await getTemporaryVenue(Number(venueId));
+		return Response.json(venue ? toTemporaryMenus(venue) : []);
+	}
+
+	// Untappd answers 403 for venues without published menus
+	const sections = await withFallback(
+		getVenueMenuSections(user.accessToken, venueId).catch((error) => {
+			if (error instanceof UntappdError && error.status === 403) return [];
+			throw error;
+		}),
+		[],
+	);
+
+	return Response.json(toMenus(sections));
 }

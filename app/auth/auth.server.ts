@@ -2,12 +2,8 @@ import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import invariant from "tiny-invariant";
 
-import {
-	API_BASE_URL,
-	CLIENT_ID,
-	CLIENT_SECRET,
-	DEVICE_UDID,
-} from "~/routes/untappd/config";
+import { getUserInfo, login } from "~/untappd/api.server";
+import { UntappdError } from "~/untappd/client.server";
 import { getUserSpecificWoSBadgeId } from "./untappd";
 
 export type SessionUser = {
@@ -18,10 +14,13 @@ export type SessionUser = {
 	userAvatarURL: string;
 	email: string;
 	profileUrl: string;
-	wosBadgeId: number;
+	wosBadgeId: number | null;
 	accessToken: string;
 	isAdmin: boolean;
 };
+
+/** The session user as sent to the browser, without the access token */
+export type PublicUser = Omit<SessionUser, "accessToken">;
 
 export const authenticator = new Authenticator<SessionUser>();
 
@@ -33,45 +32,27 @@ authenticator.use(
 		const formUsername = String(form.get("username"));
 		const formPassword = String(form.get("password"));
 
-		const formData = new FormData();
-		formData.append("user_name", formUsername);
-		formData.append("user_password", formPassword);
-		formData.append("device_udid", String(DEVICE_UDID));
-
-		const authSearchParams = new URLSearchParams({
-			client_id: String(CLIENT_ID),
-			client_secret: String(CLIENT_SECRET),
-		});
-		const url = `${API_BASE_URL}/xauth?${authSearchParams}`;
-		const response = await fetch(url, {
-			method: "POST",
-			body: formData,
-		});
-
-		if (!response.ok) {
-			// console.error("Failed to authenticate", response);
-
-			throw new Error("INVALID_PASSWORD");
+		let session: Awaited<ReturnType<typeof login>>;
+		try {
+			session = await login(formUsername, formPassword);
+		} catch (error) {
+			if (error instanceof UntappdError && error.status < 500) {
+				throw new Error("INVALID_PASSWORD");
+			}
+			throw error;
 		}
 
-		const data = await response.json();
-		const { access_token, username } = data.response;
-
-		const userSearchParams = new URLSearchParams({
-			compact: "enhanced",
-			access_token,
-		});
-		const userResponse = await fetch(
-			`${API_BASE_URL}/user/info/${username}?${userSearchParams}`,
-		);
-
-		if (!userResponse.ok) {
-			console.error("Failed to get user info", userResponse);
-
-			throw new Error("Failed to retrieve user information");
+		if (!session.access_token) {
+			// The credentials match several accounts; we have no account picker
+			throw new Error("MULTIPLE_ACCOUNTS");
 		}
+		const { access_token, username } = session;
 
-		const userData = await userResponse.json();
+		const [user, userSpecificBadgeId] = await Promise.all([
+			getUserInfo(access_token, username),
+			getUserSpecificWoSBadgeId(access_token),
+		]);
+
 		const {
 			id,
 			user_name,
@@ -80,12 +61,7 @@ authenticator.use(
 			user_avatar_hd,
 			untappd_url,
 			settings: { email_address },
-		} = userData.response.user;
-
-		const userSpecificBadgeId = await getUserSpecificWoSBadgeId(
-			0,
-			access_token,
-		);
+		} = user;
 
 		return {
 			id,

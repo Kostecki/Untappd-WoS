@@ -15,6 +15,7 @@ import {
 import { IconBarcode, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 
+import { apiFetch } from "~/api.client";
 import countryToEmoji from "~/countries";
 import { Barcode } from "../BarcodeScanner";
 import { SearchSelect } from "../SearchSelect";
@@ -43,13 +44,17 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		searchOptions.TEXT,
 	);
 
+	// Prefer the style id (stable); names change when Untappd renames a style
+	const findStyle = ({ beer_style, beer_style_id }: Beer) =>
+		beer_style_id
+			? styles.find((style) => style.styleId === beer_style_id)
+			: styles.find((style) => style.styleName === beer_style);
+
 	const setStylesHadStatus = <T extends BarcodeAPIResponse | BeerInfoResponse>(
 		beers: T[],
-	): BeerWithStylesHad[] => {
+	): WithStyleHad<T>[] => {
 		return beers.map((beer) => {
-			const matchedStyle = styles.find(
-				(style) => style.styleName === beer.beer.beer_style,
-			);
+			const matchedStyle = findStyle(beer.beer);
 
 			return {
 				...beer,
@@ -63,14 +68,16 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 
 	const fetchDetails = async (
 		inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
-		barcode?: number,
+		barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => {
 		setLoading(true);
 
 		if (barcode) {
-			const beerDetails = await fetch(`/api/barcode/${barcode}`);
+			const beerDetails = await apiFetch(
+				`/api/barcode/${encodeURIComponent(barcode)}`,
+			);
 			const beerDetailsData: BarcodeAPIResponse[] = await beerDetails.json();
 
 			const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
@@ -85,7 +92,7 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 			if (beer) {
 				setSelectedBeer(beer);
 
-				const beerDetails = await fetch(`/api/beer/${beer.beer.bid}`);
+				const beerDetails = await apiFetch(`/api/beer/${beer.beer.bid}`);
 				const beerDetailsData: BeerInfoResponse[] = await beerDetails.json();
 
 				const beerDetailsDataWithStyle = setStylesHadStatus(beerDetailsData);
@@ -97,19 +104,36 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		combobox?.closeDropdown();
 	};
 
-	const findBeerByStyle = (styleName: string) => {
-		const beer = stockListDetails?.listItems.some(
-			(beer) => beer.beer.beer_style === styleName,
-		);
+	/** Names of the user's lists with this beer, or undefined if it is on none */
+	const getListNames = (beer: BeerWithStylesHad) => {
+		// From /beer/info: the actual lists
+		if ("lists" in beer.beer && beer.beer.lists) {
+			const names = beer.beer.lists.items.map((list) => list.list_name);
+			return names.length > 0 ? names.join(", ") : undefined;
+		}
 
-		return beer;
+		// From a barcode lookup: only whether it's on any list
+		if ("on_list" in beer.beer && beer.beer.on_list) {
+			const onStockList = stockListDetails?.listItems.some(
+				(item) => item.beer.bid === beer.beer.bid,
+			);
+			return onStockList ? stockListDetails?.listName : "one of your lists";
+		}
+
+		return undefined;
 	};
 
+	// Same source as the styles table: the style ids of the whole stock list
+	const isStyleOnList = ({ beer_style, beer_style_id }: Beer) =>
+		beer_style_id
+			? stockListDetails?.styles.includes(beer_style_id)
+			: stockListDetails?.listItems.some(
+					(item) => item.beer.beer_style === beer_style,
+				);
+
 	const HaveHadStatus = ({ beer }: { beer: BeerWithStylesHad }) => {
-		const {
-			beer: { beer_style, style_had },
-		} = beer;
-		const haveStyleInStock = findBeerByStyle(beer_style);
+		const { style_had } = beer.beer;
+		const haveStyleInStock = isStyleOnList(beer.beer);
 		const haveButNotDrunk = !style_had && haveStyleInStock;
 
 		const text = style_had ? "Yes" : "No";
@@ -214,6 +238,8 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 								brewery: { brewery_name, country_name },
 							} = beer;
 
+							const onLists = getListNames(beer);
+
 							const hadBeer = () => {
 								if ("stats" in beer.beer) {
 									const stats = beer.beer.stats;
@@ -252,12 +278,22 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 											</Grid.Col>
 										</Grid>
 										<Divider my="xs" opacity={0.5} />
-										<Group>
-											<HaveHadStatus beer={beer} />
-											<Divider orientation="vertical" />
-											<Text ta="center" size="sm" c="dimmed">
-												Had beer: {hadBeer()}
-											</Text>
+										<Group justify="space-between">
+											<Group>
+												<HaveHadStatus beer={beer} />
+												<Divider orientation="vertical" />
+												<Text ta="center" size="sm" c="dimmed">
+													Had beer: {hadBeer()}
+												</Text>
+											</Group>
+											{onLists && (
+												<Text size="sm" c="dimmed">
+													On list:{" "}
+													<Text fs="italic" component="span">
+														{onLists}
+													</Text>
+												</Text>
+											)}
 										</Group>
 									</Card>
 								</Anchor>

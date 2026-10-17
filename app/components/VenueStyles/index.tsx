@@ -8,62 +8,29 @@ import {
 	Tabs,
 	Text,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import { apiFetch } from "~/api.client";
 
 import { SearchSelect } from "../SearchSelect";
 import { VenueBeerCard } from "../VenueBeerCard";
 
 interface InputProps {
 	styles: { styleId: number; styleName: string; had: boolean }[];
-	mbccEnabled: boolean;
 }
 
-type FlattenedVenueMenuData = FlattenedMenuData & {
-	mbcc_session?: MBCCSession;
-};
-
-const getMBCCSessionURL = (session: MBCCSession) => {
-	return `https://mbcc.jonpacker.com/#session[{%22colour%22:%22${session}%22}]`;
-};
-
-export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
+export const VenueStyles = ({ styles }: InputProps) => {
 	const [loading, setLoading] = useState(false);
 	const [selectedVenue, setSelectedVenue] = useState<VenueDetails | undefined>(
 		undefined,
 	);
-	const [mbccVenues, setMbccVenues] = useState<MBCCVenueDetails[]>([]);
 	const [venueDetails, setVenueDetails] = useState<
-		FlattenedVenueMenuData[] | undefined
+		FlattenedMenuData[] | undefined
 	>(undefined);
-
-	const isMBCCRelevant = mbccEnabled;
-
-	useEffect(() => {
-		const fetchMBCCVenues = async () => {
-			if (!isMBCCRelevant) {
-				setMbccVenues([]);
-				return;
-			}
-
-			try {
-				const response = await fetch("/api/mbcc/venues");
-				const data = (await response.json()) as MBCCVenueDetails[];
-				setMbccVenues(data);
-			} catch (error) {
-				console.error("Failed to load MBCC venues", error);
-			}
-		};
-
-		fetchMBCCVenues();
-	}, [isMBCCRelevant]);
-
-	const isMBCCVenue = (venue: VenueDetails): venue is MBCCVenueDetails => {
-		return "mbcc_event" in venue && venue.mbcc_event === true;
-	};
 
 	const handleVenueSelect = async (
 		inputDataList?: VenueDetails[] | BeerStringSearchResponse[],
-		_barcode?: number,
+		_barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => {
@@ -91,11 +58,8 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 			// Add 0 to filter out items without a style ("other" as style)
 			haveHadStyleIds.push(0);
 
-			const venueDetails = isMBCCVenue(venue)
-				? await fetch("/api/mbcc/venue")
-				: await fetch(`/api/venue/${venue.venue_id}`);
-			const venueDetailsData: (VenueMenuDetails | MBCCVenueMenuDetails)[] =
-				await venueDetails.json();
+			const venueDetails = await apiFetch(`/api/venue/${venue.venue_id}`);
+			const venueDetailsData: VenueMenuDetails[] = await venueDetails.json();
 
 			// Flatten the menu data to have menus with all items from sub-sections and only new styles
 			const flattenedMenuData = venueDetailsData.map((menu) => {
@@ -106,7 +70,6 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 					total_item_count: menu.total_item_count,
 					created_at: menu.created_at,
 					updated_at: menu.updated_at,
-					mbcc_session: "mbcc_session" in menu ? menu.mbcc_session : undefined,
 					items: menu.sections.items
 						.flatMap((section) => section.items)
 						.filter((item) => {
@@ -126,7 +89,7 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 							return !haveHadStyleIds.includes(effectiveStyleId);
 						}),
 				};
-			}) as FlattenedVenueMenuData[];
+			}) as FlattenedMenuData[];
 
 			setVenueDetails(flattenedMenuData);
 		}
@@ -135,7 +98,12 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 		combobox?.closeDropdown();
 	};
 
-	const groupByStyles = (items: FlattenedVenueMenuData["items"]) => {
+	// Verified venues can still have no (or only empty) published menus
+	const hasPublishedMenu = Boolean(
+		venueDetails?.some((menu) => menu.total_item_count > 0),
+	);
+
+	const groupByStyles = (items: FlattenedMenuData["items"]) => {
 		return items
 			.reduce<{ beer_style: string; beers: typeof items }[]>((acc, item) => {
 				const style = item.beer?.beer_style?.trim() ?? "Unknown";
@@ -165,11 +133,11 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 
 			<SearchSelect
 				apiURL="/api/venues"
+				emptyQueryURL="/api/temporary-venues"
 				placeholder="Search for a venue"
 				emptyText="No venues found"
 				loading={loading}
 				setLoading={setLoading}
-				prependVenues={isMBCCRelevant ? mbccVenues : undefined}
 				selectedVenue={selectedVenue}
 				setSelectedVenue={setSelectedVenue}
 				setVenueDetails={setVenueDetails}
@@ -177,12 +145,26 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 				leftSection={true}
 			/>
 
-			{venueDetails && (
+			{venueDetails && !hasPublishedMenu && (
+				<Text fs="italic" c="dimmed" fw="500" ta="center" mt="xl" mb="xs">
+					{selectedVenue?.venue_name ?? "This venue"} hasn't published a menu on
+					Untappd
+				</Text>
+			)}
+
+			{venueDetails && hasPublishedMenu && (
 				<Box mt="lg">
 					<Tabs
+						// Remount per venue so the default tab follows the new menus
+						key={selectedVenue?.venue_id}
 						color="untappd"
 						mt="sm"
-						defaultValue={String(venueDetails[0].menu_id)}
+						defaultValue={String(
+							(
+								venueDetails.find((menu) => menu.total_item_count > 0) ??
+								venueDetails[0]
+							)?.menu_id,
+						)}
 					>
 						<Tabs.List>
 							{venueDetails.map((item) => {
@@ -201,17 +183,12 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 						</Tabs.List>
 
 						{venueDetails.map((item) => {
-							const {
-								menu_id,
-								menu_description,
-								total_item_count,
-								items,
-								mbcc_session,
-							} = item;
-							const menuURL =
-								selectedVenue && isMBCCVenue(selectedVenue) && mbcc_session
-									? getMBCCSessionURL(mbcc_session)
-									: selectedVenue?.url;
+							const { menu_id, menu_description, total_item_count, items } =
+								item;
+							const menuURL = selectedVenue?.url;
+							const menuLinkText = selectedVenue?.temporary
+								? "Venue website"
+								: "Menu on Untappd";
 
 							if (total_item_count === 0) {
 								return null;
@@ -223,17 +200,19 @@ export const VenueStyles = ({ styles, mbccEnabled }: InputProps) => {
 										<Text fs="italic" size="sm" c="dimmed">
 											{menu_description}
 										</Text>
-										<Text c="untappd" size="sm" ta="right">
-											<Anchor
-												href={menuURL}
-												target="_blank"
-												c="untappd"
-												underline="always"
-												size="sm"
-											>
-												Menu on Untappd
-											</Anchor>
-										</Text>
+										{menuURL && (
+											<Text c="untappd" size="sm" ta="right">
+												<Anchor
+													href={menuURL}
+													target="_blank"
+													c="untappd"
+													underline="always"
+													size="sm"
+												>
+													{menuLinkText}
+												</Anchor>
+											</Text>
+										)}
 									</Stack>
 
 									{items.length === 0 && (

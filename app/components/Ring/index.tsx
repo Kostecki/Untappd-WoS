@@ -1,5 +1,5 @@
 import { RingProgress } from "@mantine/core";
-import { isMobile } from "~/utils";
+import { useIsMobile } from "~/utils";
 
 interface InputProps {
 	size: number;
@@ -15,7 +15,7 @@ const mapValue = (value: number, maxValue: number) => {
 export const Ring = ({ size, value, maxValue, children }: InputProps) => {
 	const clampedSize = Math.min(Math.max(size, 100), 150);
 	const mappedValue = mapValue(value, maxValue);
-	const mobile = isMobile();
+	const mobile = useIsMobile();
 
 	return (
 		<RingProgress

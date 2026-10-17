@@ -7,4 +7,11 @@
 
 .env
 
-mbcc-2026.json
+mbcc-*.json
+mbcc-*.csv
+
+# Runtime data (temporary venues); mount as a volume in production
+/data/
+# Reverse-engineering inputs
+*.xapk
+*.apk

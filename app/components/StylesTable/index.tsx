@@ -1,28 +1,23 @@
 import {
-	ActionIcon,
-	Anchor,
+	Box,
 	Card,
 	Checkbox,
 	Collapse,
-	CopyButton,
 	Flex,
-	List,
 	Loader,
 	Stack,
 	Table,
 	Text,
 	TextInput,
+	Tooltip,
 } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-import {
-	IconCheck,
-	IconChevronDown,
-	IconChevronUp,
-	IconCopy,
-} from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
-import countryToEmoji from "~/countries";
+import { apiFetch } from "~/api.client";
+import { getLocationQuery } from "~/hooks/location";
+import { StyleBeers } from "./StyleBeers";
 
 import "./style.css";
 
@@ -31,26 +26,34 @@ interface InputProps {
 	stockListDetails: StockListDetails | undefined;
 }
 
-const rowInfoCache = new Map<number, RelatedBeersResponse[]>();
+const rowInfoCache = new Map<number, StyleBeersPayload>();
 
 export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 	const [loading, setLoading] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [openRow, setOpenRow] = useState<number | undefined>(undefined);
-	const [relatedBeers, setRelatedBeers] = useState<RelatedBeersResponse[]>([]);
+	const [styleBeers, setStyleBeers] = useState<StyleBeersPayload>({
+		topRated: [],
+		nearby: [],
+	});
 
 	const { height: windowHeight } = useViewportSize();
 
-	const getRelatedBeers = async (styleId: number) => {
-		if (rowInfoCache.has(styleId)) {
-			return rowInfoCache.get(styleId) || [];
+	const getStyleBeers = async (styleId: number): Promise<StyleBeersPayload> => {
+		const cached = rowInfoCache.get(styleId);
+		if (cached) {
+			return cached;
 		}
 
-		const response = await fetch(`/api/related/${styleId}`);
-		const relatedBeers = (await response.json()) as RelatedBeersResponse[];
-		rowInfoCache.set(styleId, relatedBeers);
+		const response = await apiFetch(
+			`/api/style/${styleId}/beers${await getLocationQuery()}`,
+		);
+		const styleBeers: StyleBeersPayload = response.ok
+			? await response.json()
+			: { topRated: [], nearby: [] };
+		rowInfoCache.set(styleId, styleBeers);
 
-		return relatedBeers;
+		return styleBeers;
 	};
 
 	const toggleRow = async (styleId: number) => {
@@ -60,9 +63,7 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 			setLoading(true);
 			setOpenRow(styleId);
 
-			const relatedBeers = await getRelatedBeers(styleId);
-
-			setRelatedBeers(relatedBeers);
+			setStyleBeers(await getStyleBeers(styleId));
 			setLoading(false);
 		}
 	};
@@ -84,149 +85,120 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 				onChange={(event) => setSearchTerm(event.currentTarget.value)}
 			/>
 
-			<Table
+			{/* Scroll on a wrapper so the table keeps its normal full-width layout */}
+			<Box
 				mt="lg"
-				stickyHeader
 				style={{
-					display: "block",
-					overflowY: "scroll",
+					overflowY: "auto",
 					maxHeight: windowHeight - 140,
 					scrollbarWidth: "thin",
 				}}
 			>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th w="360px">{`Styles (${filteredStyles.length})`}</Table.Th>
-						<Table.Th ta="center">Have Had</Table.Th>
-						<Table.Th ta="center">Copy</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{filteredStyles.map((style) => {
-						const haveStyleInStock = stockListDetails?.styles.includes(
-							style.styleId,
-						);
-
-						const ShowHaveStyleInStock = () => {
-							if (haveStyleInStock) {
-								const beer = findBeerByStyle(style.styleId);
-
-								if (beer) {
-									return (
-										<Text fw="500" size="xs" ml="sm" fs="italic" c="dimmed">
-											On list: {stockListDetails?.listName}
-										</Text>
-									);
-								}
-							}
-						};
-
-						return (
-							<Fragment key={style.styleId}>
-								<Table.Tr
-									onClick={() => toggleRow(style.styleId)}
-									style={{ cursor: "pointer", userSelect: "none" }}
+				<Table stickyHeader>
+					<Table.Thead>
+						<Table.Tr>
+							<Table.Th>{`Styles (${filteredStyles.length})`}</Table.Th>
+							<Table.Th ta="center" w={1} style={{ whiteSpace: "nowrap" }}>
+								<Tooltip
+									multiline
+									w={340}
+									withArrow
+									label={
+										<Stack gap={4}>
+											<Text size="xs">✓ Had this style</Text>
+											<Text size="xs">
+												– Not had, but a beer in this style is on your stock
+												list
+											</Text>
+											<Text size="xs">☐ Not had yet</Text>
+										</Stack>
+									}
 								>
-									<Table.Td>
-										<Flex align="center">
-											{openRow === style.styleId ? (
-												<IconChevronDown size={20} color="gray" stroke={1.5} />
-											) : (
-												<IconChevronUp size={20} color="gray" stroke={1.5} />
-											)}
+									<Text component="span" fw="inherit" fz="inherit">
+										Have Had
+									</Text>
+								</Tooltip>
+							</Table.Th>
+						</Table.Tr>
+					</Table.Thead>
+					<Table.Tbody>
+						{filteredStyles.map((style) => {
+							const haveStyleInStock = stockListDetails?.styles.includes(
+								style.styleId,
+							);
 
-											<Stack gap={0}>
-												<Text fw="500" size="xs" ml="sm">
-													{style.styleName}
-												</Text>
-												<ShowHaveStyleInStock />
-											</Stack>
-										</Flex>
-									</Table.Td>
+							const ShowHaveStyleInStock = () => {
+								if (haveStyleInStock) {
+									const beer = findBeerByStyle(style.styleId);
 
-									<Table.Td>
-										<Flex justify="center">
-											<Checkbox
-												color="untappd"
-												checked={style.had}
-												indeterminate={haveStyleInStock}
-												readOnly
-											/>
-										</Flex>
-									</Table.Td>
+									if (beer) {
+										return (
+											<Text fw="500" size="xs" ml="sm" fs="italic" c="dimmed">
+												On list: {stockListDetails?.listName}
+											</Text>
+										);
+									}
+								}
+							};
 
-									<Table.Td>
-										<Flex justify="center">
-											<CopyButton value={style.styleName}>
-												{({ copied, copy }) => (
-													<ActionIcon
-														variant="transparent"
-														aria-label="Copy"
-														onClick={(event) => {
-															event.stopPropagation();
-															copy();
-														}}
-													>
-														{copied ? (
-															<IconCheck color="gray" stroke={1.5} />
-														) : (
-															<IconCopy color="gray" stroke={1.5} />
-														)}
-													</ActionIcon>
+							return (
+								<Fragment key={style.styleId}>
+									<Table.Tr
+										onClick={() => toggleRow(style.styleId)}
+										style={{ cursor: "pointer", userSelect: "none" }}
+									>
+										<Table.Td>
+											<Flex align="center">
+												{openRow === style.styleId ? (
+													<IconChevronDown
+														size={20}
+														color="gray"
+														stroke={1.5}
+													/>
+												) : (
+													<IconChevronUp size={20} color="gray" stroke={1.5} />
 												)}
-											</CopyButton>
-										</Flex>
-									</Table.Td>
-								</Table.Tr>
-								<Table.Tr style={{ border: "none" }}>
-									<Table.Td colSpan={3} p={0}>
-										<Collapse expanded={openRow === style.styleId}>
-											{loading ? (
-												<Flex justify="center">
-													<Loader color="untappd" my="lg" />
-												</Flex>
-											) : (
-												<List my="lg">
-													{relatedBeers.map((beer: BeerWithBrewery) => {
-														const {
-															beer: { beer_name, bid },
-															brewery: { brewery_name, country_name },
-														} = beer;
 
-														return (
-															<Anchor
-																href={`https://untappd.com/beer/${bid}`}
-																target="_blank"
-																key={bid}
-															>
-																<List.Item
-																	key={bid}
-																	px="sm"
-																	py="xs"
-																	className="related-beer"
-																	icon={<></>}
-																>
-																	<Text component="div" size="sm" c="dark">
-																		{beer_name}
-																	</Text>
-																	<Text component="div" size="sm" c="dimmed">
-																		{brewery_name}, {country_name}{" "}
-																		{countryToEmoji(country_name)}
-																	</Text>
-																</List.Item>
-															</Anchor>
-														);
-													})}
-												</List>
-											)}
-										</Collapse>
-									</Table.Td>
-								</Table.Tr>
-							</Fragment>
-						);
-					})}
-				</Table.Tbody>
-			</Table>
+												<Stack gap={0}>
+													<Text fw="500" size="xs" ml="sm">
+														{style.styleName}
+													</Text>
+													<ShowHaveStyleInStock />
+												</Stack>
+											</Flex>
+										</Table.Td>
+
+										<Table.Td>
+											<Flex justify="center">
+												<Checkbox
+													color="untappd"
+													checked={style.had}
+													// Dash only for styles not had yet; a had style stays ticked
+													indeterminate={!style.had && haveStyleInStock}
+													readOnly
+												/>
+											</Flex>
+										</Table.Td>
+									</Table.Tr>
+									<Table.Tr style={{ border: "none" }}>
+										<Table.Td colSpan={2} p={0}>
+											<Collapse expanded={openRow === style.styleId}>
+												{loading ? (
+													<Flex justify="center">
+														<Loader color="untappd" my="lg" />
+													</Flex>
+												) : (
+													<StyleBeers {...styleBeers} />
+												)}
+											</Collapse>
+										</Table.Td>
+									</Table.Tr>
+								</Fragment>
+							);
+						})}
+					</Table.Tbody>
+				</Table>
+			</Box>
 		</Card>
 	);
 };

@@ -10,21 +10,21 @@ import {
 	Text,
 } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
-import { IconLogout } from "@tabler/icons-react";
+import { IconLogout, IconTool } from "@tabler/icons-react";
 import { Link } from "react-router";
-import type { SessionUser } from "~/auth/auth.server";
-import { isMobile, Settings, setSettings } from "~/utils";
+import type { PublicUser } from "~/auth/auth.server";
+import { Settings, setSettings, useIsMobile } from "~/utils";
 
 import { Ring } from "../Ring";
 import { SettingsModal } from "../SettingsModal";
 
 interface InputProps {
-	user: SessionUser;
+	user: PublicUser;
 	stylesInfo: StylesInfo;
 	userLists: UserLists[];
 	stockList?: StockList;
 	stockListDetails?: StockListDetails;
-	setStockList: React.Dispatch<React.SetStateAction<StockList | undefined>>;
+	setStockListId: (listId: string | null) => void;
 	setProfileFilters: React.Dispatch<React.SetStateAction<Filters>>;
 	profileFilters: Filters;
 	latestCommit: LatestCommit;
@@ -36,13 +36,13 @@ export const Profile = ({
 	userLists,
 	stockList,
 	stockListDetails,
-	setStockList,
+	setStockListId,
 	setProfileFilters,
 	profileFilters,
 	latestCommit,
 }: InputProps) => {
 	const { ref, width } = useElementSize();
-	const mobile = isMobile();
+	const mobile = useIsMobile();
 
 	const fullName = `${user.firstName} ${user.lastName}`;
 	const {
@@ -99,11 +99,22 @@ export const Profile = ({
 					<Text>{fullName}</Text>
 				</Group>
 				<Group>
+					{user.isAdmin && (
+						<ActionIcon
+							component={Link}
+							variant="transparent"
+							aria-label="Admin"
+							color="dark"
+							to="/admin"
+						>
+							<IconTool stroke={1} />
+						</ActionIcon>
+					)}
 					<SettingsModal
 						user={user}
 						userLists={userLists}
 						stockList={stockList}
-						setStockList={setStockList}
+						setStockListId={setStockListId}
 						latestCommit={latestCommit}
 					/>
 					<ActionIcon

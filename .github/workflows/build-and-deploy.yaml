@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+  # Checks and a test image build; nothing is pushed or deployed
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -54,7 +58,13 @@ jobs:
             pnpm-${{ runner.os }}-
 
       - name: Install node modules
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
 
       - name: Build the application
         run: pnpm run build
@@ -71,6 +81,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Login to the container registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v4.6.0
         with:
           registry: ${{ env.REGISTRY }}
@@ -81,7 +92,7 @@ jobs:
         uses: docker/build-push-action@v7.4.0
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           build-args: |
             LATEST_COMMIT_HASH=${{ env.LATEST_COMMIT_HASH }}
             LATEST_COMMIT_MESSAGE=${{ env.LATEST_COMMIT_MESSAGE }}
@@ -89,12 +100,13 @@ jobs:
             ${{ steps.meta.outputs.tags }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          # Pull requests only check that the image builds
+          platforms: ${{ github.event_name == 'pull_request' && 'linux/amd64' || 'linux/amd64,linux/arm64' }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push_image
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
 
     permissions:
       id-token: write

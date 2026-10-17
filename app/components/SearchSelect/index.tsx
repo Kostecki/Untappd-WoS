@@ -1,4 +1,5 @@
 import {
+	Box,
 	CloseButton,
 	Combobox,
 	type ComboboxStore,
@@ -13,21 +14,24 @@ import {
 	useCombobox,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import { useEffect, useRef, useState } from "react";
+import { IconConfettiFilled } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
+import { apiFetch } from "~/api.client";
 import countryToEmoji from "~/countries";
-import { isMobile } from "~/utils";
+import { useIsMobile } from "~/utils";
 
 interface InputProps {
 	apiURL: string;
 	placeholder: string;
 	emptyText: string;
+	/** Fetched while the search is empty, e.g. suggestions */
+	emptyQueryURL?: string;
 	loading: boolean;
 	setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	prependVenues?: VenueDetails[];
 	optionSelectHandler: (
 		inputDataList?: BeerStringSearchResponse[] | VenueDetails[],
-		barcode?: number,
+		barcode?: string,
 		optionValue?: string,
 		combobox?: ComboboxStore,
 	) => Promise<void>;
@@ -52,9 +56,9 @@ export const SearchSelect = ({
 	apiURL,
 	placeholder,
 	emptyText,
+	emptyQueryURL,
 	loading,
 	setLoading,
-	prependVenues,
 	optionSelectHandler,
 	selectedBeer,
 	setSelectedBeer,
@@ -64,15 +68,13 @@ export const SearchSelect = ({
 	setVenueDetails,
 	leftSection = false,
 }: InputProps) => {
-	const mobile = isMobile();
+	const mobile = useIsMobile();
 
 	const [searchQuery, setSearchQuery] = useState("");
 	const [data, setData] = useState<
 		BeerStringSearchResponse[] | VenueDetails[] | undefined
 	>(undefined);
 	const [empty, setEmpty] = useState(false);
-
-	const abortController = useRef<AbortController | null>(null);
 
 	const [debouncedSearch] = useDebouncedValue(searchQuery, 300);
 
@@ -81,49 +83,40 @@ export const SearchSelect = ({
 	});
 
 	useEffect(() => {
-		const fetchData = async (query: string) => {
-			abortController.current?.abort();
-			abortController.current = new AbortController();
+		const query = debouncedSearch.trim();
 
-			if (!query) {
-				setData(undefined);
-				setLoading(false);
-				return;
-			}
+		if (!query && !emptyQueryURL) {
+			setData(undefined);
+			setEmpty(false);
+			setLoading(false);
+			return;
+		}
 
+		const controller = new AbortController();
+
+		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const response = await fetch(`${apiURL}/${query}`);
+				const url = query
+					? `${apiURL}/${encodeURIComponent(query)}`
+					: (emptyQueryURL as string);
+				const response = await apiFetch(url, { signal: controller.signal });
 				const responseData: VenueDetails[] = await response.json();
 
-				if (apiURL.includes("/venues") && prependVenues?.length) {
-					const merged = [...prependVenues, ...responseData].filter(
-						(venue, index, allVenues) =>
-							allVenues.findIndex(
-								(item) => item.venue_id === venue.venue_id,
-							) === index,
-					);
-
-					setData(merged);
-					setEmpty(merged.length === 0);
-					return;
-				}
-
 				setData(responseData);
-				setEmpty(responseData.length === 0);
+				// Nothing to suggest isn't "no results"
+				setEmpty(Boolean(query) && responseData.length === 0);
 			} catch (error) {
+				if (controller.signal.aborted) return;
 				console.error("Failed to get data", apiURL, error);
 			}
 			setLoading(false);
 		};
 
-		if (debouncedSearch.trim()) {
-			fetchData(debouncedSearch);
-		} else {
-			setData(undefined);
-			setEmpty(false);
-		}
-	}, [debouncedSearch, apiURL, prependVenues, setLoading]);
+		fetchData();
+
+		return () => controller.abort();
+	}, [debouncedSearch, apiURL, emptyQueryURL, setLoading]);
 
 	const VerifiedImageComponent = ({
 		is_verified,
@@ -140,6 +133,16 @@ export const SearchSelect = ({
 			/>
 		);
 	};
+
+	// Same yellow and size as the verified badge
+	const TemporaryVenueIcon = () => (
+		<IconConfettiFilled
+			size={16}
+			color="#FFCC00"
+			stroke={2}
+			style={{ flexShrink: 0 }}
+		/>
+	);
 
 	const TextComponents = ({
 		venue,
@@ -159,6 +162,34 @@ export const SearchSelect = ({
 
 	const options = (data || []).map((input) => {
 		if (apiURL.includes("/venues")) {
+			if ("venue_id" in input && input.temporary) {
+				return (
+					<Combobox.Option
+						value={input.venue_id.toString()}
+						key={input.venue_id}
+					>
+						{/* Same layout as Untappd venues, with a confetti icon */}
+						<Flex align="center">
+							<Box mr="xs" display="flex">
+								<TemporaryVenueIcon />
+							</Box>
+							<Flex
+								direction={mobile ? "column" : "row"}
+								justify="space-between"
+								w="100%"
+							>
+								<Text size="sm">{input.venue_name}</Text>
+								{input.venue_address && (
+									<Text size="sm" c="dimmed" fs="italic">
+										({input.venue_address})
+									</Text>
+								)}
+							</Flex>
+						</Flex>
+					</Combobox.Option>
+				);
+			}
+
 			if ("venue_id" in input && "is_verified" in input) {
 				const { venue_id, is_verified } = input;
 
@@ -207,6 +238,14 @@ export const SearchSelect = ({
 		return null;
 	});
 
+	// Temporary venues (uploaded in /admin) get their own group at the top
+	const isTemporary = (index: number) => {
+		const item = data?.[index];
+		return Boolean(item && "temporary" in item && item.temporary);
+	};
+	const hasTemporaryVenues = options.some((_, index) => isTemporary(index));
+	const hasUntappdVenues = options.some((_, index) => !isTemporary(index));
+
 	const selected = selectedBeer || selectedVenue;
 	const setDetails = setBeerDetails || setVenueDetails;
 	const setSelected = setSelectedBeer || setSelectedVenue;
@@ -246,7 +285,11 @@ export const SearchSelect = ({
 					onBlur={() => combobox.closeDropdown()}
 					leftSection={
 						leftSection &&
-						(selected ? (
+						(selected && "temporary" in selected && selected.temporary ? (
+							<Box mt="2px" display="flex">
+								<TemporaryVenueIcon />
+							</Box>
+						) : selected ? (
 							<Image
 								src={isVerified ? "verified.svg" : "unverified.svg"}
 								h={16}
@@ -274,11 +317,25 @@ export const SearchSelect = ({
 				/>
 			</Combobox.Target>
 
-			<Combobox.Dropdown hidden={data === null}>
+			{/* Hidden when there's nothing to show, e.g. before searching */}
+			<Combobox.Dropdown hidden={!options.some(Boolean) && !empty}>
 				<Combobox.Options>
 					{empty && <Combobox.Empty>{emptyText}</Combobox.Empty>}
 					<ScrollArea.Autosize type="scroll" mah={200}>
-						{options}
+						{hasTemporaryVenues ? (
+							<>
+								<Combobox.Group label="Temporary venues">
+									{options.filter((_, index) => isTemporary(index))}
+								</Combobox.Group>
+								{hasUntappdVenues && (
+									<Combobox.Group label="Untappd">
+										{options.filter((_, index) => !isTemporary(index))}
+									</Combobox.Group>
+								)}
+							</>
+						) : (
+							options
+						)}
 					</ScrollArea.Autosize>
 				</Combobox.Options>
 			</Combobox.Dropdown>

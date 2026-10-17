@@ -1,99 +1,120 @@
 import type { SessionUser } from "~/auth/auth.server";
-import { API_BASE_URL } from "../untappd/config";
+import {
+	getStylesNotHad as fetchStylesNotHad,
+	getUserLists as fetchUserLists,
+	getBadge,
+	getListView,
+} from "~/untappd/api.server";
+import { cached } from "~/untappd/cache.server";
+import { withFallback } from "~/untappd/client.server";
 
 const checkInsPerLevel = 5;
 
-const getStylesNotHad = async (user: SessionUser) => {
-	const url = `${API_BASE_URL}/badges/styles_not_had?access_token=${user.accessToken}`;
-	const response = await fetch(url);
+// Reloads within this window reuse the previous Untappd responses
+const cacheTtlMs = 60 * 1000;
 
-	if (!response.ok) {
-		console.error("Failed to get styles not had", response);
-		return [];
-	}
+const cachedForUser = <T>(
+	user: SessionUser,
+	key: string,
+	load: () => Promise<T>,
+) => cached(`${user.id}:${key}`, cacheTtlMs, load);
 
-	const data = await response.json();
+type StyleEntry = StylesInfo["styles"][number];
 
-	const outputData = data.response.items.map(
-		(item: { style_id: number; style_name: string }) => {
-			return {
-				styleId: item.style_id,
-				styleName: item.style_name,
-				had: false,
-			};
-		},
+const getStylesNotHad = async (user: SessionUser): Promise<StyleEntry[]> => {
+	const items = await withFallback(
+		cachedForUser(user, "styles-not-had", () =>
+			fetchStylesNotHad(user.accessToken),
+		),
+		[],
 	);
 
-	return outputData;
+	return items.map((item) => ({
+		styleId: item.style_id,
+		styleName: item.style_name,
+		had: false,
+	}));
 };
 
-const getStylesHad = async (user: SessionUser) => {
-	const url = `${API_BASE_URL}/badges/view/${user.wosBadgeId}?access_token=${user.accessToken}`;
-	const response = await fetch(url);
-
-	if (!response.ok) {
-		console.error("Failed to get styles had", response);
+const getStylesHad = async (user: SessionUser): Promise<StyleEntry[]> => {
+	if (!user.wosBadgeId) {
+		// User hasn't unlocked Wheel of Styles yet, so nothing is had
 		return [];
 	}
 
-	const data = (await response.json()) as {
-		response: {
-			badge: Badge;
-		};
-	};
-	const { special_status_list } = data.response.badge;
+	const { wosBadgeId } = user;
+	const badge = await withFallback(
+		cachedForUser(user, `badge:${wosBadgeId}`, () =>
+			getBadge(user.accessToken, wosBadgeId),
+		),
+		null,
+	);
+	const items = badge?.special_status_list.items[0]?.items ?? [];
 
-	const outputData = special_status_list.items[0].items.map((item) => {
-		return {
-			styleId: item.item_id,
-			styleName: item.item_name,
-			had: true,
-		};
-	});
-
-	return outputData;
+	return items.map((item) => ({
+		styleId: item.item_id,
+		styleName: item.item_name,
+		had: true,
+	}));
 };
 
-const getStylesInfo = async (user: SessionUser) => {
-	const stylesNotHad = await getStylesNotHad(user);
-	const stylesHad = await getStylesHad(user);
+const getStylesInfo = async (user: SessionUser): Promise<StylesInfo> => {
+	const [stylesNotHad, stylesHad] = await Promise.all([
+		getStylesNotHad(user),
+		getStylesHad(user),
+	]);
 
-	const hadLength = stylesHad.length;
-	const notHadLength = stylesNotHad.length;
-	const totalLength = hadLength + notHadLength;
+	const hadCount = stylesHad.length;
+	const notHadCount = stylesNotHad.length;
+	const totalCount = hadCount + notHadCount;
 
-	const stats = {
-		hadCount: hadLength,
-		notHadCount: notHadLength,
-		totalCount: totalLength,
-		level: {
-			currentLevel: Math.floor(hadLength / checkInsPerLevel),
-			progressToNext: hadLength % checkInsPerLevel,
-			checkInsPerLevel,
-			maxLevel: Math.floor(totalLength / checkInsPerLevel),
+	return {
+		styles: [...stylesNotHad, ...stylesHad],
+		stats: {
+			hadCount,
+			notHadCount,
+			totalCount,
+			level: {
+				currentLevel: Math.floor(hadCount / checkInsPerLevel),
+				progressToNext: hadCount % checkInsPerLevel,
+				checkInsPerLevel,
+				maxLevel: Math.floor(totalCount / checkInsPerLevel),
+			},
 		},
 	};
-
-	const payload = {
-		styles: [...stylesNotHad, ...stylesHad],
-		stats,
-	};
-
-	return payload;
 };
 
-const getUserLists = async (user: SessionUser): Promise<UserLists[]> => {
-	const url = `${API_BASE_URL}/custom_lists/userlists?access_token=${user.accessToken}`;
-	const response = await fetch(url);
+const getUserLists = (user: SessionUser): Promise<UserLists[]> =>
+	withFallback(
+		cachedForUser(user, "lists", () => fetchUserLists(user.accessToken)),
+		[],
+	);
 
-	if (!response.ok) {
-		console.error("Failed to get user lists", response);
-		return [];
+/** The selected stock list with the style ids of all its beers */
+const getStockList = async (
+	user: SessionUser,
+	listId: string | null,
+): Promise<StockListDetails | null> => {
+	if (!listId) {
+		return null;
 	}
 
-	const data = await response.json();
+	const list = await withFallback(
+		cachedForUser(user, `list:${listId}`, () =>
+			getListView(user.accessToken, listId),
+		),
+		null,
+	);
+	if (!list) {
+		return null;
+	}
 
-	return data.response.items;
+	return {
+		listId,
+		listName: list.list.list_name,
+		listItems: list.items,
+		styles: list.styles.items.map((style) => style.type_id),
+	};
 };
 
-export { getStylesInfo, getUserLists };
+export { getStockList, getStylesInfo, getUserLists };

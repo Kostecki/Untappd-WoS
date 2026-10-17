@@ -1,27 +1,14 @@
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
+import { checkBarcode } from "~/untappd/api.server";
+import { withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/barcode";
-import { API_BASE_URL } from "./config";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
-	const barcode = params.barcode;
-
-	const searchParams = new URLSearchParams({
-		upc: barcode,
-		access_token: user.accessToken,
-	});
-	const url = `${API_BASE_URL}/beer/checkbarcodemultiple?${searchParams}`;
-	const response = await fetch(url);
-
-	if (!response.ok) {
-		console.error("Failed to get beer(s) from barcode", response);
-		return Response.json([]);
-	}
-
-	const data = (await response.json()) as {
-		response: { items: BarcodeAPIResponse[] };
-	};
-	const { items } = data.response;
+	const user = await requireUser(request);
+	const items = await withFallback(
+		checkBarcode(user.accessToken, params.barcode),
+		[],
+	);
 
 	return Response.json(items);
 }

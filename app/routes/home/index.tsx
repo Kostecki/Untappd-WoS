@@ -1,30 +1,34 @@
 import { Box, Container, Grid } from "@mantine/core";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { redirect, useLoaderData } from "react-router";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useFetcher, useLoaderData } from "react-router";
 
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
 import { CheckBeer } from "~/components/CheckBeer";
 import { Profile } from "~/components/Profile";
 import { StylesTable } from "~/components/StylesTable";
 import { VenueStyles } from "~/components/VenueStyles";
 import { useUmamiIdentify } from "~/hooks/umami";
+import { getStockListId } from "~/settings.server";
 import { getSettings, Settings, setSettings } from "~/utils";
 import type { Route } from "./+types/index";
-import { getStylesInfo, getUserLists } from "./loader";
+import { getStockList, getStylesInfo, getUserLists } from "./loader";
 
 export function meta(_: Route.MetaArgs) {
 	return [{ title: "Wheel of Styles" }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
+	const sessionUser = await requireUser(request);
+	const stockListId = await getStockListId(request);
 
-	if (!user) {
-		throw redirect("/login");
-	}
+	const [stylesInfo, userLists, stockList] = await Promise.all([
+		getStylesInfo(sessionUser),
+		getUserLists(sessionUser),
+		getStockList(sessionUser, stockListId),
+	]);
 
-	const stylesInfo = await getStylesInfo(user);
-	const userLists = await getUserLists(user);
+	// Never send the Untappd access token to the browser
+	const { accessToken: _, ...user } = sessionUser;
 
 	const latestCommit = {
 		hash: process.env.LATEST_COMMIT_HASH ?? "No commit hash",
@@ -33,9 +37,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	const isProd = import.meta.env.PROD;
 
-	const mbccEnabled = process.env.MBCC_ENABLED !== "0";
-
-	return { user, stylesInfo, userLists, latestCommit, isProd, mbccEnabled };
+	return {
+		user,
+		stylesInfo,
+		userLists,
+		stockList,
+		latestCommit,
+		isProd,
+	};
 }
 
 const defaultProfileFilters: Filters = {
@@ -46,15 +55,28 @@ const defaultProfileFilters: Filters = {
 
 export default function Home() {
 	const data = useLoaderData<typeof loader>();
-	const { user, stylesInfo, userLists, latestCommit, mbccEnabled } = data;
+	const { user, stylesInfo, userLists, latestCommit } = data;
+	const stockListDetails = data.stockList ?? undefined;
+	const stockList: StockList | undefined = stockListDetails && {
+		listId: stockListDetails.listId,
+		listName: stockListDetails.listName,
+	};
 
 	const [profileFilters, setProfileFilters] = useState<Filters>(
 		defaultProfileFilters,
 	);
-	const [stockList, setStockList] = useState<StockList | undefined>(undefined);
-	const [stockListDetails, setStockListDetails] = useState<
-		StockListDetails | undefined
-	>(undefined);
+
+	// Saving the stock list sets a cookie; the loader then reloads with it
+	const stockListFetcher = useFetcher();
+	const setStockListId = useCallback(
+		(listId: string | null) => {
+			stockListFetcher.submit(
+				{ listId: listId ?? "" },
+				{ method: "post", action: "/settings/stock-list" },
+			);
+		},
+		[stockListFetcher.submit],
+	);
 
 	const { id: userId, email, userName: username } = user;
 	useUmamiIdentify(userId, email, username);
@@ -62,40 +84,23 @@ export default function Home() {
 	useLayoutEffect(() => {
 		const settings = getSettings();
 
-		if (Object.keys(settings).length === 0 && settings.constructor === Object) {
-			setSettings(Settings.STOCK_LIST, { listId: "", listName: "" });
-			setSettings(Settings.TABLE_FILTERS, defaultProfileFilters);
-		} else {
-			setStockList(settings.stockList);
+		if (settings.tableFilters) {
 			setProfileFilters(settings.tableFilters);
+		} else {
+			setSettings(Settings.TABLE_FILTERS, defaultProfileFilters);
 		}
 	}, []);
 
+	// One-time move of the stock list from localStorage to the cookie
 	useEffect(() => {
-		const fetchListDetails = async () => {
-			if (stockList?.listId) {
-				const listDetailsResponse = await fetch(
-					`/api/list/${stockList.listId}`,
-				);
-				const listDetails = await listDetailsResponse.json();
-				const { list_name, listItems, styles } = listDetails;
+		const legacyListId = getSettings(Settings.STOCK_LIST)?.listId;
+		if (!legacyListId) return;
 
-				const listBeerStyles = styles.items.map(
-					(styleList: StyleList) => styleList.type_id,
-				);
-
-				const stockListDetails: StockListDetails = {
-					listName: list_name,
-					listItems,
-					styles: listBeerStyles,
-				};
-
-				setStockListDetails(stockListDetails);
-			}
-		};
-
-		fetchListDetails();
-	}, [stockList]);
+		if (!data.stockList) {
+			setStockListId(legacyListId);
+		}
+		setSettings(Settings.STOCK_LIST, undefined);
+	}, [data.stockList, setStockListId]);
 
 	const filteredStyles = stylesInfo.styles.filter((style) => {
 		if (profileFilters.showHaveHad) {
@@ -133,13 +138,13 @@ export default function Home() {
 						userLists={userLists}
 						stockList={stockList}
 						stockListDetails={stockListDetails}
-						setStockList={setStockList}
+						setStockListId={setStockListId}
 						profileFilters={profileFilters}
 						setProfileFilters={setProfileFilters}
 						latestCommit={latestCommit}
 					/>
 					<Box my="md">
-						<VenueStyles styles={stylesInfo.styles} mbccEnabled={mbccEnabled} />
+						<VenueStyles styles={stylesInfo.styles} />
 					</Box>
 					<CheckBeer
 						styles={stylesInfo.styles}

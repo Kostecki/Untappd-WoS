@@ -1,69 +1,21 @@
-import { userSessionGet } from "~/auth/user.server";
+import { requireUser } from "~/auth/user.server";
+import { getBeerInfo } from "~/untappd/api.server";
+import { withFallback } from "~/untappd/client.server";
 import type { Route } from "./+types/beer";
-import { API_BASE_URL } from "./config";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-	const user = await userSessionGet(request);
-	const beerId = params.beerId;
+	const user = await requireUser(request);
+	const beer = await withFallback(
+		getBeerInfo(user.accessToken, params.beerId),
+		null,
+	);
 
-	const searchParams = new URLSearchParams({
-		access_token: user.accessToken,
-	});
-	const url = `${API_BASE_URL}/beer/info/${beerId}?${searchParams}`;
-	const response = await fetch(url);
-
-	if (!response.ok) {
-		console.error("Failed to get beers", response);
+	if (!beer) {
 		return Response.json([]);
 	}
 
-	const data = (await response.json()) as {
-		response: { beer: Beer & { stats: Stats; brewery: Brewery } };
-	};
-
-	const {
-		beer: {
-			bid,
-			beer_name,
-			beer_label,
-			beer_label_hd,
-			beer_abv,
-			beer_ibu,
-			beer_description,
-			beer_style,
-			is_in_production,
-			beer_slug,
-			is_homebrew,
-			created_at,
-			rating_count,
-			rating_score,
-			stats,
-			brewery,
-		},
-	} = data.response;
-
-	const payload = [
-		{
-			beer: {
-				bid,
-				beer_name,
-				beer_label,
-				beer_label_hd,
-				beer_abv,
-				beer_ibu,
-				beer_description,
-				beer_style,
-				is_in_production,
-				beer_slug,
-				is_homebrew,
-				created_at,
-				rating_count,
-				rating_score,
-				stats,
-			},
-			brewery,
-		},
-	] as BeerInfoResponse[];
+	const { brewery, ...beerDetails } = beer;
+	const payload: BeerInfoResponse[] = [{ beer: beerDetails, brewery }];
 
 	return Response.json(payload);
 }
