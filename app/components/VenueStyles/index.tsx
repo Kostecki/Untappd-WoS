@@ -98,6 +98,11 @@ export const VenueStyles = ({ styles }: InputProps) => {
 		combobox?.closeDropdown();
 	};
 
+	// Verified venues can still have no (or only empty) published menus
+	const hasPublishedMenu = Boolean(
+		venueDetails?.some((menu) => menu.total_item_count > 0),
+	);
+
 	const groupByStyles = (items: FlattenedMenuData["items"]) => {
 		return items
 			.reduce<{ beer_style: string; beers: typeof items }[]>((acc, item) => {
@@ -140,7 +145,14 @@ export const VenueStyles = ({ styles }: InputProps) => {
 				leftSection={true}
 			/>
 
-			{venueDetails && (
+			{venueDetails && !hasPublishedMenu && (
+				<Text fs="italic" c="dimmed" fw="500" ta="center" mt="xl" mb="xs">
+					{selectedVenue?.venue_name ?? "This venue"} hasn't published a menu on
+					Untappd
+				</Text>
+			)}
+
+			{venueDetails && hasPublishedMenu && (
 				<Box mt="lg">
 					<Tabs
 						// Remount per venue so the default tab follows the new menus
