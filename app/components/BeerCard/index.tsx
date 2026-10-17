@@ -1,13 +1,4 @@
-import {
-	Badge,
-	Card,
-	Flex,
-	Group,
-	Rating,
-	Stack,
-	Text,
-	Tooltip,
-} from "@mantine/core";
+import { Badge, Card, Flex, Group, Rating, Stack, Text } from "@mantine/core";
 import { IconCircleFilled, IconExternalLink } from "@tabler/icons-react";
 
 import countryToEmoji from "~/countries";
@@ -61,14 +52,9 @@ export const BeerCard = ({
 								</Badge>
 							)}
 							{styleCoveredBy && (
-								<Tooltip
-									label={`A beer in this style is on "${styleCoveredBy}"`}
-									withArrow
-								>
-									<Badge size="xs" variant="outline" color="untappd">
-										Style on your list
-									</Badge>
-								</Tooltip>
+								<Badge size="xs" variant="dot" color="untappd">
+									Style on your list
+								</Badge>
 							)}
 						</Group>
 						<Text size="sm" fs="italic" c="gray">
