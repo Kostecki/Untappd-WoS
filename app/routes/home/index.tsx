@@ -124,7 +124,7 @@ export default function Home() {
 
 	return (
 		<Container size="1200">
-			<Grid mt="lg">
+			<Grid my="lg">
 				<Grid.Col span={{ base: 12, lg: 6 }} order={{ base: 2, lg: 1 }}>
 					<StylesTable
 						styles={filteredStyles}
