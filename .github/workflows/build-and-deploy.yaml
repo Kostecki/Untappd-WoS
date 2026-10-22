@@ -24,7 +24,7 @@ concurrency:
 jobs:
   checks:
     name: Checks
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
 
@@ -139,7 +139,7 @@ jobs:
     name: Publish image
     needs: build-and-push_image
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       packages: write
@@ -187,7 +187,7 @@ jobs:
 
   deploy:
     name: Deploy
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: publish-image
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
 
