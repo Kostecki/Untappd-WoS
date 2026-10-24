@@ -3,7 +3,7 @@ services:
     image: ghcr.io/kostecki/wheel-of-styles:latest
     restart: unless-stopped
     container_name: wheel-of-styles
-    hostname: ${APP_HOSTNAME:-wheel-of-styles}
+    hostname: wheel-of-styles
     ports:
       - ${APP_PORT:-3000}:3000
     environment:
