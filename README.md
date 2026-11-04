@@ -1,4 +1,5 @@
 # Wheel of Styles
+
 ##### Keep track of your progress towards completing the Wheel of Styles badge
 
 - View your level progress

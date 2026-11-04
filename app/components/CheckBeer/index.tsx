@@ -33,6 +33,37 @@ enum searchOptions {
 	BARCODE,
 }
 
+const HaveHadStatus = ({
+	beer,
+	stockListDetails,
+}: {
+	beer: BeerWithStylesHad;
+	stockListDetails: StockListDetails | undefined;
+}) => {
+	const { style_had } = beer.beer;
+	const haveStyleInStock = isStyleOnList(stockListDetails, beer.beer);
+	const haveButNotDrunk = !style_had && haveStyleInStock;
+
+	const text = style_had ? "Yes" : "No";
+
+	return (
+		<Text size="sm" c="dimmed">
+			Had style: {text}
+			{haveButNotDrunk && (
+				<Box component="span">
+					<Text component="span" size="sm" c="dimmed">
+						, But on list:{" "}
+						<Text fs="italic" component="span">
+							"{stockListDetails?.listName}"
+						</Text>
+					</Text>
+					<Divider orientation="vertical" />
+				</Box>
+			)}
+		</Text>
+	);
+};
+
 export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 	const [loading, setLoading] = useState(false);
 	const [selectedBeer, setSelectedBeer] = useState<
@@ -116,31 +147,6 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 		}
 
 		return undefined;
-	};
-
-	const HaveHadStatus = ({ beer }: { beer: BeerWithStylesHad }) => {
-		const { style_had } = beer.beer;
-		const haveStyleInStock = isStyleOnList(stockListDetails, beer.beer);
-		const haveButNotDrunk = !style_had && haveStyleInStock;
-
-		const text = style_had ? "Yes" : "No";
-
-		return (
-			<Text size="sm" c="dimmed">
-				Had style: {text}
-				{haveButNotDrunk && (
-					<Box component="span">
-						<Text component="span" size="sm" c="dimmed">
-							, But on list:{" "}
-							<Text fs="italic" component="span">
-								"{stockListDetails?.listName}"
-							</Text>
-						</Text>
-						<Divider orientation="vertical" />
-					</Box>
-				)}
-			</Text>
-		);
 	};
 
 	return (
@@ -267,7 +273,10 @@ export const CheckBeer = ({ styles, stockListDetails }: InputProps) => {
 										<Divider my="xs" opacity={0.5} />
 										<Group justify="space-between">
 											<Group>
-												<HaveHadStatus beer={beer} />
+												<HaveHadStatus
+													beer={beer}
+													stockListDetails={stockListDetails}
+												/>
 												<Divider orientation="vertical" />
 												<Text ta="center" size="sm" c="dimmed">
 													Had beer: {hadBeer()}
