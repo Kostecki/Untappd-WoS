@@ -1,5 +1,5 @@
 # Same Node version as CI (.github/actions/setup/action.yml)
-FROM node:24.21.0-slim
+FROM node:26.13.0-slim
 
 ENV NODE_ENV=production
 ENV HOSTNAME="0.0.0.0"
