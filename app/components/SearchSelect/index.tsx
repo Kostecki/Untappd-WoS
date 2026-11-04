@@ -52,6 +52,44 @@ interface InputProps {
 	leftSection?: boolean;
 }
 
+const VerifiedImageComponent = ({ is_verified }: { is_verified: boolean }) => {
+	return (
+		<Image
+			src={is_verified ? "verified.svg" : "unverified.svg"}
+			h="16"
+			w="16"
+			style={{ opacity: is_verified ? 1 : 0.3 }}
+			mr="xs"
+		/>
+	);
+};
+
+// Same yellow and size as the verified badge
+const TemporaryVenueIcon = () => (
+	<IconConfettiFilled
+		size={16}
+		color="#FFCC00"
+		stroke={2}
+		style={{ flexShrink: 0 }}
+	/>
+);
+
+const TextComponents = ({
+	venue,
+}: {
+	venue: { venue_name: string; venue_city: string; venue_country: string };
+}) => {
+	const { venue_name, venue_city, venue_country } = venue;
+	return (
+		<>
+			<Text size="sm">{venue_name}</Text>
+			<Text size="sm" c="dimmed" fs="italic">
+				({venue_city}, {venue_country})
+			</Text>
+		</>
+	);
+};
+
 export const SearchSelect = ({
 	apiURL,
 	placeholder,
@@ -117,48 +155,6 @@ export const SearchSelect = ({
 
 		return () => controller.abort();
 	}, [debouncedSearch, apiURL, emptyQueryURL, setLoading]);
-
-	const VerifiedImageComponent = ({
-		is_verified,
-	}: {
-		is_verified: boolean;
-	}) => {
-		return (
-			<Image
-				src={is_verified ? "verified.svg" : "unverified.svg"}
-				h="16"
-				w="16"
-				style={{ opacity: is_verified ? 1 : 0.3 }}
-				mr="xs"
-			/>
-		);
-	};
-
-	// Same yellow and size as the verified badge
-	const TemporaryVenueIcon = () => (
-		<IconConfettiFilled
-			size={16}
-			color="#FFCC00"
-			stroke={2}
-			style={{ flexShrink: 0 }}
-		/>
-	);
-
-	const TextComponents = ({
-		venue,
-	}: {
-		venue: { venue_name: string; venue_city: string; venue_country: string };
-	}) => {
-		const { venue_name, venue_city, venue_country } = venue;
-		return (
-			<>
-				<Text size="sm">{venue_name}</Text>
-				<Text size="sm" c="dimmed" fs="italic">
-					({venue_city}, {venue_country})
-				</Text>
-			</>
-		);
-	};
 
 	const options = (data || []).map((input) => {
 		if (apiURL.includes("/venues")) {

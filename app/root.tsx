@@ -57,6 +57,15 @@ const umami = {
 	websiteId: "84995db7-3b4e-4c2e-8b0c-7f6c8c88f920",
 };
 
+const UmamiScript = () => {
+	const isProd = import.meta.env.PROD;
+	if (!isProd) return null;
+
+	return (
+		<script defer src={umami.src} data-website-id={umami.websiteId}></script>
+	);
+};
+
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 	{
@@ -80,15 +89,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
 	const loaderData = useLoaderData<typeof loader>();
 	const toast = loaderData?.toast;
-
-	const UmamiScript = () => {
-		const isProd = import.meta.env.PROD;
-		if (!isProd) return null;
-
-		return (
-			<script defer src={umami.src} data-website-id={umami.websiteId}></script>
-		);
-	};
 
 	useEffect(() => {
 		if (toast) {

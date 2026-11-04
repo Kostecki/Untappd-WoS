@@ -33,6 +33,22 @@ interface InputProps {
 	latestCommit: LatestCommit;
 }
 
+const BadgeLabel = () => (
+	<Text size="md" ta="center" fw="bold">
+		Badge
+	</Text>
+);
+const StyleLabel = () => (
+	<Text size="md" ta="center" fw="bold">
+		Style
+	</Text>
+);
+const LevelLabel = () => (
+	<Text size="md" ta="center" fw="bold">
+		Level
+	</Text>
+);
+
 export const Profile = ({
 	user,
 	stylesInfo,
@@ -80,22 +96,6 @@ export const Profile = ({
 		setProfileFilters(newFilters);
 		setSettings(Settings.TABLE_FILTERS, newFilters);
 	};
-
-	const BadgeLabel = () => (
-		<Text size="md" ta="center" fw="bold">
-			Badge
-		</Text>
-	);
-	const StyleLabel = () => (
-		<Text size="md" ta="center" fw="bold">
-			Style
-		</Text>
-	);
-	const LevelLabel = () => (
-		<Text size="md" ta="center" fw="bold">
-			Level
-		</Text>
-	);
 
 	return (
 		<Card shadow="sm" padding="lg" radius="md" withBorder>

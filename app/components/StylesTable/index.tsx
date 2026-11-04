@@ -127,19 +127,8 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 								style.styleId,
 							);
 
-							const ShowHaveStyleInStock = () => {
-								if (haveStyleInStock) {
-									const beer = findBeerByStyle(style.styleId);
-
-									if (beer) {
-										return (
-											<Text fw="500" size="xs" ml="sm" fs="italic" c="dimmed">
-												On list: {stockListDetails?.listName}
-											</Text>
-										);
-									}
-								}
-							};
+							const showOnList =
+								haveStyleInStock && findBeerByStyle(style.styleId);
 
 							return (
 								<Fragment key={style.styleId}>
@@ -163,7 +152,17 @@ export const StylesTable = ({ styles, stockListDetails }: InputProps) => {
 													<Text fw="500" size="xs" ml="sm">
 														{style.styleName}
 													</Text>
-													<ShowHaveStyleInStock />
+													{showOnList && (
+														<Text
+															fw="500"
+															size="xs"
+															ml="sm"
+															fs="italic"
+															c="dimmed"
+														>
+															On list: {stockListDetails?.listName}
+														</Text>
+													)}
 												</Stack>
 											</Flex>
 										</Table.Td>
