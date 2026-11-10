@@ -62,7 +62,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           files=$(gh pr diff "$PR" --name-only -R "$GITHUB_REPOSITORY")
-          if grep -qxE 'Dockerfile|\.dockerignore|pnpm-lock\.yaml|pnpm-workspace\.yaml|\.github/workflows/build-and-deploy\.yaml|\.github/actions/setup/.*' <<< "$files"; then
+          if grep -qxE 'Dockerfile|\.dockerignore|pnpm-lock\.yaml|pnpm-workspace\.yaml|mise\.toml|\.github/workflows/build-and-deploy\.yaml|\.github/actions/setup/.*' <<< "$files"; then
             echo "image=true" >> "$GITHUB_OUTPUT"
           fi
 
