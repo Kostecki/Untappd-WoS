@@ -177,7 +177,6 @@ Venue menus go through:
 > `name`/`style` are the venue's display values (e.g. `"1. Darkness (Nitro)"`);
 > `original_name`/`original_style` are the Untappd values.
 
-
 ```ts
 {
   venue_id: number;
