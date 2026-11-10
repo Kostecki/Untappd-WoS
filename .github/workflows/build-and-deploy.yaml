@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-  # Checks and a test image build; nothing is pushed or deployed
+  # Checks, plus a test image build when the PR changes what goes into the image;
+  # nothing is pushed or deployed
   pull_request:
     branches:
       - main
@@ -27,6 +28,10 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
+      pull-requests: read
+    outputs:
+      # Build the image on main/manual runs, and on PRs that change what goes into it
+      image: ${{ github.event_name != 'pull_request' || steps.changes.outputs.image == 'true' }}
 
     steps:
       - name: Checkout repository
@@ -46,11 +51,27 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Build
+        run: pnpm build
+
+      - name: Does this PR change the image?
+        id: changes
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          files=$(gh pr diff "$PR" --name-only -R "$GITHUB_REPOSITORY")
+          if grep -qxE 'Dockerfile|\.dockerignore|pnpm-lock\.yaml|pnpm-workspace\.yaml|\.github/workflows/build-and-deploy\.yaml|\.github/actions/setup/.*' <<< "$files"; then
+            echo "image=true" >> "$GITHUB_OUTPUT"
+          fi
+
   # Each platform builds natively on its own runner and is pushed by digest;
   # publish-image combines them into one multi-platform image
   build-and-push_image:
     name: Build image (${{ matrix.arch }})
     needs: checks
+    if: needs.checks.outputs.image == 'true'
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
@@ -103,7 +124,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Pull requests build both platforms but push nothing
+      # Pull requests (that change the image) build both platforms but push nothing
       - name: Build and push Docker image by digest
         id: build
         uses: docker/build-push-action@v7.4.0
