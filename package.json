@@ -14,17 +14,17 @@
     "venues:jonpacker": "node ./scripts/jonpacker-to-csv.mjs"
   },
   "dependencies": {
-    "@mantine/core": "9.7.5",
-    "@mantine/dropzone": "9.7.5",
-    "@mantine/hooks": "9.7.5",
-    "@mantine/notifications": "9.7.5",
+    "@mantine/core": "9.8.0",
+    "@mantine/dropzone": "9.8.0",
+    "@mantine/hooks": "9.8.0",
+    "@mantine/notifications": "9.8.0",
     "@react-router/node": "8.5.1",
     "@react-router/serve": "8.5.1",
     "@tabler/icons-react": "3.51.0",
     "barcode-detector": "3.2.3",
     "dotenv-cli": "11.1.0",
     "exceljs": "4.4.0",
-    "isbot": "5.2.2",
+    "isbot": "5.2.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-router": "8.5.1",
@@ -46,7 +46,7 @@
     "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "7.0.1",
     "typescript": "7.0.2",
-    "vite": "8.3.6",
+    "vite": "8.3.7",
     "vitest": "5.1.0"
   }
 }
