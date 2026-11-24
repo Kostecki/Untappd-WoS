@@ -1,7 +1,7 @@
 {
   "name": "untappd-wos",
   "private": true,
-  "packageManager": "pnpm@12.21.0",
+  "packageManager": "pnpm@12.22.0",
   "type": "module",
   "scripts": {
     "build": "react-router build",
@@ -14,10 +14,10 @@
     "venues:jonpacker": "node ./scripts/jonpacker-to-csv.mjs"
   },
   "dependencies": {
-    "@mantine/core": "9.8.1",
-    "@mantine/dropzone": "9.8.1",
-    "@mantine/hooks": "9.8.1",
-    "@mantine/notifications": "9.8.1",
+    "@mantine/core": "9.8.2",
+    "@mantine/dropzone": "9.8.2",
+    "@mantine/hooks": "9.8.2",
+    "@mantine/notifications": "9.8.2",
     "@react-router/node": "8.5.2",
     "@react-router/serve": "8.5.2",
     "@tabler/icons-react": "3.52.0",
