@@ -231,11 +231,11 @@ importers:
         specifier: 3.11.1
         version: 3.11.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@16.13.1)(react@19.3.1)(redux@5.0.1)
       remix-auth:
-        specifier: 4.2.0
-        version: 4.2.0
+        specifier: 5.0.0
+        version: 5.0.0
       remix-auth-form:
         specifier: 3.0.0
-        version: 3.0.0(remix-auth@4.2.0)
+        version: 3.0.0(remix-auth@5.0.0)
       remix-toast:
         specifier: 4.0.0
         version: 4.0.0(react-router@8.5.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
@@ -425,6 +425,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@edgefirst-dev/data@0.0.4':
+    resolution: {integrity: sha512-VLhlvEPDJ0Sd0pE6sAYTQkIqZCXVonaWlgRJIQQHzfjTXCadF77qqHj5NxaPSc4wCul0DJO/0MnejVqJAXUiRg==}
+    engines: {node: '>=20.0.0'}
+
   '@emnapi/core@2.0.0-beta.2':
     resolution: {integrity: sha512-MzCVoWtcg4Pm2B3je5mMvYMvj3MmBKw+fU7vbsJc9/iT8ip6/eYIHo/Dsm/mr+wsHB6SEyJDuxB09Yy6r/8+4A==}
 
@@ -584,8 +588,20 @@ packages:
       react-redux:
         optional: true
 
+  '@remix-run/headers@1.1.1':
+    resolution: {integrity: sha512-pIUErNdqYYx8zCVqMcLfZbrXC8BDufMliG2wvaYy57LJKz5OvkYHrqXl5yMlDcM/dac+DpM36A4nOzGx60ZfGg==}
+
+  '@remix-run/html-template@1.0.0':
+    resolution: {integrity: sha512-XX2VgVMf4d8Mk3bvcDkHqHQEfXLjny8SE5QApXaTbc7F2BpuQbtTVji2d8Aqlo7U4V5ZGOPZqdbGhwjI2Iknqw==}
+
+  '@remix-run/mime@1.0.0':
+    resolution: {integrity: sha512-oOPL/TMsNIbfNpSzjtZhTmIeqfgCYM3mQOYs13UsHKTmgLRgKfiNz4B1q/SN3juhCrtPwDwjwUEx1Vn8vp9SEg==}
+
   '@remix-run/node-fetch-server@0.14.1':
     resolution: {integrity: sha512-pKenF5ysIN5lDCnCyvoUxDhKP0tfnGagvGbZh01xxHG6DJXSIXWVC9NpLSDGjxcxd1CKdCOKuZFleXBF3pChIg==}
+
+  '@remix-run/response@1.0.3':
+    resolution: {integrity: sha512-uq/1JbZ8FaUyZhL+atu48gRNLg4dOrwp0071yjANfKTv50kSTtq0y8gha/Rmpeja5S6P+eRIr9yZz9XGHmGf3A==}
 
   '@remix-run/route-pattern@0.22.1':
     resolution: {integrity: sha512-czdGJWh09Lapvcqt7Vb09KlrU2PhRJ8xQaI+AItTuD9aDJ5MAgxnS38lnys6Ll+6RJEqPiaUqTwIQhVLwFvv+w==}
@@ -2188,8 +2204,8 @@ packages:
     peerDependencies:
       remix-auth: ^4.0.0
 
-  remix-auth@4.2.0:
-    resolution: {integrity: sha512-3LSfWEvSgG2CgbG/p4ge5hbV8tTXWNnnYIGbTr9oSSiHz9dD7wh6S0MEyo3pwh7MlKezB2WIlevGeyqUZykk7g==}
+  remix-auth@5.0.0:
+    resolution: {integrity: sha512-Mhv2Vmf6/wxlRNK6wS6M33Ubkd3wc8OpZ/se4pFfxJks3hzbsh8zp6emMpE6tTuJ1KiHsKilMBs708zwkJCNJA==}
     engines: {node: '>=20.0.0'}
 
   remix-toast@4.0.0:
@@ -2790,6 +2806,8 @@ snapshots:
   '@biomejs/cli-win32-x64@2.6.8':
     optional: true
 
+  '@edgefirst-dev/data@0.0.4': {}
+
   '@emnapi/core@2.0.0-beta.2':
     dependencies:
       '@emnapi/wasi-threads': 2.2.0
@@ -2994,7 +3012,19 @@ snapshots:
       react: 19.3.1
       react-redux: 9.2.0(@types/react@19.3.0)(react@19.3.1)(redux@5.0.1)
 
+  '@remix-run/headers@1.1.1': {}
+
+  '@remix-run/html-template@1.0.0': {}
+
+  '@remix-run/mime@1.0.0': {}
+
   '@remix-run/node-fetch-server@0.14.1': {}
+
+  '@remix-run/response@1.0.3':
+    dependencies:
+      '@remix-run/headers': 1.1.1
+      '@remix-run/html-template': 1.0.0
+      '@remix-run/mime': 1.0.0
 
   '@remix-run/route-pattern@0.22.1': {}
 
@@ -4553,11 +4583,16 @@ snapshots:
       gopd: 1.2.0
       set-function-name: 2.0.2
 
-  remix-auth-form@3.0.0(remix-auth@4.2.0):
+  remix-auth-form@3.0.0(remix-auth@5.0.0):
     dependencies:
-      remix-auth: 4.2.0
+      remix-auth: 5.0.0
 
-  remix-auth@4.2.0: {}
+  remix-auth@5.0.0:
+    dependencies:
+      '@edgefirst-dev/data': 0.0.4
+      '@remix-run/headers': 1.1.1
+      '@remix-run/response': 1.0.3
+      type-fest: 5.10.0
 
   remix-toast@4.0.0(react-router@8.5.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)):
     dependencies:
